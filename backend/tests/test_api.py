@@ -143,3 +143,132 @@ def test_admin_sets_listing_status(client):
     admin = headers(client, "admin_terracrest")
     r = client.patch("/admin/listings/BL-BLR-2026-008/status", headers=admin, json={"status": "under-offer"})
     assert r.status_code == 200 and r.json()["status"] == "under-offer"
+
+
+def test_admin_creates_listing(client):
+    admin = headers(client, "admin_terracrest")
+    payload = {
+        "id": "JD-BLR-2026-099", "vertical": "joint-development", "headline": "Test parcel",
+        "localityLabel": "Test locality", "areaLabel": "~ 1 acre", "landAreaSqft": 43560,
+        "zoning": "Residential", "localityNote": "Test note", "ownerId": "landowner_ramanathan_002",
+        "guidanceLow": 40, "guidanceHigh": 50, "areaLat": 13.2, "areaLng": 77.7, "areaRadiusKm": 3.0,
+        "address": "Test address", "ownerName": "Test Owner", "surveyNos": "1/1, 1/2", "contact": "+91 000",
+        "exactLat": 13.21, "exactLng": 77.71, "plotAreaSqft": 43560, "fsi": 2.0, "floors": 10,
+        "towers": 2, "avgUnitSqft": 1200, "baseSalePsf": 7000,
+    }
+    r = client.post("/admin/listings", headers=admin, json=payload)
+    assert r.status_code == 201
+    assert r.json()["id"] == "JD-BLR-2026-099" and r.json()["status"] == "verified"
+    # appears in discovery, sealed withheld from a builder without NDA, and has a vault
+    builder = headers(client, "builder_rajesh_001")
+    assert "JD-BLR-2026-099" in [l["id"] for l in client.get("/listings", headers=builder).json()]
+    assert not client.get("/listings/JD-BLR-2026-099", headers=builder).json().get("sealed")
+    assert len(client.get("/listings/JD-BLR-2026-099/documents", headers=admin).json()) == 4
+
+
+def test_admin_create_listing_rejects_duplicate(client):
+    admin = headers(client, "admin_terracrest")
+    dup = {
+        "id": "JD-BLR-2026-012", "vertical": "joint-development", "headline": "x", "localityLabel": "x",
+        "areaLabel": "x", "landAreaSqft": 1, "zoning": "x", "localityNote": "x", "ownerId": "landowner_ramanathan_002",
+        "guidanceLow": 1, "guidanceHigh": 2, "areaLat": 0, "areaLng": 0, "areaRadiusKm": 1, "address": "x",
+        "ownerName": "x", "surveyNos": "1", "contact": "x", "exactLat": 0, "exactLng": 0, "plotAreaSqft": 1,
+        "fsi": 1, "floors": 1, "towers": 1, "avgUnitSqft": 1, "baseSalePsf": 1,
+    }
+    assert client.post("/admin/listings", headers=admin, json=dup).status_code == 409
+
+
+# ------------------------------------------------------------- deal room
+def test_deal_room_gated_and_post(client):
+    rajesh = headers(client, "builder_rajesh_001")  # has NDA on JD-012
+    priya = headers(client, "builder_priya_003")  # no NDA on JD-012
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 3
+    assert client.get("/listings/JD-BLR-2026-012/messages", headers=priya).json() == []
+    assert client.post("/listings/JD-BLR-2026-012/messages", headers=priya, json={"body": "hi"}).status_code == 403
+    r = client.post("/listings/JD-BLR-2026-012/messages", headers=rajesh, json={"body": "Following up on the site walk."})
+    assert r.status_code == 201 and r.json()["authorId"] == "builder_rajesh_001"
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 4
+
+
+# ------------------------------------------------- admin user management
+def test_admin_user_management(client):
+    admin = headers(client, "admin_terracrest")
+    # reset password: temp works, old fails
+    r = client.patch("/admin/users/builder_priya_003/password", headers=admin)
+    assert r.status_code == 200
+    temp = r.json()["tempPassword"]
+    assert client.post("/auth/login", json={"username": "builder_priya_003", "password": "demo"}).status_code == 401
+    assert client.post("/auth/login", json={"username": "builder_priya_003", "password": temp}).status_code == 200
+    # deactivate blocks login (403), reactivate restores it
+    assert client.patch("/admin/users/builder_priya_003/active", headers=admin, json={"active": False}).status_code == 200
+    assert client.post("/auth/login", json={"username": "builder_priya_003", "password": temp}).status_code == 403
+    client.patch("/admin/users/builder_priya_003/active", headers=admin, json={"active": True})
+    assert client.post("/auth/login", json={"username": "builder_priya_003", "password": temp}).status_code == 200
+    # toggle KYC
+    r = client.patch("/admin/users/builder_priya_003/kyc", headers=admin, json={"verified": False})
+    assert r.status_code == 200 and r.json()["kycVerified"] is False
+
+
+# ------------------------------------------------------------- price book
+def test_pricebook_read_and_admin_update(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    admin = headers(client, "admin_terracrest")
+    # any authenticated user can read the live rates the Studio prices against
+    r = client.get("/pricebook", headers=rajesh)
+    assert r.status_code == 200
+    pb = r.json()
+    assert pb["baseBuildPsf"] == 2150 and pb["rates"]["flooring:mid"] == 85
+    # non-admin cannot rewrite the book
+    assert client.patch("/admin/pricebook", headers=rajesh, json={"baseBuildPsf": 1, "rates": {}}).status_code == 403
+    # admin update persists and is served on the next read
+    new_rates = dict(pb["rates"], **{"flooring:mid": 99})
+    up = client.patch("/admin/pricebook", headers=admin, json={"baseBuildPsf": 2300, "rates": new_rates})
+    assert up.status_code == 200 and up.json()["baseBuildPsf"] == 2300
+    assert client.get("/pricebook", headers=rajesh).json()["rates"]["flooring:mid"] == 99
+
+
+# ---------------------------------------------------------- activity feed
+def test_activity_feed_admin_only_and_grows(client):
+    rajesh = headers(client, "builder_rajesh_001")  # has NDA on JD-012
+    admin = headers(client, "admin_terracrest")
+    # the audit feed is admin-only
+    assert client.get("/admin/activity", headers=rajesh).status_code == 403
+    before = client.get("/admin/activity", headers=admin).json()
+    assert len(before) >= 6  # seeded history
+    # consequential actions append events; the feed reflects them
+    client.post("/listings/JD-BLR-2026-012/messages", headers=rajesh, json={"body": "Audit me."})
+    client.get("/listings/JD-BLR-2026-012/documents/JD-BLR-2026-012-title-deed", headers=rajesh)
+    after = client.get("/admin/activity", headers=admin).json()
+    assert len(after) > len(before)
+    kinds = {ev["kind"] for ev in after}
+    assert {"login", "message", "document"} <= kinds
+    # returned newest-first (non-increasing timestamps)
+    stamps = [ev["createdAt"] for ev in after]
+    assert stamps == sorted(stamps, reverse=True)
+
+
+# ------------------------------------------------- architect validation
+def test_architect_review_flow(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    admin = headers(client, "admin_terracrest")
+    snap = {"units": 120, "saleableSqft": 170000, "baseNet": 800000000, "constructionCost": 700000000, "salePsf": 8000}
+    # a builder commissions validation
+    r = client.post("/architect-reviews", headers=rajesh, json={"listingId": "JD-BLR-2026-012", "mlSnapshot": snap})
+    assert r.status_code == 201
+    review = r.json()
+    assert review["status"] == "requested" and review["fee"] == 250000 and review["mlSnapshot"]["baseNet"] == 800000000
+    rid = review["id"]
+    # it shows up in the builder's own list and the admin queue
+    assert any(x["id"] == rid for x in client.get("/me/architect-reviews", headers=rajesh).json())
+    assert any(x["id"] == rid for x in client.get("/admin/architect-reviews", headers=admin).json())
+    # the desk delivers the architect's validated figure
+    payload = {"architectName": "Test Architect · CoA 1", "architectGdv": 775000000, "architectNotes": "Trimmed for NBC."}
+    d = client.patch(f"/admin/architect-reviews/{rid}", headers=admin, json=payload)
+    assert d.status_code == 200
+    body = d.json()
+    assert body["status"] == "delivered" and body["architectGdv"] == 775000000 and body["deliveredAt"]
+    # the builder now sees the delivered validation
+    mine = {x["id"]: x for x in client.get("/me/architect-reviews", headers=rajesh).json()}
+    assert mine[rid]["status"] == "delivered" and mine[rid]["architectName"] == "Test Architect · CoA 1"
+    # a non-admin cannot deliver
+    assert client.patch(f"/admin/architect-reviews/{rid}", headers=rajesh, json=payload).status_code == 403

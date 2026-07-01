@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Terracrest backup nightly at 02:30
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true          # catch up if the machine was asleep at 02:30
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

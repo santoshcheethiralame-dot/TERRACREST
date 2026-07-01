@@ -25,6 +25,7 @@ class UserOut(CamelModel):
     role: str
     office_location: Optional[str] = None
     kyc_verified: bool
+    active: bool = True
     member_since: str
 
 
@@ -100,6 +101,19 @@ class DocumentOut(CamelModel):
     kind: str
 
 
+class MessageOut(CamelModel):
+    id: str
+    listing_id: str
+    author_id: str
+    author_name: str
+    body: str
+    created_at: str
+
+
+class PostMessageRequest(BaseModel):
+    body: str
+
+
 class DealOut(CamelModel):
     id: str
     listing_id: str
@@ -126,8 +140,107 @@ class CreateNdaRequest(BaseModel):
     listingId: str
 
 
+class SetActiveRequest(BaseModel):
+    active: bool
+
+
+class SetKycRequest(BaseModel):
+    verified: bool
+
+
+class PasswordResetOut(CamelModel):
+    temp_password: str
+
+
+class ArchitectReviewOut(CamelModel):
+    id: str
+    listing_id: str
+    builder_id: str
+    builder_name: str = ""
+    status: str
+    fee: int
+    ml_snapshot: dict
+    architect_name: Optional[str] = None
+    architect_gdv: Optional[int] = None
+    architect_notes: Optional[str] = None
+    requested_at: str
+    delivered_at: Optional[str] = None
+
+
+class RequestArchitectReviewRequest(BaseModel):
+    listingId: str
+    mlSnapshot: dict
+
+
+class DeliverArchitectReviewRequest(BaseModel):
+    architectName: str
+    architectGdv: int
+    architectNotes: str = ""
+
+
+def serialize_architect_review(r: "models.ArchitectReview", builder_name: str) -> ArchitectReviewOut:
+    return ArchitectReviewOut(
+        id=r.id, listing_id=r.listing_id, builder_id=r.builder_id, builder_name=builder_name,
+        status=r.status, fee=r.fee, ml_snapshot=r.ml_snapshot,
+        architect_name=r.architect_name, architect_gdv=r.architect_gdv, architect_notes=r.architect_notes,
+        requested_at=r.requested_at, delivered_at=r.delivered_at,
+    )
+
+
+class ActivityEventOut(CamelModel):
+    id: str
+    actor_id: Optional[str] = None
+    actor_name: str
+    kind: str
+    listing_id: Optional[str] = None
+    summary: str
+    created_at: str
+
+
+class PriceBookOut(CamelModel):
+    base_build_psf: int
+    rates: dict
+
+
+class UpdatePriceBookRequest(BaseModel):
+    baseBuildPsf: int
+    rates: dict
+
+
 class UpdateStatusRequest(BaseModel):
     status: str
+
+
+class CreateListingRequest(BaseModel):
+    id: str
+    vertical: str
+    headline: str
+    localityLabel: str
+    areaLabel: str
+    landAreaSqft: int
+    zoning: str
+    localityNote: str
+    ownerId: str
+    guidanceLow: int
+    guidanceHigh: int
+    # public map (coarse, pre-NDA)
+    areaLat: float
+    areaLng: float
+    areaRadiusKm: float
+    # sealed (unlock-only)
+    address: str
+    ownerName: str
+    surveyNos: str  # comma-separated
+    contact: str
+    exactLat: float
+    exactLng: float
+    # feasibility (drives the Studio)
+    plotAreaSqft: int
+    fsi: float
+    floors: int
+    towers: int
+    avgUnitSqft: int
+    baseSalePsf: int
 
 
 def serialize_listing(listing: "models.Listing", include_sealed: bool) -> ListingOut:

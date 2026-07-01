@@ -3,7 +3,7 @@ import datetime as dt
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import activity, models, schemas
 from ..auth import get_current_user
 from ..database import get_db
 
@@ -69,4 +69,8 @@ def log_nda(listing_id: str, user: models.User = Depends(get_current_user), db: 
     db.add(nda)
     db.commit()
     db.refresh(nda)
+    activity.log(
+        db, kind="nda", summary=f"{user.display_name} logged an NDA — {listing.headline}",
+        actor_id=user.id, actor_name=user.display_name, listing_id=listing_id,
+    )
     return nda

@@ -42,6 +42,7 @@ export interface User {
   /** Builders only — used for pre-calculated distance to a parcel. */
   officeLocation?: string
   kycVerified: boolean
+  active?: boolean
   memberSince: string
 }
 
@@ -195,4 +196,96 @@ export interface Document {
   listingId: string
   name: string
   kind: string
+}
+
+export interface Message {
+  id: string
+  listingId: string
+  authorId: string
+  authorName: string
+  body: string
+  createdAt: string
+}
+
+/** Admin-maintained construction rates the Studio reads live. */
+export interface PriceBook {
+  baseBuildPsf: number
+  rates: Record<string, number> // key: `${categoryKey}:${tier}`
+}
+
+export type ArchitectReviewStatus = 'requested' | 'delivered'
+
+/** The Studio's instant ML estimate, snapshotted at the moment of engagement. */
+export interface MlSnapshot {
+  units: number
+  saleableSqft: number
+  baseNet: number
+  constructionCost: number
+  salePsf: number
+}
+
+/** Stage Two: a builder's request for stamped architect validation of a model. */
+export interface ArchitectReview {
+  id: string
+  listingId: string
+  builderId: string
+  builderName: string
+  status: ArchitectReviewStatus
+  fee: number
+  mlSnapshot: MlSnapshot
+  architectName?: string
+  architectGdv?: number
+  architectNotes?: string
+  requestedAt: string
+  deliveredAt?: string
+}
+
+export type ActivityKind =
+  | 'login'
+  | 'nda'
+  | 'message'
+  | 'listing_created'
+  | 'status_change'
+  | 'document'
+  | 'architect'
+
+/** One row of the append-only operations-centre audit trail. */
+export interface ActivityEvent {
+  id: string
+  actorId?: string
+  actorName: string
+  kind: ActivityKind
+  listingId?: string
+  summary: string
+  createdAt: string // ISO-8601 UTC
+}
+
+/** Flat payload the admin create-parcel form submits. */
+export interface NewListingInput {
+  id: string
+  vertical: Vertical
+  headline: string
+  localityLabel: string
+  areaLabel: string
+  landAreaSqft: number
+  zoning: string
+  localityNote: string
+  ownerId: string
+  guidanceLow: number
+  guidanceHigh: number
+  areaLat: number
+  areaLng: number
+  areaRadiusKm: number
+  address: string
+  ownerName: string
+  surveyNos: string
+  contact: string
+  exactLat: number
+  exactLng: number
+  plotAreaSqft: number
+  fsi: number
+  floors: number
+  towers: number
+  avgUnitSqft: number
+  baseSalePsf: number
 }

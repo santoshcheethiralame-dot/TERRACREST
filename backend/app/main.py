@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .seed import seed_if_empty
-from .routers import admin, auth, dashboard, documents, listings
+from .routers import admin, architect, auth, dashboard, documents, listings, messages, pricebook
 
 # Ensure tables exist and a fresh database is populated (idempotent).
 seed_if_empty()
@@ -30,6 +30,9 @@ app.include_router(listings.router)
 app.include_router(dashboard.router)
 app.include_router(admin.router)
 app.include_router(documents.router)
+app.include_router(messages.router)
+app.include_router(pricebook.router)
+app.include_router(architect.router)
 
 
 @app.get("/health", tags=["meta"])

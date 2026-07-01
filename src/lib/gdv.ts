@@ -1,5 +1,5 @@
-import type { FeasibilityInput } from '@/domain/types'
-import { MATERIALS, type Tier } from '@/lib/materials'
+import type { FeasibilityInput, PriceBook } from '@/domain/types'
+import { MATERIALS, TIERS, type Tier } from '@/lib/materials'
 
 /* ============================================================
    The GDV engine — pure, deterministic, framework-agnostic.
@@ -53,12 +53,21 @@ export function defaultSelection(): MaterialSelection {
   return Object.fromEntries(MATERIALS.map((c) => [c.key, 'mid'])) as MaterialSelection
 }
 
-/** Sum of material contributions, ₹/sq ft of built-up area. */
-export function finishesPsf(selection: MaterialSelection): number {
+/** Sum of material contributions, ₹/sq ft of built-up area. Uses the live
+ *  price book when supplied, else the built-in catalogue defaults. */
+export function finishesPsf(selection: MaterialSelection, priceBook?: PriceBook): number {
   return MATERIALS.reduce((sum, cat) => {
     const tier = selection[cat.key] ?? 'mid'
-    return sum + cat.options[tier].psf
+    const rate = priceBook?.rates[`${cat.key}:${tier}`] ?? cat.options[tier].psf
+    return sum + rate
   }, 0)
+}
+
+/** The built-in catalogue as a price book (fallback / no-backend mode). */
+export function defaultPriceBook(): PriceBook {
+  const rates: Record<string, number> = {}
+  for (const cat of MATERIALS) for (const tier of TIERS) rates[`${cat.key}:${tier}`] = cat.options[tier].psf
+  return { baseBuildPsf: BASE_BUILD_PSF, rates }
 }
 
 export function computeFeasibility(f: FeasibilityInput): Feasibility {
@@ -79,10 +88,11 @@ export function computeFeasibility(f: FeasibilityInput): Feasibility {
   }
 }
 
-export function computeGdv(f: FeasibilityInput, selection: MaterialSelection): GdvResult {
+export function computeGdv(f: FeasibilityInput, selection: MaterialSelection, priceBook?: PriceBook): GdvResult {
   const feas = computeFeasibility(f)
-  const fin = finishesPsf(selection)
-  const constructionPsfBase = BASE_BUILD_PSF + fin
+  const baseBuildPsf = priceBook?.baseBuildPsf ?? BASE_BUILD_PSF
+  const fin = finishesPsf(selection, priceBook)
+  const constructionPsfBase = baseBuildPsf + fin
 
   const zone = (key: ZoneKey): ZoneResult => {
     const salePsf = f.baseSalePsf * SALE_MULT[key]

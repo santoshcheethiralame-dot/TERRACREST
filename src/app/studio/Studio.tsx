@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { FeasibilityInput, Listing } from '@/domain/types'
+import type { ArchitectReview, FeasibilityInput, Listing, MlSnapshot, PriceBook } from '@/domain/types'
 import { VERTICAL_LABEL } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { computeGdv, defaultSelection, type MaterialSelection, type GdvResult } from '@/lib/gdv'
@@ -41,14 +41,31 @@ function StudioInner({ listing }: { listing: Listing }) {
   const [feas, setFeas] = useState<FeasibilityInput>(listing.feasibility)
   const [selection, setSelection] = useState<MaterialSelection>(defaultSelection())
   const [engage, setEngage] = useState(false)
+  const [priceBook, setPriceBook] = useState<PriceBook | undefined>(undefined)
+  const [review, setReview] = useState<ArchitectReview | null>(null)
 
-  const gdv = useMemo(() => computeGdv(feas, selection), [feas, selection])
+  useEffect(() => {
+    repo.getPriceBook().then(setPriceBook).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    let alive = true
+    repo
+      .myArchitectReviews()
+      .then((rs) => alive && setReview(rs.find((r) => r.listingId === listing.id) ?? null))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [listing.id])
+
+  const gdv = useMemo(() => computeGdv(feas, selection, priceBook), [feas, selection, priceBook])
   const plan = useMemo(() => buildSitePlan(feas, gdv.feas.footprintSqft), [feas, gdv.feas.footprintSqft])
   const set = (patch: Partial<FeasibilityInput>) => setFeas((f) => ({ ...f, ...patch }))
 
   return (
     <div className="flex min-h-screen flex-col bg-ink text-ivory lg:h-screen lg:overflow-hidden">
-      <StudioBar listing={listing} onEngage={() => setEngage(true)} />
+      <StudioBar listing={listing} review={review} onEngage={() => setEngage(true)} />
 
       <div className="grid flex-1 grid-cols-1 lg:min-h-0 lg:grid-cols-[1.55fr_1fr]">
         {/* canvas + metrics */}
@@ -69,13 +86,18 @@ function StudioInner({ listing }: { listing: Listing }) {
 
       <GdvTicker gdv={gdv} />
 
-      <AnimatePresence>{engage && <EngageModal listing={listing} gdv={gdv} onClose={() => setEngage(false)} />}</AnimatePresence>
+      <AnimatePresence>
+        {engage && <EngageModal listing={listing} gdv={gdv} review={review} onRequested={setReview} onClose={() => setEngage(false)} />}
+      </AnimatePresence>
     </div>
   )
 }
 
 /* --------------------------------------------------------------- top bar */
-function StudioBar({ listing, onEngage }: { listing: Listing; onEngage: () => void }) {
+function StudioBar({ listing, review, onEngage }: { listing: Listing; review: ArchitectReview | null; onEngage: () => void }) {
+  const delivered = review?.status === 'delivered'
+  const requested = review?.status === 'requested'
+  const label = delivered ? 'Architect Validated' : requested ? 'Validation Requested' : 'Confirm & Engage Architect'
   return (
     <header className="flex items-center justify-between border-b border-line px-6 py-4 md:px-10">
       <div className="flex items-center gap-6">
@@ -92,10 +114,15 @@ function StudioBar({ listing, onEngage }: { listing: Listing; onEngage: () => vo
       </div>
       <button
         onClick={onEngage}
-        className="label group inline-flex items-center gap-3 border border-[color:var(--line-gold)] px-5 py-3 text-gold transition-colors duration-500 hover:bg-gold hover:text-ink"
+        className={`label group inline-flex items-center gap-3 border px-5 py-3 transition-colors duration-500 ${
+          delivered
+            ? 'border-emerald/50 text-emerald-bright hover:bg-emerald hover:text-ink'
+            : 'border-[color:var(--line-gold)] text-gold hover:bg-gold hover:text-ink'
+        }`}
       >
-        Confirm &amp; Engage Architect
-        <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+        {delivered && <span aria-hidden>✓</span>}
+        {label}
+        {!delivered && <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>}
       </button>
     </header>
   )
@@ -343,7 +370,38 @@ function ZoneLabel({ name, value, tone, center, right }: { name: string; value: 
 }
 
 /* ----------------------------------------------------------- engage modal */
-function EngageModal({ listing, gdv, onClose }: { listing: Listing; gdv: GdvResult; onClose: () => void }) {
+function EngageModal({
+  listing,
+  gdv,
+  review,
+  onRequested,
+  onClose,
+}: {
+  listing: Listing
+  gdv: GdvResult
+  review: ArchitectReview | null
+  onRequested: (r: ArchitectReview) => void
+  onClose: () => void
+}) {
+  const [busy, setBusy] = useState(false)
+
+  const proceed = async () => {
+    setBusy(true)
+    const snapshot: MlSnapshot = {
+      units: gdv.feas.unitCount,
+      saleableSqft: Math.round(gdv.feas.saleableAreaSqft),
+      baseNet: Math.round(gdv.zones.base.netValue),
+      constructionCost: Math.round(gdv.zones.base.constructionCost),
+      salePsf: Math.round(gdv.zones.base.salePsf),
+    }
+    try {
+      const r = await repo.requestArchitectReview(listing.id, snapshot)
+      onRequested(r)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <motion.div className="fixed inset-0 z-[70] grid place-items-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-0 bg-ink/80" onClick={onClose} />
@@ -352,29 +410,124 @@ function EngageModal({ listing, gdv, onClose }: { listing: Listing; gdv: GdvResu
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="relative w-full max-w-lg border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
+        className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
       >
-        <p className="label text-gold">Stage Two · Original Architecture</p>
-        <h3 className="mt-4 font-display text-3xl text-ivory">Engage the empanelled architect</h3>
-        <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
-          Your feasibility on <span className="mono text-ivory">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a
-          market Net Development Value of <span className="text-gold">{crFromRupees(gdv.zones.base.netValue)}</span> — will be handed to our internal architect for
-          stamped, buildable drawings validated against this model.
-        </p>
-        <div className="mt-6 flex items-baseline justify-between border-y border-line py-4">
-          <span className="label text-ivory-faint">Engagement fee</span>
-          <span className="mono text-lg text-ivory">₹2,50,000</span>
-        </div>
-        <p className="mt-3 text-[0.78rem] text-ivory-faint">Adjustable against Terracrest commission on closure.</p>
-        <div className="mt-7 flex gap-3">
-          <button onClick={onClose} className="label flex-1 border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory">
-            Not yet
-          </button>
-          <button onClick={onClose} className="label flex-1 bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright">
-            Proceed →
-          </button>
-        </div>
+        {review?.status === 'delivered' ? (
+          <DeliveredView review={review} onClose={onClose} />
+        ) : review?.status === 'requested' ? (
+          <RequestedView review={review} listing={listing} onClose={onClose} />
+        ) : (
+          <RequestView listing={listing} gdv={gdv} busy={busy} onProceed={proceed} onClose={onClose} />
+        )}
       </motion.div>
     </motion.div>
   )
+}
+
+function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: Listing; gdv: GdvResult; busy: boolean; onProceed: () => void; onClose: () => void }) {
+  return (
+    <div>
+      <p className="label text-gold">Stage Two · Original Architecture</p>
+      <h3 className="mt-4 font-display text-3xl text-ivory">Engage the empanelled architect</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
+        Your feasibility on <span className="mono text-ivory">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a market
+        Net Development Value of <span className="text-gold">{crFromRupees(gdv.zones.base.netValue)}</span> — is snapshotted and handed to our empanelled architect for
+        stamped, buildable drawings validated against this model.
+      </p>
+      <div className="mt-6 flex items-baseline justify-between border-y border-line py-4">
+        <span className="label text-ivory-faint">Engagement fee</span>
+        <span className="mono text-lg text-ivory">₹2,50,000</span>
+      </div>
+      <p className="mt-3 text-[0.78rem] text-ivory-faint">Adjustable against Terracrest commission on closure.</p>
+      <div className="mt-7 flex gap-3">
+        <button onClick={onClose} disabled={busy} className="label flex-1 border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory disabled:opacity-50">
+          Not yet
+        </button>
+        <button onClick={onProceed} disabled={busy} className="label flex-1 bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:opacity-60">
+          {busy ? 'Commissioning…' : 'Proceed →'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function RequestedView({ review, listing, onClose }: { review: ArchitectReview; listing: Listing; onClose: () => void }) {
+  return (
+    <div>
+      <p className="label text-gold">Stage Two · In Progress</p>
+      <h3 className="mt-4 font-display text-3xl text-ivory">Validation commissioned</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
+        Your model on <span className="mono text-ivory">{listing.id}</span> is with the empanelled architect. They return stamped drawings and an independent Net
+        Development Value — typically within three working days — which will appear here alongside your ML estimate.
+      </p>
+      <div className="mt-6 space-y-3 border-y border-line py-4">
+        <Row k="Commissioned" v={fmtDate(review.requestedAt)} />
+        <Row k="ML estimate (Market)" v={crFromRupees(review.mlSnapshot.baseNet)} />
+        <Row k="Status" v="Awaiting architect" tone="text-gold" />
+      </div>
+      <button onClick={onClose} className="label mt-7 w-full border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory">
+        Close
+      </button>
+    </div>
+  )
+}
+
+function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: () => void }) {
+  const ml = review.mlSnapshot.baseNet
+  const arch = review.architectGdv ?? ml
+  const variancePct = ml > 0 ? ((arch - ml) / ml) * 100 : 0
+  const up = variancePct >= 0
+  return (
+    <div>
+      <p className="label text-emerald-bright">Stage Two · Validated</p>
+      <h3 className="mt-4 font-display text-3xl text-ivory">Architect-validated feasibility</h3>
+      <p className="mt-3 text-[0.88rem] text-ivory-dim">{review.architectName}</p>
+
+      <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border border-line bg-[color:var(--line)]">
+        <div className="bg-ink-card p-5">
+          <p className="label text-ivory-faint">ML Studio · Market</p>
+          <p className="mono mt-2 text-2xl text-ivory">{crFromRupees(ml)}</p>
+        </div>
+        <div className="bg-ink-card p-5">
+          <p className="label text-gold">Architect · Validated</p>
+          <p className="mono mt-2 text-2xl text-gilt">{crFromRupees(arch)}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between border border-line px-5 py-3">
+        <span className="label text-ivory-faint">Variance to model</span>
+        <span className={`mono text-sm ${up ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>
+          {up ? '+' : ''}
+          {variancePct.toFixed(1)}%
+        </span>
+      </div>
+
+      {review.architectNotes && (
+        <div className="mt-5">
+          <p className="label text-ivory-faint">Architect's note</p>
+          <p className="mt-2 text-[0.9rem] leading-relaxed text-ivory-dim">{review.architectNotes}</p>
+        </div>
+      )}
+
+      <p className="mono mt-5 text-[0.72rem] text-ivory-faint">Delivered {fmtDate(review.deliveredAt ?? review.requestedAt)} · stamped drawings issued to your Deal Room.</p>
+      <button onClick={onClose} className="label mt-6 w-full bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright">
+        Close
+      </button>
+    </div>
+  )
+}
+
+function Row({ k, v, tone }: { k: string; v: string; tone?: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <span className="label text-ivory-faint">{k}</span>
+      <span className={`mono text-sm ${tone ?? 'text-ivory'}`}>{v}</span>
+    </div>
+  )
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }

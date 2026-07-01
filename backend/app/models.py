@@ -12,6 +12,7 @@ class User(Base):
     role = Column(String, nullable=False)  # builder | landowner | investor | admin
     office_location = Column(String, nullable=True)
     kyc_verified = Column(Boolean, nullable=False, default=True)
+    active = Column(Boolean, nullable=False, default=True)
     member_since = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
 
@@ -96,3 +97,65 @@ class Deal(Base):
     stage = Column(String, nullable=False)
     est_commission = Column(Integer, nullable=False)
     rm = Column(String, nullable=False)
+
+
+class Message(Base):
+    """Deal Room correspondence — visible only to entitled parties (NDA'd builder,
+    owner, admin)."""
+
+    __tablename__ = "messages"
+
+    id = Column(String, primary_key=True)
+    listing_id = Column(String, ForeignKey("listings.id"), index=True, nullable=False)
+    author_id = Column(String, ForeignKey("users.id"), nullable=False)
+    body = Column(String, nullable=False)
+    created_at = Column(String, nullable=False)
+
+
+class PriceBook(Base):
+    """Admin-maintained Bangalore rates the Feasibility Studio reads live.
+    Single row, id='current'."""
+
+    __tablename__ = "price_book"
+
+    id = Column(String, primary_key=True)
+    base_build_psf = Column(Integer, nullable=False)
+    rates = Column(JSON, nullable=False)  # {"flooring:budget": 45, ...}
+
+
+class ArchitectReview(Base):
+    """A builder's request for independent architect validation of a Studio
+    feasibility. The ML engine produces the instant estimate; the empanelled
+    architect returns a stamped, human-validated figure — the two are then
+    compared side by side. This is Stage Two of the Studio."""
+
+    __tablename__ = "architect_reviews"
+
+    id = Column(String, primary_key=True)
+    listing_id = Column(String, ForeignKey("listings.id"), index=True, nullable=False)
+    builder_id = Column(String, ForeignKey("users.id"), index=True, nullable=False)
+    status = Column(String, nullable=False)  # requested | delivered
+    fee = Column(Integer, nullable=False)
+    ml_snapshot = Column(JSON, nullable=False)  # {units, saleableSqft, baseNet, constructionCost, salePsf}
+    architect_name = Column(String, nullable=True)
+    architect_gdv = Column(Integer, nullable=True)  # architect's validated net value, ₹
+    architect_notes = Column(String, nullable=True)
+    requested_at = Column(String, nullable=False)
+    delivered_at = Column(String, nullable=True)
+
+
+class ActivityEvent(Base):
+    """Append-only audit trail behind the operations-centre feed. Every
+    consequential action writes one row — this is what makes the platform's
+    'every view and action is logged' promise real rather than decorative."""
+
+    __tablename__ = "activity_events"
+
+    id = Column(String, primary_key=True)
+    actor_id = Column(String, nullable=True)
+    actor_name = Column(String, nullable=False)
+    # login | nda | message | listing_created | status_change | document | architect
+    kind = Column(String, nullable=False)
+    listing_id = Column(String, nullable=True)
+    summary = Column(String, nullable=False)
+    created_at = Column(String, nullable=False)  # ISO-8601 UTC

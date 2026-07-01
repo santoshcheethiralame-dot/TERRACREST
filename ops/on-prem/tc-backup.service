@@ -1,0 +1,11 @@
+[Unit]
+Description=Terracrest nightly encrypted database backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=postgres
+# Holds PGPASSWORD (replication/app read) and RESTIC_PASSWORD_FILE. chmod 600, root:postgres.
+EnvironmentFile=/etc/terracrest/backup.env
+ExecStart=/usr/local/sbin/tc-backup

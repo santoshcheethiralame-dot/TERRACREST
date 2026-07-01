@@ -1,0 +1,32 @@
+[Unit]
+Description=DB Terracrest Advisory API (FastAPI via Gunicorn/Uvicorn workers)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=terracrest
+Group=terracrest
+WorkingDirectory=/opt/terracrest/app/backend
+EnvironmentFile=/etc/terracrest/api.env
+ExecStart=/opt/terracrest/app/backend/.venv/bin/gunicorn app.main:app \
+    --workers 3 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:8000 \
+    --access-logfile - \
+    --error-logfile -
+Restart=on-failure
+RestartSec=3
+
+# Hardening — the service touches only its own tree and talks to Postgres on loopback.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/terracrest
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

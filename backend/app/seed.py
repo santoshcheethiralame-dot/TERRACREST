@@ -214,6 +214,75 @@ def _documents():
     return rows
 
 
+def _messages():
+    return [
+        models.Message(id="msg_001", listing_id="JD-BLR-2026-012", author_id="landowner_ramanathan_002",
+                       body="Welcome, Rajesh. Happy to discuss the JD terms once you've reviewed the title set.",
+                       created_at="2026-06-25T10:15+00:00"),
+        models.Message(id="msg_002", listing_id="JD-BLR-2026-012", author_id="builder_rajesh_001",
+                       body="Thank you. The FSI and approvals look clean — can we schedule a site walk next week?",
+                       created_at="2026-06-25T11:40+00:00"),
+        models.Message(id="msg_003", listing_id="JD-BLR-2026-012", author_id="landowner_ramanathan_002",
+                       body="Certainly. Our RM Kavya will coordinate — proposing Tuesday morning.",
+                       created_at="2026-06-26T09:05+00:00"),
+    ]
+
+
+def _pricebook():
+    tiers = {
+        "flooring": {"budget": 45, "mid": 85, "premium": 220, "luxury": 450},
+        "sanitary": {"budget": 20, "mid": 45, "premium": 95, "luxury": 190},
+        "kitchen": {"budget": 30, "mid": 70, "premium": 150, "luxury": 320},
+        "windows": {"budget": 35, "mid": 80, "premium": 160, "luxury": 300},
+        "lift": {"budget": 15, "mid": 35, "premium": 60, "luxury": 95},
+        "facade": {"budget": 25, "mid": 55, "premium": 95, "luxury": 210},
+    }
+    rates = {f"{cat}:{tier}": psf for cat, ts in tiers.items() for tier, psf in ts.items()}
+    return models.PriceBook(id="current", base_build_psf=2150, rates=rates)
+
+
+def _architect_reviews():
+    # One delivered (so a builder sees the ML-vs-architect comparison) and one
+    # pending (so the desk has something to action in a demo).
+    ml = {"units": 130, "saleableSqft": 183259, "baseNet": 862000000, "constructionCost": 731000000, "salePsf": 8200}
+    return [
+        models.ArchitectReview(
+            id="ar_001", listing_id="JD-BLR-2026-012", builder_id="builder_rajesh_001",
+            status="delivered", fee=250000, ml_snapshot=ml,
+            architect_name="Sundaram & Associates · CoA CA/2011/48210",
+            architect_gdv=834000000,
+            architect_notes=(
+                "Massing holds at G+14 across four towers. Two units per floor drop to meet NBC "
+                "refuge-floor and lift-lobby norms, trimming saleable ~1.6%. Construction rate revised "
+                "up for the podium transfer-slab. Net: a disciplined, financeable model — buildable as drawn."
+            ),
+            requested_at="2026-06-26T09:20:00+00:00", delivered_at="2026-06-29T17:05:00+00:00",
+        ),
+        models.ArchitectReview(
+            id="ar_002", listing_id="WH-BLR-2026-047", builder_id="builder_rajesh_001",
+            status="requested", fee=250000,
+            ml_snapshot={"units": 1, "saleableSqft": 101200, "baseNet": 214000000, "constructionCost": 289000000, "salePsf": 3100},
+            requested_at="2026-07-01T12:40:00+00:00",
+        ),
+    ]
+
+
+def _activity():
+    # A little history so the operations-centre feed isn't empty on first boot.
+    rows = [
+        ("ev_1", "Terracrest Desk", None, "listing_created", "JD-BLR-2026-012", "Parcel JD-BLR-2026-012 created — North-corridor JD parcel", "2026-06-14T09:12:00+00:00"),
+        ("ev_2", "Terracrest Desk", None, "status_change", "JD-BLR-2026-012", "JD-BLR-2026-012 → live", "2026-06-20T15:41:00+00:00"),
+        ("ev_3", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "login", None, "Rajesh Menon · Rajesh Developers signed in", "2026-06-24T08:03:00+00:00"),
+        ("ev_4", "Terracrest Desk", "builder_rajesh_001", "nda", "JD-BLR-2026-012", "Desk recorded a witnessed NDA — Rajesh Menon · Rajesh Developers on North-corridor JD parcel", "2026-06-24T10:22:00+00:00"),
+        ("ev_5", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "document", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel", "2026-06-24T10:31:00+00:00"),
+        ("ev_6", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "message", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room", "2026-06-25T11:40:00+00:00"),
+    ]
+    return [
+        models.ActivityEvent(id=i, actor_name=an, actor_id=aid, kind=k, listing_id=lid, summary=s, created_at=ts)
+        for i, an, aid, k, lid, s, ts in rows
+    ]
+
+
 def _insert_all(db) -> None:
     db.add_all(_users())
     db.add_all(_listings())
@@ -222,6 +291,10 @@ def _insert_all(db) -> None:
     db.add_all(_engagements())
     db.add_all(_deals())
     db.add_all(_documents())
+    db.add_all(_messages())
+    db.add(_pricebook())
+    db.add_all(_architect_reviews())
+    db.add_all(_activity())
     db.commit()
 
 

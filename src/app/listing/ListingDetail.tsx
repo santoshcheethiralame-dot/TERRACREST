@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import type { Document, Listing } from '@/domain/types'
+import type { Document, Listing, Message } from '@/domain/types'
 import { VERTICAL_LABEL, STATUS_LABEL } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { useAuth } from '@/auth/AuthContext'
@@ -26,6 +26,8 @@ export function ListingDetail() {
   const [unlocked, setUnlocked] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
   const [docs, setDocs] = useState<Document[]>([])
+  const [msgs, setMsgs] = useState<Message[]>([])
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -47,6 +49,18 @@ export function ListingDetail() {
     }
     let alive = true
     repo.getDocuments(listing.id).then((d) => alive && setDocs(d))
+    return () => {
+      alive = false
+    }
+  }, [listing, unlocked])
+
+  useEffect(() => {
+    if (!listing || !unlocked) {
+      setMsgs([])
+      return
+    }
+    let alive = true
+    repo.getMessages(listing.id).then((m) => alive && setMsgs(m))
     return () => {
       alive = false
     }
@@ -96,6 +110,13 @@ export function ListingDetail() {
   const openDoc = async (doc: Document) => {
     const url = await repo.documentUrl(listing.id, doc.id)
     window.open(url, '_blank', 'noopener')
+  }
+
+  const sendMessage = async (body: string) => {
+    setSending(true)
+    const m = await repo.postMessage(listing.id, body)
+    setSending(false)
+    setMsgs((prev) => [...prev, m])
   }
 
   return (
@@ -222,7 +243,66 @@ export function ListingDetail() {
           </div>
         </motion.div>
       </motion.div>
+
+      {unlocked && <DealRoom currentUserId={user?.id} msgs={msgs} onSend={sendMessage} sending={sending} />}
     </AppShell>
+  )
+}
+
+function DealRoom({
+  currentUserId,
+  msgs,
+  onSend,
+  sending,
+}: {
+  currentUserId?: string
+  msgs: Message[]
+  onSend: (body: string) => void
+  sending: boolean
+}) {
+  const [draft, setDraft] = useState('')
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    if (draft.trim()) {
+      onSend(draft.trim())
+      setDraft('')
+    }
+  }
+  return (
+    <section className="mt-14 border-t border-line pt-10">
+      <div className="flex items-baseline gap-3">
+        <h2 className="font-display text-3xl text-ivory">Deal Room</h2>
+        <span className="label text-ivory-faint">logged · admin-visible</span>
+      </div>
+      <p className="mt-2 text-sm text-ivory-faint">Correspondence with the counterparty — not real-time. Every message is logged; the platform stays the principal.</p>
+      <div className="mt-6 max-w-3xl space-y-4">
+        {msgs.length === 0 && <p className="text-sm text-ivory-faint">No messages yet — start the conversation below.</p>}
+        {msgs.map((m) => {
+          const mine = m.authorId === currentUserId
+          return (
+            <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] border px-4 py-3 ${mine ? 'border-[color:var(--line-gold)] bg-gold/10' : 'border-line bg-ink-raise/50'}`}>
+                <div className="label text-ivory-faint">
+                  {m.authorName.split('·')[0].trim()} · {new Date(m.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <p className="mt-1.5 text-[0.92rem] leading-relaxed text-ivory">{m.body}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <form onSubmit={submit} className="mt-6 flex max-w-3xl gap-3">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Write a message…"
+          className="mono flex-1 border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-gold)]"
+        />
+        <button type="submit" disabled={sending || !draft.trim()} className="label bg-gold px-6 py-3 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+          {sending ? '…' : 'Send'}
+        </button>
+      </form>
+    </section>
   )
 }
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import activity, models, schemas
 from ..auth import create_access_token, create_refresh_token, get_current_user, verify_password
 from ..config import settings
 from ..database import get_db
@@ -17,6 +17,9 @@ def login(body: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(func.lower(models.User.username) == username).first()
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Credentials not recognised. Access is by admin-issued login only.")
+    if not user.active:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This account has been deactivated. Contact your relationship manager.")
+    activity.log(db, kind="login", summary=f"{user.display_name} signed in", actor_id=user.id, actor_name=user.display_name)
     return schemas.LoginResponse(
         access_token=create_access_token(user.id),
         refresh_token=create_refresh_token(user.id),

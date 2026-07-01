@@ -1,6 +1,7 @@
-import type { User, Listing, Nda, Engagement, Offer, Deal, Role, Document } from '@/domain/types'
-import { users, listings, ndas as seedNdas, engagements, offers, deals, documents } from '@/data/seed'
+import type { User, Listing, Nda, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot } from '@/domain/types'
+import { users, listings, ndas as seedNdas, engagements, offers, deals, documents, messages, activityEvents, architectReviews } from '@/data/seed'
 import { api, apiEnabled, ApiError, getBlobUrl } from '@/data/api'
+import { defaultPriceBook } from '@/lib/gdv'
 
 /* ============================================================
    Repository — the single seam between the UI and the data.
@@ -15,8 +16,9 @@ export interface AuthResult {
   refreshToken: string | null
 }
 
-// In-memory NDA log — only used in fallback (no-backend) mode.
+// In-memory logs — only used in fallback (no-backend) mode.
 const ndaLog: Nda[] = [...seedNdas]
+const reviewLog: ArchitectReview[] = [...architectReviews]
 
 const latency = <T,>(value: T, ms = 160): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms))
@@ -173,6 +175,74 @@ export const repo = {
     return latency([...deals])
   },
 
+  async adminCreateListing(input: NewListingInput): Promise<Listing> {
+    if (apiEnabled) return api.post<Listing>('/admin/listings', input)
+    const listing: Listing = {
+      id: input.id,
+      vertical: input.vertical,
+      headline: input.headline,
+      status: 'verified',
+      localityLabel: input.localityLabel,
+      areaLabel: input.areaLabel,
+      landAreaSqft: input.landAreaSqft,
+      zoning: input.zoning,
+      localityNote: input.localityNote,
+      verification: { by: 'Terracrest Site Team', on: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
+      guidance: { low: input.guidanceLow, high: input.guidanceHigh },
+      publicArea: { lat: input.areaLat, lng: input.areaLng, radiusKm: input.areaRadiusKm },
+      sealed: {
+        coords: { lat: input.exactLat, lng: input.exactLng },
+        address: input.address,
+        ownerName: input.ownerName,
+        ownerId: input.ownerId,
+        surveyNos: input.surveyNos.split(',').map((s) => s.trim()).filter(Boolean),
+        contact: input.contact,
+      },
+      jd: input.vertical === 'joint-development' ? { fsi: input.fsi, approval: 'Admin-entered', roadWidthFt: 40, suggestedModel: 'TBD', timelineMonths: 36 } : undefined,
+      comps: [],
+      feasibility: {
+        plotAreaSqft: input.plotAreaSqft,
+        fsi: input.fsi,
+        setbackM: 6,
+        roadWidthFt: 40,
+        towers: input.towers,
+        floors: input.floors,
+        floorPlateEfficiency: 0.78,
+        avgUnitSqft: input.avgUnitSqft,
+        baseSalePsf: input.baseSalePsf,
+      },
+      createdAt: new Date().toISOString().slice(0, 10),
+    }
+    listings.push(listing)
+    const vault = [
+      ['title-deed', 'Title deed', 'deed'],
+      ['ec', 'Encumbrance certificate', 'certificate'],
+      ['survey', 'Boundary survey', 'survey'],
+      ['tax', 'Tax receipts (3 yrs)', 'receipt'],
+    ]
+    for (const [key, name, kind] of vault) documents.push({ id: `${input.id}-${key}`, listingId: input.id, name, kind })
+    return latency(listing, 300)
+  },
+
+  async adminResetPassword(userId: string): Promise<{ tempPassword: string }> {
+    if (apiEnabled) return api.patch<{ tempPassword: string }>(`/admin/users/${userId}/password`)
+    return latency({ tempPassword: 'demo' }, 200)
+  },
+
+  async adminSetActive(userId: string, active: boolean): Promise<User> {
+    if (apiEnabled) return api.patch<User>(`/admin/users/${userId}/active`, { active })
+    const u = users.find((x) => x.id === userId)
+    if (u) u.active = active
+    return latency(u as User, 200)
+  },
+
+  async adminSetKyc(userId: string, verified: boolean): Promise<User> {
+    if (apiEnabled) return api.patch<User>(`/admin/users/${userId}/kyc`, { verified })
+    const u = users.find((x) => x.id === userId)
+    if (u) u.kycVerified = verified
+    return latency(u as User, 200)
+  },
+
   // --- document vault ---
   async getDocuments(listingId: string): Promise<Document[]> {
     if (apiEnabled) return api.get<Document[]>(`/listings/${listingId}/documents`)
@@ -184,6 +254,86 @@ export const repo = {
     if (apiEnabled) return getBlobUrl(`/listings/${listingId}/documents/${docId}`)
     const text = `DB TERRACREST ADVISORY\n\nDocument: ${docId}\nCONFIDENTIAL — watermarked demo copy.\nEvery view and download is logged.`
     return URL.createObjectURL(new Blob([text], { type: 'text/plain' }))
+  },
+
+  // --- deal room ---
+  async getMessages(listingId: string): Promise<Message[]> {
+    if (apiEnabled) return api.get<Message[]>(`/listings/${listingId}/messages`)
+    return latency(messages.filter((m) => m.listingId === listingId))
+  },
+
+  async postMessage(listingId: string, body: string): Promise<Message> {
+    if (apiEnabled) return api.post<Message>(`/listings/${listingId}/messages`, { body })
+    const msg: Message = {
+      id: `msg_local_${messages.length + 1}`,
+      listingId,
+      authorId: 'you',
+      authorName: 'You',
+      body,
+      createdAt: new Date().toISOString().slice(0, 16),
+    }
+    messages.push(msg)
+    return latency(msg, 200)
+  },
+
+  // --- price book ---
+  async getPriceBook(): Promise<PriceBook> {
+    if (apiEnabled) return api.get<PriceBook>('/pricebook')
+    return latency(defaultPriceBook())
+  },
+
+  async adminUpdatePriceBook(pb: PriceBook): Promise<PriceBook> {
+    if (apiEnabled) return api.patch<PriceBook>('/admin/pricebook', pb)
+    return latency(pb, 200)
+  },
+
+  // --- audit trail ---
+  async adminActivity(): Promise<ActivityEvent[]> {
+    if (apiEnabled) return api.get<ActivityEvent[]>('/admin/activity')
+    return latency([...activityEvents].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+  },
+
+  // --- architect validation (Studio Stage Two) ---
+  async requestArchitectReview(listingId: string, mlSnapshot: MlSnapshot): Promise<ArchitectReview> {
+    if (apiEnabled) return api.post<ArchitectReview>('/architect-reviews', { listingId, mlSnapshot })
+    const review: ArchitectReview = {
+      id: `ar_local_${reviewLog.length + 1}`,
+      listingId,
+      builderId: 'you',
+      builderName: 'You',
+      status: 'requested',
+      fee: 250000,
+      mlSnapshot,
+      requestedAt: new Date().toISOString().slice(0, 19) + '+00:00',
+    }
+    reviewLog.unshift(review)
+    return latency(review, 300)
+  },
+
+  async myArchitectReviews(): Promise<ArchitectReview[]> {
+    if (apiEnabled) return api.get<ArchitectReview[]>('/me/architect-reviews')
+    return latency([...reviewLog])
+  },
+
+  async adminArchitectReviews(): Promise<ArchitectReview[]> {
+    if (apiEnabled) return api.get<ArchitectReview[]>('/admin/architect-reviews')
+    return latency([...reviewLog])
+  },
+
+  async adminDeliverArchitectReview(
+    id: string,
+    payload: { architectName: string; architectGdv: number; architectNotes: string },
+  ): Promise<ArchitectReview> {
+    if (apiEnabled) return api.patch<ArchitectReview>(`/admin/architect-reviews/${id}`, payload)
+    const r = reviewLog.find((x) => x.id === id)
+    if (r) {
+      r.status = 'delivered'
+      r.architectName = payload.architectName
+      r.architectGdv = payload.architectGdv
+      r.architectNotes = payload.architectNotes
+      r.deliveredAt = new Date().toISOString().slice(0, 19) + '+00:00'
+    }
+    return latency(r as ArchitectReview, 300)
   },
 }
 

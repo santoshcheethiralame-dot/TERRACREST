@@ -1,4 +1,4 @@
-import type { User, Listing, Nda, Offer, Engagement, Deal, Document } from '@/domain/types'
+import type { User, Listing, Nda, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview } from '@/domain/types'
 
 /* ============================================================
    Seed data — a realistic Bengaluru book of business.
@@ -288,6 +288,33 @@ export const deals: Deal[] = [
   },
 ]
 
+export const messages: Message[] = [
+  {
+    id: 'msg_001',
+    listingId: 'JD-BLR-2026-012',
+    authorId: 'landowner_ramanathan_002',
+    authorName: 'S. Ramanathan · Ramanathan Holdings LLP',
+    body: "Welcome, Rajesh. Happy to discuss the JD terms once you've reviewed the title set.",
+    createdAt: '2026-06-25T10:15+00:00',
+  },
+  {
+    id: 'msg_002',
+    listingId: 'JD-BLR-2026-012',
+    authorId: 'builder_rajesh_001',
+    authorName: 'Rajesh Menon · Rajesh Developers',
+    body: 'Thank you. The FSI and approvals look clean — can we schedule a site walk next week?',
+    createdAt: '2026-06-25T11:40+00:00',
+  },
+  {
+    id: 'msg_003',
+    listingId: 'JD-BLR-2026-012',
+    authorId: 'landowner_ramanathan_002',
+    authorName: 'S. Ramanathan · Ramanathan Holdings LLP',
+    body: 'Certainly. Our RM Kavya will coordinate — proposing Tuesday morning.',
+    createdAt: '2026-06-26T09:05+00:00',
+  },
+]
+
 export const documents: Document[] = (() => {
   const per = [
     { key: 'title-deed', name: 'Title deed', kind: 'deed' },
@@ -301,3 +328,40 @@ export const documents: Document[] = (() => {
   }
   return out
 })()
+
+export const architectReviews: ArchitectReview[] = [
+  {
+    id: 'ar_001',
+    listingId: 'JD-BLR-2026-012',
+    builderId: 'builder_rajesh_001',
+    builderName: 'Rajesh Menon · Rajesh Developers',
+    status: 'delivered',
+    fee: 250000,
+    mlSnapshot: { units: 130, saleableSqft: 183259, baseNet: 862000000, constructionCost: 731000000, salePsf: 8200 },
+    architectName: 'Sundaram & Associates · CoA CA/2011/48210',
+    architectGdv: 834000000,
+    architectNotes:
+      'Massing holds at G+14 across four towers. Two units per floor drop to meet NBC refuge-floor and lift-lobby norms, trimming saleable ~1.6%. Construction rate revised up for the podium transfer-slab. Net: a disciplined, financeable model — buildable as drawn.',
+    requestedAt: '2026-06-26T09:20:00+00:00',
+    deliveredAt: '2026-06-29T17:05:00+00:00',
+  },
+  {
+    id: 'ar_002',
+    listingId: 'WH-BLR-2026-047',
+    builderId: 'builder_rajesh_001',
+    builderName: 'Rajesh Menon · Rajesh Developers',
+    status: 'requested',
+    fee: 250000,
+    mlSnapshot: { units: 1, saleableSqft: 101200, baseNet: 214000000, constructionCost: 289000000, salePsf: 3100 },
+    requestedAt: '2026-07-01T12:40:00+00:00',
+  },
+]
+
+export const activityEvents: ActivityEvent[] = [
+  { id: 'ev_1', actorName: 'Terracrest Desk', kind: 'listing_created', listingId: 'JD-BLR-2026-012', summary: 'Parcel JD-BLR-2026-012 created — North-corridor JD parcel', createdAt: '2026-06-14T09:12:00+00:00' },
+  { id: 'ev_2', actorName: 'Terracrest Desk', kind: 'status_change', listingId: 'JD-BLR-2026-012', summary: 'JD-BLR-2026-012 → live', createdAt: '2026-06-20T15:41:00+00:00' },
+  { id: 'ev_3', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'login', summary: 'Rajesh Menon · Rajesh Developers signed in', createdAt: '2026-06-24T08:03:00+00:00' },
+  { id: 'ev_4', actorName: 'Terracrest Desk', actorId: 'builder_rajesh_001', kind: 'nda', listingId: 'JD-BLR-2026-012', summary: 'Desk recorded a witnessed NDA — Rajesh Menon · Rajesh Developers on North-corridor JD parcel', createdAt: '2026-06-24T10:22:00+00:00' },
+  { id: 'ev_5', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'document', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel', createdAt: '2026-06-24T10:31:00+00:00' },
+  { id: 'ev_6', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'message', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room', createdAt: '2026-06-25T11:40:00+00:00' },
+]
