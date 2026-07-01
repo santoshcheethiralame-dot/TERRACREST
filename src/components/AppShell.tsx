@@ -1,0 +1,54 @@
+import type { ReactNode } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import type { Role } from '@/domain/types'
+import { useAuth } from '@/auth/AuthContext'
+import { Seal } from '@/components/Seal'
+
+const ROLE_LABEL: Record<Role, string> = {
+  builder: 'Builder',
+  landowner: 'Land Owner',
+  investor: 'Investor',
+  admin: 'Desk',
+}
+
+/** Shared chrome for authenticated screens: crest, member identity, sign-out. */
+export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNode }) {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const onLogout = () => {
+    logout()
+    navigate('/')
+  }
+
+  return (
+    <div className="grain min-h-screen bg-ink text-ivory">
+      <header className="sticky top-0 z-40 border-b border-line bg-ink/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4 md:px-10">
+          <div className="flex items-center gap-8">
+            <Link to="/app" className="flex items-center gap-3">
+              <Seal size={24} />
+              <span className="label text-ivory-dim">Terracrest</span>
+            </Link>
+            {nav}
+          </div>
+          <div className="flex items-center gap-5">
+            {user && (
+              <div className="hidden text-right sm:block">
+                <p className="mono text-[0.72rem] text-ivory">{user.displayName.split('·')[0].trim()}</p>
+                <p className="label text-ivory-faint">{ROLE_LABEL[user.role]}</p>
+              </div>
+            )}
+            <button
+              onClick={onLogout}
+              className="label border border-line px-4 py-2.5 text-ivory-faint transition-colors hover:border-[color:var(--line-gold)] hover:text-gold"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-shell px-6 py-10 md:px-10 md:py-14">{children}</main>
+    </div>
+  )
+}

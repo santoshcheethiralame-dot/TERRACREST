@@ -1,0 +1,227 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DB TERRACREST ADVISORY — Design tokens
+   "The Confidential Dossier" — private-bank deal memo aesthetic
+   ============================================================ */
+:root {
+  /* surfaces */
+  --ink: #0e0e11;
+  --ink-raise: #15151a;
+  --ink-card: #1a1a20;
+  --navy: #0f172a;
+
+  /* text — warm ivories */
+  --ivory: #f4f1e8;
+  --ivory-dim: #b0ab9d;
+  --ivory-faint: #726d61;
+
+  /* brushed gold — the single precious accent */
+  --gold: #c9a227;
+  --gold-bright: #e3c766;
+  --gold-deep: #9a7b1c;
+
+  /* zone accents — Bull / Bear */
+  --emerald: #3a6b58;
+  --emerald-bright: #5c9b80;
+  --oxblood: #8a3a34;
+  --oxblood-bright: #bd6552;
+
+  /* hairlines */
+  --line: rgba(244, 241, 232, 0.09);
+  --line-strong: rgba(244, 241, 232, 0.16);
+  --line-gold: rgba(201, 162, 39, 0.30);
+}
+
+*,
+*::before,
+*::after {
+  border-color: var(--line);
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--ink);
+  color: var(--ivory);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-feature-settings: 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  line-height: 1.02;
+  margin: 0;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.26);
+  color: var(--ivory);
+}
+
+/* ---- scrollbar ---- */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb {
+  background: #2b2b32;
+  border: 3px solid var(--ink);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
+
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ============================================================
+   Component primitives
+   ============================================================ */
+@layer components {
+  /* dossier label — monospaced, wide-tracked small caps */
+  .label {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.66rem;
+    line-height: 1;
+    color: var(--ivory-faint);
+  }
+
+  .mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* hairline separators */
+  .hairline { height: 1px; width: 100%; background: var(--line); }
+  .hairline-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-gold), transparent);
+  }
+
+  /* subtle brushed-gold text */
+  .text-gilt {
+    background: linear-gradient(176deg, var(--gold-bright), var(--gold) 52%, var(--gold-deep));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* REDACTION — the signature masked-data motif */
+  .redaction {
+    position: relative;
+    color: transparent !important;
+    user-select: none;
+    border-radius: 2px;
+    background-color: var(--ink-card);
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgb(10, 10, 12) 0 5px,
+      rgb(40, 40, 47) 5px 10px
+    );
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .redaction::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(201, 162, 39, 0.05);
+  }
+
+  /* verification seal ring */
+  .seal-ring {
+    border: 1px solid var(--line-gold);
+    box-shadow: inset 0 0 0 3px rgba(201, 162, 39, 0.06);
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+@layer utilities {
+  /* architectural blueprint grid — atmosphere */
+  .blueprint {
+    background-color: var(--ink);
+    background-image:
+      linear-gradient(rgba(201, 162, 39, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201, 162, 39, 0.045) 1px, transparent 1px),
+      linear-gradient(rgba(244, 241, 232, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244, 241, 232, 0.022) 1px, transparent 1px);
+    background-size: 128px 128px, 128px 128px, 32px 32px, 32px 32px;
+    background-position: center;
+  }
+
+  .vignette {
+    background: radial-gradient(120% 90% at 50% 0%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+  }
+
+  /* film grain — depth without color */
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0.038;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* ============================================================
+   Motion
+   ============================================================ */
+/* Reveal for unsealed values — enhancement only; the element's
+   resting state is fully visible, so a throttled tab still shows it. */
+@keyframes unseal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.unseal-in {
+  animation: unseal 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Leaflet, dark-filtered to match the dossier ---- */
+.leaflet-container {
+  background: var(--ink);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+.tc-map .leaflet-tile {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+.leaflet-control-zoom a {
+  background: var(--ink-card) !important;
+  color: var(--gold) !important;
+  border: 1px solid var(--line) !important;
+}
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

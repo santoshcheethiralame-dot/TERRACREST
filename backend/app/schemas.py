@@ -1,0 +1,141 @@
+from typing import Any, Optional
+
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
+
+from . import models
+
+
+class CamelModel(BaseModel):
+    """Serializes to camelCase to match the frontend domain types exactly,
+    while reading snake_case attributes off the ORM objects."""
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, from_attributes=True)
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class UserOut(CamelModel):
+    id: str
+    username: str
+    display_name: str
+    role: str
+    office_location: Optional[str] = None
+    kyc_verified: bool
+    member_since: str
+
+
+class LoginResponse(CamelModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    user: UserOut
+
+
+class TokenPair(CamelModel):
+    access_token: str
+    refresh_token: str
+
+
+class RefreshRequest(BaseModel):
+    refreshToken: str
+
+
+class ListingOut(CamelModel):
+    id: str
+    vertical: str
+    headline: str
+    status: str
+    locality_label: str
+    area_label: str
+    land_area_sqft: int
+    zoning: str
+    locality_note: str
+    verification: dict
+    guidance: dict
+    public_area: Optional[dict] = None  # coarse area, always shown
+    sealed: Optional[dict] = None  # withheld unless caller is entitled
+    jd: Optional[dict] = None
+    warehouse: Optional[dict] = None
+    big_land: Optional[dict] = None
+    comps: list[Any]
+    feasibility: dict
+    created_at: str
+
+
+class NdaOut(CamelModel):
+    id: str
+    builder_id: str
+    landowner_id: str
+    listing_id: str
+    signed_on: str
+    witnessed_by: str
+    scan_ref: str
+
+
+class OfferOut(CamelModel):
+    id: str
+    listing_id: str
+    builder: str
+    type: str
+    quote: str
+    terms: str
+    status: str
+
+
+class EngagementOut(CamelModel):
+    listing_id: str
+    views: list[Any]
+    shortlists: list[Any]
+    site_visits: list[Any]
+
+
+class DocumentOut(CamelModel):
+    id: str
+    listing_id: str
+    name: str
+    kind: str
+
+
+class DealOut(CamelModel):
+    id: str
+    listing_id: str
+    builder_id: str
+    stage: str
+    est_commission: int
+    rm: str
+
+
+class UnlockState(BaseModel):
+    unlocked: bool
+
+
+# --- admin request bodies (camelCase to match the frontend) ---
+class CreateUserRequest(BaseModel):
+    username: str
+    displayName: str
+    role: str
+    officeLocation: Optional[str] = None
+
+
+class CreateNdaRequest(BaseModel):
+    builderId: str
+    listingId: str
+
+
+class UpdateStatusRequest(BaseModel):
+    status: str
+
+
+def serialize_listing(listing: "models.Listing", include_sealed: bool) -> ListingOut:
+    """The heart of the moat: sealed details are attached only when entitled;
+    otherwise they never leave the server."""
+    out = ListingOut.model_validate(listing)
+    if include_sealed:
+        out.sealed = {**listing.sealed, "ownerId": listing.owner_id}
+    else:
+        out.sealed = None
+    return out
