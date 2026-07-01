@@ -6,7 +6,7 @@
    mid-use; if the refresh itself fails, it triggers logout.
    ============================================================ */
 
-export const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+export const API_URL = (import.meta.env.VITE_API_URL ?? '').trim().replace(/\/$/, '')
 export const apiEnabled = API_URL.length > 0
 
 let accessToken: string | null = null
