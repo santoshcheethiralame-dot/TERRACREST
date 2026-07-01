@@ -42,18 +42,21 @@ All seeded accounts use the password `demo`:
 
 ## Deploy (make the public link full-stack)
 
-**Render — one-click blueprint:**
+**Render — one-click blueprint (free):**
 1. Push this repo to GitHub (already connected).
 2. Render → **New → Blueprint** → pick this repo. The root `render.yaml`
-   provisions a free web service **and** a free Postgres and wires them together
-   (JWT secret auto-generated, CORS set to the Vercel origin). First boot
-   **auto-seeds** the database.
+   provisions a free web service (JWT secret auto-generated, CORS set to the
+   Vercel origin). First boot **auto-seeds** the database.
 3. Copy the deployed API URL (e.g. `https://terracrest-api.onrender.com`).
 4. In **Vercel → the `terracrest` project → Settings → Environment Variables**,
    add `VITE_API_URL = <that URL>` and redeploy. The public site is now full-stack.
 
-If you use a custom domain for the frontend, add it to `TERRACREST_CORS_ORIGINS`.
+The free tier runs on ephemeral SQLite (resets to the clean demo on each wake)
+and sleeps after ~15 min idle (first request then cold-starts in ~50s — warm it
+up before a demo). If you use a custom domain, add it to `TERRACREST_CORS_ORIGINS`.
+
+**Persistent data:** attach any Postgres (Neon/Supabase free tier work) and set
+`DATABASE_URL` on the service — no code changes.
 
 **On-prem (the spec's zero-cloud path):** point `DATABASE_URL` at your own
 PostgreSQL and run the Docker image (`backend/Dockerfile`) on company hardware.
-No code changes — SQLite (dev) → Postgres (prod) is a URL swap.
