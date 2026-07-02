@@ -22,8 +22,9 @@ The product's two signatures:
 ## Stack
 
 - **Frontend** — Vite + React + TypeScript, Tailwind, Framer Motion, Leaflet.
-  Design language: the "Confidential Dossier" — charcoal, brushed gold, ivory;
-  Cormorant Garamond over Satoshi and IBM Plex Mono.
+  Design language: "Blueprint Noir" — near-black ink, electric indigo, bone type;
+  Space Grotesk display over Satoshi body and IBM Plex Mono annotations, with
+  wireframe massing art and redaction bars as the house motifs.
 - **Backend** — FastAPI + SQLAlchemy + Postgres (SQLite in dev), JWT access/refresh,
   bcrypt, watermarked-PDF document vault, an append-only audit trail.
 - **Seam** — the frontend talks to a single async repository

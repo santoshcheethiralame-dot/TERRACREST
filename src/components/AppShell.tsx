@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Role } from '@/domain/types'
 import { useAuth } from '@/auth/AuthContext'
-import { Seal } from '@/components/Seal'
 
 const ROLE_LABEL: Record<Role, string> = {
   builder: 'Builder',
@@ -26,9 +25,9 @@ export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNo
       <header className="sticky top-0 z-40 border-b border-line bg-ink/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4 md:px-10">
           <div className="flex items-center gap-8">
-            <Link to="/app" className="flex items-center gap-3">
-              <Seal size={24} />
-              <span className="label text-ivory-dim">Terracrest</span>
+            <Link to="/app" className="flex items-baseline gap-2.5">
+              <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
+              <span className="font-display text-[0.98rem] font-bold tracking-tight2 text-ivory">TERRACREST</span>
             </Link>
             {nav}
           </div>
@@ -41,7 +40,7 @@ export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNo
             )}
             <button
               onClick={onLogout}
-              className="label border border-line px-4 py-2.5 text-ivory-faint transition-colors hover:border-[color:var(--line-gold)] hover:text-gold"
+              className="label border border-line px-4 py-2.5 text-ivory-faint transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
             >
               Sign out
             </button>

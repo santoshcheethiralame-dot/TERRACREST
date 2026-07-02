@@ -14,7 +14,7 @@ export function Slider({ label, value, min, max, step = 1, onChange, format, hin
     <div>
       <div className="flex items-baseline justify-between gap-4">
         <label className="label text-ivory-faint">{label}</label>
-        <span className="mono text-sm text-gold">{format ? format(value) : value}</span>
+        <span className="mono text-sm text-accent">{format ? format(value) : value}</span>
       </div>
       <input
         type="range"
@@ -24,7 +24,7 @@ export function Slider({ label, value, min, max, step = 1, onChange, format, hin
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         aria-label={label}
-        className="mt-2.5 h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--line-strong)] accent-[#c9a227]"
+        className="mt-2.5 h-1 w-full cursor-pointer appearance-none rounded-full bg-[color:var(--line-strong)] accent-[#8A7DFF]"
       />
       {hint && <p className="mt-1.5 text-[0.7rem] leading-snug text-ivory-faint">{hint}</p>}
     </div>

@@ -135,7 +135,7 @@ function StudioBar({ listing, review, onEngage }: { listing: Listing; review: Ar
         </Link>
         <div className="hidden h-4 w-px bg-[color:var(--line-strong)] sm:block" />
         <div className="hidden sm:block">
-          <p className="label text-gold">Feasibility Studio</p>
+          <p className="label text-accent">Feasibility Studio</p>
           <p className="mono mt-1 text-[0.72rem] text-ivory-dim">
             {listing.id} · {VERTICAL_LABEL[listing.vertical]} · {listing.localityLabel.split('·')[0].trim()}
           </p>
@@ -146,7 +146,7 @@ function StudioBar({ listing, review, onEngage }: { listing: Listing; review: Ar
         className={`label group inline-flex items-center gap-3 border px-5 py-3 transition-colors duration-500 ${
           delivered
             ? 'border-emerald/50 text-emerald-bright hover:bg-emerald hover:text-ink'
-            : 'border-[color:var(--line-gold)] text-gold hover:bg-gold hover:text-ink'
+            : 'border-[color:var(--line-accent)] text-accent hover:bg-accent hover:text-ink'
         }`}
       >
         {delivered && <span aria-hidden>✓</span>}
@@ -172,14 +172,14 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
     <svg viewBox={vb} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Live parcel massing schematic">
       {/* road along frontage (bottom) */}
       <g>
-        <rect x={0} y={plot.h + road * 0.35} width={plot.w} height={road * 0.5} fill="#726d61" fillOpacity="0.08" stroke="#726d61" strokeOpacity="0.4" strokeWidth={sw * 0.7} />
-        <text x={plot.w / 2} y={plot.h + road * 0.72} textAnchor="middle" fill="#726d61" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.82} letterSpacing={fs * 0.03}>
+        <rect x={0} y={plot.h + road * 0.35} width={plot.w} height={road * 0.5} fill="#67676F" fillOpacity="0.08" stroke="#67676F" strokeOpacity="0.4" strokeWidth={sw * 0.7} />
+        <text x={plot.w / 2} y={plot.h + road * 0.72} textAnchor="middle" fill="#67676F" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.82} letterSpacing={fs * 0.03}>
           {feas.roadWidthFt} FT ROAD · FRONTAGE
         </text>
       </g>
 
       {/* parcel boundary */}
-      <rect x={0} y={0} width={plot.w} height={plot.h} fill="none" stroke="#c9a227" strokeOpacity="0.7" strokeWidth={sw} />
+      <rect x={0} y={0} width={plot.w} height={plot.h} fill="none" stroke="#8A7DFF" strokeOpacity="0.7" strokeWidth={sw} />
       {/* setback envelope */}
       <rect
         x={plan.buildable.x}
@@ -187,7 +187,7 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
         width={plan.buildable.w}
         height={plan.buildable.h}
         fill="none"
-        stroke="#c9a227"
+        stroke="#8A7DFF"
         strokeOpacity="0.32"
         strokeWidth={sw * 0.8}
         strokeDasharray={`${U * 0.02} ${U * 0.02}`}
@@ -200,16 +200,16 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
           initial={false}
           animate={{ x: t.x, y: t.y, width: t.w, height: t.h }}
           transition={{ duration: 0.6, ease: EASE }}
-          fill="#c9a227"
+          fill="#8A7DFF"
           fillOpacity="0.13"
-          stroke="#c9a227"
+          stroke="#8A7DFF"
           strokeOpacity="0.62"
           strokeWidth={sw}
         />
       ))}
 
       {/* dimension — frontage */}
-      <g stroke="#726d61" strokeWidth={sw * 0.6} fill="#726d61">
+      <g stroke="#67676F" strokeWidth={sw * 0.6} fill="#67676F">
         <line x1={0} y1={-padY * 0.5} x2={plot.w} y2={-padY * 0.5} strokeOpacity="0.5" />
         <line x1={0} y1={-padY * 0.62} x2={0} y2={-padY * 0.38} strokeOpacity="0.5" />
         <line x1={plot.w} y1={-padY * 0.62} x2={plot.w} y2={-padY * 0.38} strokeOpacity="0.5" />
@@ -218,7 +218,7 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
         </text>
       </g>
       {/* dimension — depth */}
-      <g stroke="#726d61" strokeWidth={sw * 0.6} fill="#726d61">
+      <g stroke="#67676F" strokeWidth={sw * 0.6} fill="#67676F">
         <line x1={-padX * 0.5} y1={0} x2={-padX * 0.5} y2={plot.h} strokeOpacity="0.5" />
         <text
           x={-padX * 0.62}
@@ -235,9 +235,9 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
       </g>
 
       {/* north arrow */}
-      <g transform={`translate(${plot.w + padX * 0.45} ${padY * 0.2})`} stroke="#726d61" strokeWidth={sw * 0.8} fill="none">
+      <g transform={`translate(${plot.w + padX * 0.45} ${padY * 0.2})`} stroke="#67676F" strokeWidth={sw * 0.8} fill="none">
         <path d={`M0 ${fs * 1.6} L0 0 M${-fs * 0.35} ${fs * 0.4} L0 0 L${fs * 0.35} ${fs * 0.4}`} />
-        <text x={0} y={fs * 2.6} textAnchor="middle" fill="#726d61" stroke="none" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.9}>
+        <text x={0} y={fs * 2.6} textAnchor="middle" fill="#67676F" stroke="none" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.9}>
           N
         </text>
       </g>
@@ -261,7 +261,7 @@ function MetricsStrip({ gdv }: { gdv: GdvResult }) {
       {cells.map((c, i) => (
         <div key={c.k} className={`px-4 py-4 ${i % 3 !== 2 ? 'border-r border-line' : ''} ${i < 3 ? 'border-b border-line md:border-b-0' : ''} md:border-r`}>
           <div className="label text-ivory-faint">{c.k}</div>
-          <div className="mono mt-1.5 text-sm text-ivory">{c.v}</div>
+          <div className="mono mt-1.5 whitespace-nowrap text-[0.82rem] text-ivory">{c.v}</div>
         </div>
       ))}
     </div>
@@ -273,7 +273,7 @@ function Controls({ feas, set, listing }: { feas: FeasibilityInput; set: (p: Par
   const fsiCap = listing.jd?.fsi
   return (
     <div>
-      <p className="label text-gold">Design Parameters</p>
+      <p className="label text-accent">Design Parameters</p>
       <div className="mt-6 space-y-6">
         <Slider label="Towers" value={feas.towers} min={1} max={6} onChange={(v) => set({ towers: v })} />
         <Slider label="Floors (G +)" value={feas.floors} min={2} max={24} onChange={(v) => set({ floors: v })} format={(v) => `G+${v}`} />
@@ -300,7 +300,7 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="label text-gold">Material Specification</p>
+        <p className="label text-accent">Material Specification</p>
         <span className="mono text-xs text-ivory-dim">finishes +₹{groupIN(finishesPsf)}/sq ft</span>
       </div>
       <div className="mt-6 space-y-5">
@@ -320,7 +320,7 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
                       key={t}
                       onClick={() => onSelect(cat.key, t)}
                       className={`label border px-2 py-2 text-[0.58rem] transition-colors duration-300 ${
-                        active ? 'border-[color:var(--line-gold)] bg-gold/10 text-gold' : 'border-line text-ivory-faint hover:text-ivory'
+                        active ? 'border-[color:var(--line-accent)] bg-accent/10 text-accent' : 'border-line text-ivory-faint hover:text-ivory'
                       }`}
                     >
                       {TIER_LABEL[t]}
@@ -351,7 +351,7 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
         {/* headline — ML-adjusted net value with its calibrated band */}
         <div>
           <p className="label text-ivory-faint">ML-adjusted NDV · Market</p>
-          <p className="font-display text-4xl text-gilt md:text-5xl">{crFromRupees(headline)}</p>
+          <p className="font-display text-4xl font-semibold tracking-tight2 text-beam md:text-5xl">{crFromRupees(headline)}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             {prediction && (
               <span className="mono text-[0.72rem] text-ivory-dim">
@@ -364,7 +364,7 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
                 {prediction.adjustmentPct}% vs parametric {crFromRupees(base.netValue)}
               </span>
             )}
-            <button onClick={onModelCard} className="label text-gold transition-colors hover:text-gold-bright">
+            <button onClick={onModelCard} className="label text-accent transition-colors hover:text-accent-bright">
               Model card ›
             </button>
           </div>
@@ -373,14 +373,14 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
         {/* three-zone bar */}
         <div className="px-1">
           <div className="relative h-[3px] w-full bg-[color:var(--line-strong)]">
-            <div className="absolute inset-y-0 left-0 bg-gold/40" style={{ width: `${basePos}%` }} />
+            <div className="absolute inset-y-0 left-0 bg-accent/40" style={{ width: `${basePos}%` }} />
             <Tick pos={0} tone="oxblood" />
-            <Tick pos={basePos} tone="gold" />
+            <Tick pos={basePos} tone="accent" />
             <Tick pos={100} tone="emerald" />
           </div>
           <div className="mt-3 flex justify-between">
             <ZoneLabel tone="text-oxblood-bright" name="Bear" value={crFromRupees(bear.netValue)} />
-            <ZoneLabel tone="text-gold" name="Base" value={crFromRupees(base.netValue)} center />
+            <ZoneLabel tone="text-accent" name="Base" value={crFromRupees(base.netValue)} center />
             <ZoneLabel tone="text-emerald-bright" name="Bull" value={crFromRupees(bull.netValue)} right />
           </div>
         </div>
@@ -396,8 +396,8 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
   )
 }
 
-function Tick({ pos, tone }: { pos: number; tone: 'oxblood' | 'gold' | 'emerald' }) {
-  const color = tone === 'oxblood' ? '#bd6552' : tone === 'emerald' ? '#5c9b80' : '#c9a227'
+function Tick({ pos, tone }: { pos: number; tone: 'oxblood' | 'accent' | 'emerald' }) {
+  const color = tone === 'oxblood' ? '#FF7A6A' : tone === 'emerald' ? '#4ADE9E' : '#8A7DFF'
   return (
     <span
       className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 border"
@@ -456,7 +456,7 @@ function EngageModal({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
+        className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto border border-[color:var(--line-accent)] bg-ink-card p-8 shadow-deep"
       >
         {review?.status === 'delivered' ? (
           <DeliveredView review={review} onClose={onClose} />
@@ -473,11 +473,11 @@ function EngageModal({
 function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: Listing; gdv: GdvResult; busy: boolean; onProceed: () => void; onClose: () => void }) {
   return (
     <div>
-      <p className="label text-gold">Stage Two · Original Architecture</p>
+      <p className="label text-accent">Stage Two · Original Architecture</p>
       <h3 className="mt-4 font-display text-3xl text-ivory">Engage the empanelled architect</h3>
       <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
         Your feasibility on <span className="mono text-ivory">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a market
-        Net Development Value of <span className="text-gold">{crFromRupees(gdv.zones.base.netValue)}</span> — is snapshotted and handed to our empanelled architect for
+        Net Development Value of <span className="text-accent">{crFromRupees(gdv.zones.base.netValue)}</span> — is snapshotted and handed to our empanelled architect for
         stamped, buildable drawings validated against this model.
       </p>
       <div className="mt-6 flex items-baseline justify-between border-y border-line py-4">
@@ -489,7 +489,7 @@ function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: List
         <button onClick={onClose} disabled={busy} className="label flex-1 border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory disabled:opacity-50">
           Not yet
         </button>
-        <button onClick={onProceed} disabled={busy} className="label flex-1 bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:opacity-60">
+        <button onClick={onProceed} disabled={busy} className="label flex-1 bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-60">
           {busy ? 'Commissioning…' : 'Proceed →'}
         </button>
       </div>
@@ -500,7 +500,7 @@ function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: List
 function RequestedView({ review, listing, onClose }: { review: ArchitectReview; listing: Listing; onClose: () => void }) {
   return (
     <div>
-      <p className="label text-gold">Stage Two · In Progress</p>
+      <p className="label text-accent">Stage Two · In Progress</p>
       <h3 className="mt-4 font-display text-3xl text-ivory">Validation commissioned</h3>
       <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
         Your model on <span className="mono text-ivory">{listing.id}</span> is with the empanelled architect. They return stamped drawings and an independent Net
@@ -509,7 +509,7 @@ function RequestedView({ review, listing, onClose }: { review: ArchitectReview; 
       <div className="mt-6 space-y-3 border-y border-line py-4">
         <Row k="Commissioned" v={fmtDate(review.requestedAt)} />
         <Row k="ML estimate (Market)" v={crFromRupees(review.mlSnapshot.baseNet)} />
-        <Row k="Status" v="Awaiting architect" tone="text-gold" />
+        <Row k="Status" v="Awaiting architect" tone="text-accent" />
       </div>
       <button onClick={onClose} className="label mt-7 w-full border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory">
         Close
@@ -535,8 +535,8 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
           <p className="mono mt-2 text-2xl text-ivory">{crFromRupees(ml)}</p>
         </div>
         <div className="bg-ink-card p-5">
-          <p className="label text-gold">Architect · Validated</p>
-          <p className="mono mt-2 text-2xl text-gilt">{crFromRupees(arch)}</p>
+          <p className="label text-accent">Architect · Validated</p>
+          <p className="mono mt-2 text-2xl text-beam">{crFromRupees(arch)}</p>
         </div>
       </div>
 
@@ -556,7 +556,7 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
       )}
 
       <p className="mono mt-5 text-[0.72rem] text-ivory-faint">Delivered {fmtDate(review.deliveredAt ?? review.requestedAt)} · stamped drawings issued to your Deal Room.</p>
-      <button onClick={onClose} className="label mt-6 w-full bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright">
+      <button onClick={onClose} className="label mt-6 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright">
         Close
       </button>
     </div>
@@ -592,7 +592,7 @@ function ModelCardModal({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
+        className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-accent)] bg-ink-card p-8 shadow-deep"
       >
         {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ivory-faint">Loading the model…</p>}
         <button onClick={onClose} className="label mt-7 w-full border border-line py-3 text-ivory-dim transition-colors hover:text-ivory">

@@ -38,7 +38,7 @@ export function BuilderDashboard() {
   return (
     <AppShell nav={<BuilderNav />}>
       <section>
-        <p className="label text-gold">Discovery</p>
+        <p className="label text-accent">Discovery</p>
         <h1 className="mt-4 font-display text-5xl text-ivory md:text-6xl">Curated for you.</h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ivory-dim">
           Parcels chosen by your relationship manager — not an algorithm. Location, ownership and documents stay sealed
@@ -106,7 +106,7 @@ export function BuilderDashboard() {
 
 function BuilderNav() {
   const linkCls = ({ isActive }: { isActive: boolean }) =>
-    `label transition-colors ${isActive ? 'text-gold' : 'text-ivory-faint hover:text-ivory'}`
+    `label transition-colors ${isActive ? 'text-accent' : 'text-ivory-faint hover:text-ivory'}`
   return (
     <nav className="hidden items-center gap-7 md:flex">
       <NavLink to="/app" end className={linkCls}>

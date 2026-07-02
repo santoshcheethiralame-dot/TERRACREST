@@ -36,7 +36,7 @@ export function InvestorDashboard() {
   return (
     <AppShell>
       <section>
-        <p className="label text-gold">Big Land</p>
+        <p className="label text-accent">Big Land</p>
         <h1 className="mt-4 font-display text-5xl text-ivory md:text-6xl">Land, held for the long arc.</h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ivory-dim">
           Verified, contiguous parcels for patient capital — sized by investment, holding period and admin-assessed appreciation.
@@ -69,8 +69,8 @@ export function InvestorDashboard() {
                   <td className="px-5 py-4 text-sm text-ivory">{h.parcel}</td>
                   <td className="mono px-5 py-4 text-sm text-ivory-dim">{h.acquired}</td>
                   <td className="mono px-5 py-4 text-sm text-ivory-dim">{formatCr(h.invested, 0)}</td>
-                  <td className="mono px-5 py-4 text-sm text-gold">{formatCr(h.current, 0)}</td>
-                  <td className="px-5 py-4 text-[0.82rem] italic text-ivory-faint">{h.note}</td>
+                  <td className="mono px-5 py-4 text-sm text-accent">{formatCr(h.current, 0)}</td>
+                  <td className="px-5 py-4 text-[0.82rem] text-ivory-faint">{h.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -89,7 +89,7 @@ export function InvestorDashboard() {
               <motion.div key={l.id} variants={rise}>
                 <Link
                   to={`/listing/${l.id}`}
-                  className="group flex flex-col border border-line bg-ink-raise/40 p-7 transition-colors hover:border-[color:var(--line-gold)]"
+                  className="group flex flex-col border border-line bg-ink-raise/40 p-7 transition-colors hover:border-[color:var(--line-accent)]"
                 >
                   <div className="flex items-center justify-between">
                     <span className="mono text-[0.72rem] text-ivory-dim">{l.id}</span>
@@ -104,7 +104,7 @@ export function InvestorDashboard() {
                     <MiniStat label="Area" value={l.areaLabel.replace('≈ ', '')} />
                   </div>
 
-                  {l.bigLand && <p className="mt-5 font-display text-[1.02rem] italic leading-snug text-ivory-faint">“{l.bigLand.appreciationNote}.”</p>}
+                  {l.bigLand && <p className="mt-5 text-[0.88rem] leading-relaxed text-ivory-faint">“{l.bigLand.appreciationNote}.”</p>}
                   <span className="mt-5 self-end text-ivory-faint transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </Link>
               </motion.div>
@@ -116,7 +116,7 @@ export function InvestorDashboard() {
   )
 }
 
-function Stat({ label, value, tone = 'text-gilt' }: { label: string; value: string; tone?: string }) {
+function Stat({ label, value, tone = 'text-beam' }: { label: string; value: string; tone?: string }) {
   return (
     <div className="bg-ink px-6 py-7 text-center">
       <div className={`font-display text-4xl md:text-5xl ${tone}`}>{value}</div>

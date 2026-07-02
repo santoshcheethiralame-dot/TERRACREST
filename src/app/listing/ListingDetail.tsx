@@ -100,7 +100,7 @@ export function ListingDetail() {
       <AppShell nav={<BackNav />}>
         <div className="py-24 text-center">
           <h1 className="font-display text-4xl text-ivory">Parcel not found</h1>
-          <Link to="/app" className="label mt-6 inline-block text-gold">
+          <Link to="/app" className="label mt-6 inline-block text-accent">
             ← Back to discovery
           </Link>
         </div>
@@ -138,7 +138,7 @@ export function ListingDetail() {
           <div className="flex items-center gap-3">
             <span className="mono text-[0.72rem] text-ivory-dim">{listing.id}</span>
             <span className="text-ivory-faint">·</span>
-            <span className="label text-gold">{VERTICAL_LABEL[listing.vertical]}</span>
+            <span className="label text-accent">{VERTICAL_LABEL[listing.vertical]}</span>
             <span className="text-ivory-faint">·</span>
             <span className="label text-ivory-faint">{STATUS_LABEL[listing.status]}</span>
           </div>
@@ -149,7 +149,7 @@ export function ListingDetail() {
           <div className="mt-8 flex items-start gap-5 border-y border-line py-6">
             <Seal size={58} text="· PHYSICALLY VERIFIED · TERRACREST " />
             <div>
-              <p className="font-display text-lg italic leading-snug text-ivory">“{listing.localityNote}”</p>
+              <p className="border-l-2 border-[color:var(--line-accent)] pl-4 text-[0.98rem] leading-relaxed text-ivory">“{listing.localityNote}”</p>
               <p className="label mt-3 text-ivory-faint">
                 {listing.verification.by} · {listing.verification.on}
               </p>
@@ -219,7 +219,7 @@ export function ListingDetail() {
                     {listing.vertical === 'joint-development' && (
                       <Link
                         to={`/studio/${listing.id}`}
-                        className="label group flex items-center justify-center gap-3 bg-gold py-4 text-ink transition-colors hover:bg-gold-bright"
+                        className="label group flex items-center justify-center gap-3 bg-accent py-4 text-ink transition-colors hover:bg-accent-bright"
                       >
                         Open Feasibility Studio
                         <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
@@ -244,7 +244,7 @@ export function ListingDetail() {
                     <button
                       onClick={unlock}
                       disabled={unlocking}
-                      className="label group flex w-full items-center justify-center gap-3 border border-[color:var(--line-gold)] py-3.5 text-gold transition-colors duration-500 hover:bg-gold hover:text-ink disabled:opacity-50"
+                      className="label group flex w-full items-center justify-center gap-3 border border-[color:var(--line-accent)] py-3.5 text-accent transition-colors duration-500 hover:bg-accent hover:text-ink disabled:opacity-50"
                     >
                       {unlocking ? 'Desk logging NDA…' : '▶ Simulate executed NDA (demo)'}
                     </button>
@@ -263,12 +263,12 @@ export function ListingDetail() {
 
 function RiskScorecard({ risk }: { risk: RiskScore | null }) {
   if (!risk) return null
-  const gradeColor = risk.grade === 'A' ? 'text-emerald-bright' : risk.grade === 'B' ? 'text-gold' : 'text-oxblood-bright'
+  const gradeColor = risk.grade === 'A' ? 'text-emerald-bright' : risk.grade === 'B' ? 'text-accent' : 'text-oxblood-bright'
   return (
     <div className="mt-10 border-t border-line pt-8">
       <div className="flex items-center justify-between">
         <div>
-          <p className="label text-gold">Risk Scorecard</p>
+          <p className="label text-accent">Risk Scorecard</p>
           <p className="mt-1.5 text-[0.82rem] text-ivory-faint">Transparent and rules-based — every point is an auditable factor, not a black box.</p>
         </div>
         <div className="flex items-baseline gap-2">
@@ -284,7 +284,7 @@ function RiskScorecard({ risk }: { risk: RiskScore | null }) {
               <span className="mono text-sm text-ivory">{b.score}</span>
             </div>
             <div className="mt-1.5 h-1.5 bg-[color:var(--line)]">
-              <div className="h-full bg-gold" style={{ width: `${b.score}%` }} />
+              <div className="h-full bg-accent" style={{ width: `${b.score}%` }} />
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {b.factors.map((f, i) => (
@@ -336,7 +336,7 @@ function DealRoom({
           const mine = m.authorId === currentUserId
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] border px-4 py-3 ${mine ? 'border-[color:var(--line-gold)] bg-gold/10' : 'border-line bg-ink-raise/50'}`}>
+              <div className={`max-w-[80%] border px-4 py-3 ${mine ? 'border-[color:var(--line-accent)] bg-accent/10' : 'border-line bg-ink-raise/50'}`}>
                 <div className="label text-ivory-faint">
                   {m.authorName.split('·')[0].trim()} · {new Date(m.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </div>
@@ -351,9 +351,9 @@ function DealRoom({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Write a message…"
-          className="mono flex-1 border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-gold)]"
+          className="mono flex-1 border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-accent)]"
         />
-        <button type="submit" disabled={sending || !draft.trim()} className="label bg-gold px-6 py-3 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+        <button type="submit" disabled={sending || !draft.trim()} className="label bg-accent px-6 py-3 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
           {sending ? '…' : 'Send'}
         </button>
       </form>
@@ -387,7 +387,7 @@ function VaultRow({ name, unlocked, doc, onOpen }: { name: string; unlocked: boo
     <div className="flex items-center justify-between">
       <span className="text-[0.86rem] text-ivory-dim">{name}</span>
       {unlocked && doc ? (
-        <button onClick={() => onOpen(doc)} className="label text-gold transition-colors hover:text-gold-bright">
+        <button onClick={() => onOpen(doc)} className="label text-accent transition-colors hover:text-accent-bright">
           View ↓
         </button>
       ) : (
@@ -426,7 +426,7 @@ function Specs({ listing }: { listing: Listing }) {
   }
   return (
     <div className="mt-8">
-      <p className="label text-gold">Development potential</p>
+      <p className="label text-accent">Development potential</p>
       <dl className="mt-4 divide-y divide-[color:var(--line)] border-y border-line">
         {rows.map(([k, v]) => (
           <div key={k} className="flex items-baseline justify-between gap-6 py-3">
@@ -442,7 +442,7 @@ function Specs({ listing }: { listing: Listing }) {
 function Comps({ listing }: { listing: Listing }) {
   return (
     <div className="mt-8">
-      <p className="label text-gold">Comparable sales — admin-maintained</p>
+      <p className="label text-accent">Comparable sales — admin-maintained</p>
       <div className="mt-4 overflow-hidden border border-line">
         <table className="w-full text-left">
           <thead>

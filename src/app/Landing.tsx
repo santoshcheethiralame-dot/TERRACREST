@@ -1,18 +1,20 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Seal } from '@/components/Seal'
+import { MassingArt } from '@/components/MassingArt'
 import { Redaction } from '@/components/Redaction'
-import { rise, fade, stagger, inView } from '@/lib/motion'
+import { EASE, fade, rise, stagger, inView } from '@/lib/motion'
 
 export function Landing() {
   return (
     <div className="grain relative min-h-screen bg-ink text-ivory">
       <TopBar />
       <Hero />
-      <Difference />
+      <Marquee />
       <StatsBand />
+      <Platform />
       <StudioTease />
+      <Protocol />
       <Footer />
     </div>
   )
@@ -23,18 +25,21 @@ function TopBar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-ink/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4 md:px-10">
-        <Link to="/" className="flex items-center gap-3">
-          <Seal size={26} />
-          <span className="label text-ivory-dim">DB Terracrest Advisory</span>
+        <Link to="/" className="flex items-baseline gap-2.5">
+          <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
+          <span className="font-display text-[1.05rem] font-bold tracking-tight2 text-ivory">TERRACREST</span>
         </Link>
         <nav className="flex items-center gap-8">
-          <a href="#difference" className="label hidden text-ivory-faint transition-colors hover:text-ivory sm:block">
-            The Difference
+          <a href="#platform" className="label hidden text-ivory-faint transition-colors hover:text-ivory md:block">
+            Platform
           </a>
-          <Link
-            to="/login"
-            className="label border border-[color:var(--line-gold)] px-4 py-2.5 text-gold transition-colors duration-500 hover:bg-gold hover:text-ink"
-          >
+          <a href="#intelligence" className="label hidden text-ivory-faint transition-colors hover:text-ivory md:block">
+            Intelligence
+          </a>
+          <a href="#access" className="label hidden text-ivory-faint transition-colors hover:text-ivory md:block">
+            Access
+          </a>
+          <Link to="/login" className="label bg-accent px-5 py-3 text-ink transition-colors duration-300 hover:bg-accent-bright">
             Member Access ↗
           </Link>
         </nav>
@@ -44,104 +49,284 @@ function TopBar() {
 }
 
 /* --------------------------------------------------------------------- hero */
+function RevealLine({ children, delay }: { children: ReactNode; delay: number }) {
+  return (
+    <span className="block overflow-hidden pb-[0.06em]">
+      <motion.span
+        className="block"
+        initial={{ y: '112%' }}
+        animate={{ y: 0 }}
+        transition={{ duration: 1.15, delay, ease: EASE }}
+      >
+        {children}
+      </motion.span>
+    </span>
+  )
+}
+
 function Hero() {
   return (
-    <section className="blueprint relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 vignette" />
-      <div className="relative mx-auto grid max-w-shell grid-cols-1 gap-16 px-6 pb-24 pt-40 md:grid-cols-[1.15fr_0.85fr] md:items-center md:px-10 md:pb-32 md:pt-52">
-        {/* left — statement */}
-        <motion.div variants={stagger(0.15, 0.11)} initial="hidden" animate="show">
-          <motion.p variants={rise} className="label text-gold">
-            By Invitation Only · 20–200 Principals · Bengaluru
-          </motion.p>
-
-          <motion.h1
-            variants={rise}
-            className="mt-8 font-display text-[3.4rem] leading-[0.95] tracking-tight text-ivory sm:text-7xl lg:text-8xl"
+    <section className="dotgrid relative overflow-hidden">
+      <div className="bloom pointer-events-none absolute inset-0" />
+      <div className="relative mx-auto grid max-w-shell grid-cols-1 items-center gap-14 px-6 pb-16 pt-36 md:px-10 md:pt-48 lg:grid-cols-[1.12fr_0.88fr] lg:pb-24">
+        {/* statement */}
+        <div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.15 }}
+            className="label text-accent"
           >
-            The market you were
-            <br />
-            <span className="italic text-gilt">never meant to see.</span>
-          </motion.h1>
-
-          <motion.p variants={rise} className="mt-9 max-w-xl text-lg leading-relaxed text-ivory-dim">
-            A private, non-bypassable advisory for land that never lists. Every parcel is walked and
-            verified on the ground. Every principal is known to us in person. Introductions are made
-            under signature — never brokered in the open.
+            By invitation only — 20–200 principals — Bengaluru
           </motion.p>
 
-          <motion.div variants={rise} className="mt-11 flex flex-wrap items-center gap-5">
+          <h1 className="mt-8 font-display text-[clamp(3.3rem,7.4vw,7.6rem)] font-semibold leading-[0.94] tracking-[-0.04em] text-ivory">
+            <RevealLine delay={0.25}>The market</RevealLine>
+            <RevealLine delay={0.35}>you were never</RevealLine>
+            <RevealLine delay={0.45}>
+              <span className="text-beam">meant to see.</span>
+            </RevealLine>
+          </h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.95, delay: 0.85, ease: EASE }}
+            className="mt-9 max-w-xl text-lg leading-relaxed text-ivory-dim"
+          >
+            A private, non-bypassable advisory for land that never lists. Every parcel is walked and verified on the
+            ground. Every principal is known to us in person. Introductions are made under signature — never brokered
+            in the open.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.95, delay: 1.0, ease: EASE }}
+            className="mt-11 flex flex-wrap items-center gap-5"
+          >
             <Link
               to="/login"
-              className="label group inline-flex items-center gap-3 bg-gold px-8 py-4 text-ink transition-all duration-500 hover:bg-gold-bright"
+              className="label group inline-flex items-center gap-3 bg-accent px-8 py-4 text-ink shadow-glow transition-colors duration-300 hover:bg-accent-bright"
             >
-              Request an Introduction
+              Request an introduction
               <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
             </Link>
-            <Link to="/login" className="label inline-flex items-center gap-2 text-ivory-dim transition-colors hover:text-ivory">
-              Member Access
+            <Link to="/login" className="label inline-flex items-center gap-2 border border-line px-6 py-4 text-ivory-dim transition-colors hover:border-[color:var(--line-accent)] hover:text-ivory">
+              Member access
             </Link>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* right — the dossier card (redaction demonstrated) */}
-        <motion.div variants={fade} initial="hidden" animate="show" transition={{ delay: 0.9 }}>
-          <DossierCard />
+        {/* the massing — drawn, not photographed */}
+        <motion.div variants={fade} initial="hidden" animate="show" transition={{ delay: 0.5 }} className="relative">
+          <MassingArt className="mx-auto w-full max-w-[560px]" />
         </motion.div>
       </div>
     </section>
   )
 }
 
-function DossierCard() {
-  return (
-    <figure className="relative border border-line bg-ink-raise/80 shadow-deep backdrop-blur-sm">
-      {/* corner ticks */}
-      <Corner className="left-0 top-0" />
-      <Corner className="right-0 top-0 rotate-90" />
-      <Corner className="bottom-0 left-0 -rotate-90" />
-      <Corner className="bottom-0 right-0 rotate-180" />
+/* ------------------------------------------------------------------ marquee */
+const TAPE = [
+  'Joint development',
+  'Warehouse',
+  'Big land',
+  'Verified on the ground',
+  'Sealed until signed',
+  'Zero public listings',
+  'Bengaluru',
+]
 
-      <figcaption className="flex items-center justify-between border-b border-line px-6 py-4">
-        <span className="mono text-[0.72rem] tracking-widest text-ivory-dim">JD-BLR-2026-012</span>
-        <span className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-bright" />
-          <span className="label text-emerald-bright">Verified · Live</span>
+function Marquee() {
+  const row = (key: string) => (
+    <div key={key} className="flex shrink-0 items-center">
+      {TAPE.map((t) => (
+        <span key={t} className="label flex items-center whitespace-nowrap py-5 text-ivory-faint">
+          <span className="mx-7">{t}</span>
+          <span className="text-accent">◆</span>
+        </span>
+      ))}
+    </div>
+  )
+  return (
+    <div className="overflow-hidden border-y border-line">
+      <div className="animate-marquee flex w-max">{[row('a'), row('b')]}</div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------- stats band */
+const STATS = [
+  { k: '20–200', v: 'Principals, ever' },
+  { k: '100%', v: 'In-person KYC' },
+  { k: '0.88', v: 'Valuation model R²' },
+  { k: 'Zero', v: 'Public listings' },
+]
+
+function StatsBand() {
+  return (
+    <section>
+      <motion.div
+        variants={stagger(0.1, 0.12)}
+        initial="hidden"
+        whileInView="show"
+        viewport={inView}
+        className="mx-auto grid max-w-shell grid-cols-2 divide-x divide-y divide-[color:var(--line)] md:grid-cols-4 md:divide-y-0"
+      >
+        {STATS.map((s) => (
+          <motion.div key={s.v} variants={fade} className="px-8 py-14 text-center">
+            <div className="font-display text-5xl font-semibold tracking-tight2 text-ivory md:text-6xl">{s.k}</div>
+            <div className="label mt-4 text-ivory-faint">{s.v}</div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
+  )
+}
+
+/* ----------------------------------------------------------- the platform */
+function Platform() {
+  return (
+    <section id="platform" className="border-t border-line">
+      <div className="mx-auto max-w-shell px-6 py-24 md:px-10 md:py-32">
+        <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={inView}>
+          <motion.p variants={rise} className="label text-accent">
+            The platform
+          </motion.p>
+          <motion.h2 variants={rise} className="mt-6 max-w-3xl font-display text-5xl font-semibold tracking-tight2 text-ivory md:text-7xl">
+            Not a portal.
+            <br />A principal.
+          </motion.h2>
+        </motion.div>
+
+        <div className="mt-24 space-y-24 md:space-y-32">
+          <Row n="01" title="Walked before it's shown." visual={<ManifestVisual />}>
+            No parcel goes live until our team walks the land, inspects the title chain, and confirms every survey
+            number against the record. Nothing here is scraped, syndicated, or self-listed — the book is small because
+            the bar is high.
+          </Row>
+
+          <Row n="02" title="Sealed until it's signed." visual={<DossierVisual />} flip>
+            Location, ownership, and the document vault are withheld by the server itself — not hidden in the
+            interface. They unseal only when a witnessed NDA is logged by the desk, so the introduction cannot be
+            bypassed, screenshotted, or scraped.
+          </Row>
+
+          <Row n="03" title="Priced by a model that learns." visual={<ModelVisual />}>
+            A parametric engine models every parcel's development value live — then a learned model corrects it,
+            trained on what our empanelled architects actually sign. Every delivery sharpens the corpus. The number
+            comes with calibrated uncertainty, never false precision.
+          </Row>
+
+          <Row n="04" title="Signed off by a human." visual={<ArchitectVisual />} flip>
+            Machine speed, human credibility. Commission the empanelled architect from the Studio and a stamped,
+            buildable figure returns beside the model's — variance shown, drawings issued to your deal room.
+          </Row>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Row({ n, title, children, visual, flip }: { n: string; title: string; children: ReactNode; visual: ReactNode; flip?: boolean }) {
+  return (
+    <motion.div
+      variants={stagger(0.1, 0.12)}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.25 }}
+      className="grid grid-cols-1 gap-10 md:grid-cols-[88px_1fr] md:gap-6"
+    >
+      {/* numeral rail */}
+      <motion.div variants={fade} className="flex items-start gap-5 md:flex-col md:gap-6">
+        <span className="mono text-xl text-accent">{n}</span>
+        <span className="hidden h-full w-px bg-[color:var(--line)] md:block" />
+        <span className="block h-px flex-1 bg-[color:var(--line)] md:hidden" />
+      </motion.div>
+
+      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <motion.div variants={rise} className={flip ? 'lg:order-2' : ''}>
+          <h3 className="font-display text-4xl font-semibold tracking-tight2 text-ivory md:text-5xl">{title}</h3>
+          <p className="mt-6 max-w-lg text-[1.02rem] leading-relaxed text-ivory-dim">{children}</p>
+        </motion.div>
+        <motion.div variants={rise} className={flip ? 'lg:order-1' : ''}>
+          {visual}
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* --- row visuals ---------------------------------------------------------- */
+function Frame({ children, caption }: { children: ReactNode; caption: string }) {
+  return (
+    <figure className="border border-line bg-ink-raise/60 shadow-deep">
+      <figcaption className="flex items-center justify-between border-b border-line px-5 py-3.5">
+        <span className="label text-ivory-faint">{caption}</span>
+        <span className="flex gap-1.5" aria-hidden>
+          <span className="h-1 w-1 bg-[color:var(--line-strong)]" />
+          <span className="h-1 w-1 bg-[color:var(--line-strong)]" />
+          <span className="h-1 w-1 bg-accent" />
         </span>
       </figcaption>
-
-      {/* mini site plan */}
-      <div className="border-b border-line px-6 py-5">
-        <SitePlanThumb />
-      </div>
-
-      <dl className="divide-y divide-[color:var(--line)] px-6">
-        <Row term="Location">
-          <Redaction>Sector 4, Devanahalli</Redaction>
-          <span className="ml-2 text-ivory-faint">· Bengaluru N.</span>
-        </Row>
-        <Row term="Owner of Record">
-          <Redaction>Ramanathan Holdings LLP</Redaction>
-        </Row>
-        <Row term="Survey No.">
-          <Redaction>141/2B, 141/3</Redaction>
-        </Row>
-        <Row term="Guidance (GDV)">
-          <span className="mono text-gold">₹85–95 Cr</span>
-        </Row>
-      </dl>
-
-      <div className="flex items-center gap-3 border-t border-line px-6 py-4">
-        <LockGlyph />
-        <p className="text-[0.82rem] leading-snug text-ivory-faint">
-          Location and identity unseal only upon an executed, witnessed NDA.
-        </p>
-      </div>
+      <div className="p-6">{children}</div>
     </figure>
   )
 }
 
-function Row({ term, children }: { term: string; children: ReactNode }) {
+function ManifestVisual() {
+  const rows = [
+    ['Title chain traced', '30 yrs · clean'],
+    ['Survey nos. cross-checked', 'DTP record'],
+    ['Encumbrance certificate', 'nil charges'],
+    ['Site walked', '12 Jun 2026'],
+  ]
+  return (
+    <Frame caption="Verification manifest · JD-BLR-2026-012">
+      <ul className="divide-y divide-[color:var(--line)]">
+        {rows.map(([k, v]) => (
+          <li key={k} className="flex items-center justify-between gap-6 py-3.5">
+            <span className="flex items-center gap-3 text-[0.95rem] text-ivory">
+              <span className="text-emerald-bright" aria-hidden>
+                ✓
+              </span>
+              {k}
+            </span>
+            <span className="mono text-[0.72rem] text-ivory-faint">{v}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="label mt-5 text-emerald-bright">Physically verified — Terracrest site team</p>
+    </Frame>
+  )
+}
+
+function DossierVisual() {
+  return (
+    <Frame caption="Sealed dossier · pre-NDA view">
+      <dl className="divide-y divide-[color:var(--line)]">
+        <VRow term="Location">
+          <Redaction>Sector 4, Devanahalli</Redaction>
+        </VRow>
+        <VRow term="Owner of record">
+          <Redaction>Ramanathan Holdings LLP</Redaction>
+        </VRow>
+        <VRow term="Survey no.">
+          <Redaction>141/2B, 141/3</Redaction>
+        </VRow>
+        <VRow term="Guidance (GDV)">
+          <span className="mono text-accent">₹85–95 Cr</span>
+        </VRow>
+      </dl>
+      <p className="mt-5 text-[0.8rem] leading-relaxed text-ivory-faint">
+        The sealed fields never leave the server without a logged NDA — there is nothing in the page to inspect.
+      </p>
+    </Frame>
+  )
+}
+
+function VRow({ term, children }: { term: string; children: ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-6 py-3.5">
       <dt className="label text-ivory-faint">{term}</dt>
@@ -150,79 +335,154 @@ function Row({ term, children }: { term: string; children: ReactNode }) {
   )
 }
 
-function SitePlanThumb() {
+function ModelVisual() {
+  const bars = [
+    ['High-rise premium floors', 92, 'lowers'],
+    ['FSI', 57, 'lowers'],
+    ['Sale price assumption', 47, 'lowers'],
+    ['Floor-plate efficiency', 25, 'raises'],
+  ] as const
   return (
-    <svg viewBox="0 0 260 130" className="h-auto w-full" role="img" aria-label="Parcel massing schematic">
-      {/* parcel boundary */}
-      <rect x="10" y="10" width="240" height="110" fill="none" stroke="#c9a227" strokeOpacity="0.55" />
-      {/* setback line */}
-      <rect x="28" y="26" width="204" height="78" fill="none" stroke="#c9a227" strokeOpacity="0.28" strokeDasharray="3 4" />
-      {/* towers */}
-      {[46, 104, 162].map((x) => (
-        <rect key={x} x={x} y="40" width="44" height="50" fill="#c9a227" fillOpacity="0.09" stroke="#c9a227" strokeOpacity="0.5" />
-      ))}
-      {/* dimension line */}
-      <line x1="10" y1="126" x2="250" y2="126" stroke="#726d61" strokeWidth="0.5" />
-      <text x="130" y="123" textAnchor="middle" fill="#726d61" fontFamily="'IBM Plex Mono', monospace" fontSize="6">
-        ~2.35 LAKH SQ FT BUILDABLE · FSI 2.25
-      </text>
-      {/* north arrow */}
-      <g transform="translate(238 30)" stroke="#726d61" strokeWidth="0.6" fill="none">
-        <path d="M0 12 L0 0 M-3 3 L0 0 L3 3" />
-        <text x="-2.5" y="22" fill="#726d61" fontFamily="'IBM Plex Mono', monospace" fontSize="6">N</text>
-      </g>
-    </svg>
+    <Frame caption="Valuation model · ridge regression">
+      <div className="flex items-baseline justify-between">
+        <span className="mono text-3xl text-ivory">R² 0.88</span>
+        <span className="label text-ivory-faint">holdout</span>
+      </div>
+      <div className="mt-6 space-y-3">
+        {bars.map(([label, w, dir]) => (
+          <div key={label} className="flex items-center gap-3">
+            <span className="w-44 shrink-0 text-[0.8rem] text-ivory-dim">{label}</span>
+            <span className="relative h-1.5 flex-1 bg-[color:var(--line)]">
+              <span className={`absolute inset-y-0 left-0 ${dir === 'raises' ? 'bg-emerald-bright' : 'bg-accent'}`} style={{ width: `${w}%` }} />
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="mono mt-6 text-[0.72rem] text-ivory-faint">Every architect delivery becomes a labelled training example.</p>
+    </Frame>
   )
 }
 
-function Corner({ className = '' }: { className?: string }) {
+function ArchitectVisual() {
   return (
-    <span className={`pointer-events-none absolute ${className}`} aria-hidden>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <path d="M0 0 H14 M0 0 V14" stroke="#c9a227" strokeOpacity="0.6" />
-      </svg>
-    </span>
+    <Frame caption="Stage two · architect validation">
+      <div className="grid grid-cols-2 gap-px border border-line bg-[color:var(--line)]">
+        <div className="bg-ink p-5">
+          <p className="label text-ivory-faint">Studio model</p>
+          <p className="mono mt-2 text-2xl text-ivory">₹86.2 Cr</p>
+        </div>
+        <div className="bg-ink p-5">
+          <p className="label text-accent">Architect · stamped</p>
+          <p className="mono mt-2 text-2xl text-beam">₹83.4 Cr</p>
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between border border-line px-5 py-3">
+        <span className="label text-ivory-faint">Variance to model</span>
+        <span className="mono text-sm text-oxblood-bright">−3.2%</span>
+      </div>
+      <p className="mono mt-5 text-[0.72rem] text-ivory-faint">Sundaram &amp; Associates · CoA CA/2011/48210 · drawings issued</p>
+    </Frame>
   )
 }
 
-function LockGlyph() {
+/* ------------------------------------------------------------- studio tease */
+function StudioTease() {
   return (
-    <svg width="14" height="16" viewBox="0 0 14 16" fill="none" className="shrink-0" aria-hidden>
-      <rect x="1.5" y="6.5" width="11" height="8" rx="0.5" stroke="#726d61" />
-      <path d="M4 6.5V4a3 3 0 0 1 6 0v2.5" stroke="#726d61" />
-    </svg>
+    <section id="intelligence" className="border-t border-line">
+      <div className="mx-auto grid max-w-shell grid-cols-1 items-center gap-16 px-6 py-24 md:px-10 md:py-32 lg:grid-cols-[1fr_0.95fr]">
+        <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={inView}>
+          <motion.p variants={rise} className="label text-accent">
+            The feasibility studio
+          </motion.p>
+          <motion.h2 variants={rise} className="mt-6 font-display text-5xl font-semibold leading-[0.98] tracking-tight2 text-ivory md:text-7xl">
+            Model the profit
+            <br />
+            before the fee.
+          </motion.h2>
+          <motion.p variants={rise} className="mt-7 max-w-xl text-lg leading-relaxed text-ivory-dim">
+            Draw a parcel's massing from its own by-laws, assign materials surface by surface, and watch a three-zone
+            development value resolve live — corrected by the model, banded by its uncertainty.
+          </motion.p>
+          <motion.div variants={rise} className="mt-10">
+            <Link
+              to="/login"
+              className="label group inline-flex items-center gap-3 bg-accent px-8 py-4 text-ink transition-colors duration-300 hover:bg-accent-bright"
+            >
+              Enter the studio
+              <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        <motion.div variants={fade} initial="hidden" whileInView="show" viewport={inView}>
+          <TickerMock />
+        </motion.div>
+      </div>
+    </section>
   )
 }
 
-/* --------------------------------------------------------------- difference */
-const PILLARS = [
+function TickerMock() {
+  return (
+    <div className="blueprint border border-line shadow-deep">
+      <div className="flex items-center justify-between border-b border-line px-6 py-4">
+        <span className="mono text-[0.72rem] text-ivory-dim">JD-BLR-2026-012 · DEVANAHALLI</span>
+        <span className="label text-emerald-bright">● Live</span>
+      </div>
+      <div className="px-6 py-8">
+        <p className="label text-ivory-faint">ML-adjusted NDV · market</p>
+        <p className="mt-3 font-display text-6xl font-semibold tracking-tight2 text-beam md:text-7xl">₹84.1 Cr</p>
+        <p className="mono mt-3 text-[0.78rem] text-ivory-dim">
+          P10–P90 ₹82.0–86.2 Cr · <span className="text-oxblood-bright">−2.6%</span> vs parametric
+        </p>
+        <div className="mt-8 grid grid-cols-3 gap-px border border-line bg-[color:var(--line)]">
+          {(
+            [
+              ['Bear', '₹70.1 Cr', 'text-oxblood-bright'],
+              ['Base', '₹86.3 Cr', 'text-accent'],
+              ['Bull', '₹98.8 Cr', 'text-emerald-bright'],
+            ] as const
+          ).map(([z, v, tone]) => (
+            <div key={z} className="bg-ink px-4 py-4">
+              <p className={`label ${tone}`}>{z}</p>
+              <p className="mono mt-2 text-sm text-ivory">{v}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------- protocol */
+const STEPS = [
   {
     n: '01',
-    title: 'Physically verified',
-    body: 'No parcel goes live until our team walks the land, inspects the title, and confirms every survey number against the record. Nothing here is scraped or self-listed.',
+    t: 'Introduction',
+    b: 'Referred by an existing principal. KYC is completed in person, at the desk — never online.',
   },
   {
     n: '02',
-    title: 'Non-bypassable',
-    body: 'Buyer and seller meet only after a witnessed NDA. The platform is the unavoidable principal to the introduction — protected in writing, enforceable in court.',
+    t: 'Signature',
+    b: 'One witnessed NDA per parcel, executed before our lawyer. Nothing digital to leak or forward.',
   },
   {
     n: '03',
-    title: 'Feasibility before fees',
-    body: 'A parametric GDV studio models a parcel’s profit in three zones — before an architect is ever engaged, or a rupee committed.',
+    t: 'The desk opens',
+    b: 'The dossier unseals: exact location, ownership, the document vault, the deal room, the studio.',
   },
 ]
 
-function Difference() {
+function Protocol() {
   return (
-    <section id="difference" className="border-t border-line px-6 py-28 md:px-10 md:py-36">
-      <div className="mx-auto max-w-shell">
+    <section id="access" className="border-t border-line">
+      <div className="mx-auto max-w-shell px-6 py-24 md:px-10 md:py-32">
         <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={inView}>
-          <motion.p variants={rise} className="label text-gold">
-            The Difference
+          <motion.p variants={rise} className="label text-accent">
+            Access
           </motion.p>
-          <motion.h2 variants={rise} className="mt-6 max-w-2xl font-display text-5xl text-ivory md:text-6xl">
-            Not a portal. A principal.
+          <motion.h2 variants={rise} className="mt-6 font-display text-5xl font-semibold tracking-tight2 text-ivory md:text-7xl">
+            The protocol.
           </motion.h2>
         </motion.div>
 
@@ -233,75 +493,24 @@ function Difference() {
           viewport={inView}
           className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-[color:var(--line)] md:grid-cols-3"
         >
-          {PILLARS.map((p) => (
-            <motion.article key={p.n} variants={rise} className="bg-ink px-8 py-10">
-              <span className="mono text-2xl text-gilt">{p.n}</span>
-              <h3 className="mt-6 font-display text-3xl text-ivory">{p.title}</h3>
-              <p className="mt-4 text-[0.98rem] leading-relaxed text-ivory-dim">{p.body}</p>
+          {STEPS.map((s) => (
+            <motion.article key={s.n} variants={rise} className="group bg-ink px-8 py-12 transition-colors duration-500 hover:bg-ink-raise">
+              <span className="mono text-xl text-accent">{s.n}</span>
+              <h3 className="mt-8 font-display text-3xl font-semibold tracking-tight2 text-ivory">{s.t}</h3>
+              <p className="mt-4 text-[0.98rem] leading-relaxed text-ivory-dim">{s.b}</p>
             </motion.article>
           ))}
         </motion.div>
-      </div>
-    </section>
-  )
-}
 
-/* -------------------------------------------------------------- stats band */
-const STATS = [
-  { k: '20–200', v: 'Principals, ever' },
-  { k: '100%', v: 'In-person KYC' },
-  { k: 'Zero', v: 'Cloud dependency' },
-  { k: '±6%', v: 'GDV accuracy' },
-]
-
-function StatsBand() {
-  return (
-    <section className="border-t border-line bg-navy/40">
-      <motion.div
-        variants={stagger(0.1, 0.12)}
-        initial="hidden"
-        whileInView="show"
-        viewport={inView}
-        className="mx-auto grid max-w-shell grid-cols-2 divide-x divide-y divide-[color:var(--line)] md:grid-cols-4 md:divide-y-0"
-      >
-        {STATS.map((s) => (
-          <motion.div key={s.k} variants={fade} className="px-8 py-12 text-center">
-            <div className="font-display text-5xl text-gilt md:text-6xl">{s.k}</div>
-            <div className="label mt-4 text-ivory-faint">{s.v}</div>
-          </motion.div>
-        ))}
-      </motion.div>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------------- studio tease */
-function StudioTease() {
-  return (
-    <section className="border-t border-line px-6 py-28 md:px-10 md:py-36">
-      <div className="mx-auto flex max-w-shell flex-col items-start justify-between gap-10 md:flex-row md:items-end">
-        <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={inView} className="max-w-2xl">
-          <motion.p variants={rise} className="label text-gold">
-            The Feasibility Studio
-          </motion.p>
-          <motion.h2 variants={rise} className="mt-6 font-display text-5xl leading-tight text-ivory md:text-6xl">
-            Model the profit before
-            <br />
-            you commit the fee.
-          </motion.h2>
-          <motion.p variants={rise} className="mt-7 text-lg leading-relaxed text-ivory-dim">
-            Draw a parcel’s massing from its own by-laws, assign materials surface by surface, and
-            watch a three-zone GDV — bear, base, bull — resolve live. The architect comes second.
-          </motion.p>
-        </motion.div>
-        <motion.div variants={fade} initial="hidden" whileInView="show" viewport={inView}>
+        <motion.div variants={fade} initial="hidden" whileInView="show" viewport={inView} className="mt-14 flex flex-wrap items-center gap-6">
           <Link
             to="/login"
-            className="label group inline-flex items-center gap-3 border border-[color:var(--line-gold)] px-8 py-4 text-gold transition-colors duration-500 hover:bg-gold hover:text-ink"
+            className="label group inline-flex items-center gap-3 bg-accent px-8 py-4 text-ink shadow-glow transition-colors duration-300 hover:bg-accent-bright"
           >
-            Enter the Studio
+            Request an introduction
             <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
           </Link>
+          <p className="mono text-[0.72rem] text-ivory-faint">No sign-up · No OTP · No public listings</p>
         </motion.div>
       </div>
     </section>
@@ -311,15 +520,45 @@ function StudioTease() {
 /* ------------------------------------------------------------------- footer */
 function Footer() {
   return (
-    <footer className="border-t border-line px-6 py-16 md:px-10">
-      <div className="mx-auto flex max-w-shell flex-col items-center gap-8 text-center">
-        <Seal size={64} text="· DB TERRACREST ADVISORY · BENGALURU " />
-        <p className="font-display text-3xl italic text-ivory">By invitation only.</p>
-        <div className="hairline-gold w-24" />
-        <p className="mono max-w-xl text-[0.68rem] leading-relaxed tracking-widest text-ivory-faint">
-          DB TERRACREST ADVISORY · A PRIVATE DEAL PORTAL, NOT A LISTING SERVICE · ALL PARCELS
-          PHYSICALLY INSPECTED · © MMXXVI
-        </p>
+    <footer className="relative overflow-hidden border-t border-line">
+      <div className="mx-auto max-w-shell px-6 pb-10 pt-20 md:px-10">
+        <div className="flex flex-col justify-between gap-10 md:flex-row md:items-end">
+          <div>
+            <p className="flex items-baseline gap-2.5">
+              <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
+              <span className="font-display text-lg font-bold tracking-tight2 text-ivory">TERRACREST</span>
+            </p>
+            <p className="mono mt-4 max-w-sm text-[0.7rem] leading-relaxed tracking-widest text-ivory-faint">
+              A PRIVATE DEAL PORTAL, NOT A LISTING SERVICE.
+              <br />
+              ALL PARCELS PHYSICALLY INSPECTED.
+            </p>
+          </div>
+          <nav className="flex flex-wrap gap-x-10 gap-y-3">
+            <a href="#platform" className="label text-ivory-faint transition-colors hover:text-ivory">
+              Platform
+            </a>
+            <a href="#intelligence" className="label text-ivory-faint transition-colors hover:text-ivory">
+              Intelligence
+            </a>
+            <a href="#access" className="label text-ivory-faint transition-colors hover:text-ivory">
+              Access
+            </a>
+            <Link to="/login" className="label text-accent transition-colors hover:text-accent-bright">
+              Member access ↗
+            </Link>
+          </nav>
+          <p className="mono text-[0.7rem] tracking-widest text-ivory-faint">BENGALURU · © MMXXVI</p>
+        </div>
+
+        {/* the watermark — outline wordmark fading into the ink */}
+        <div
+          aria-hidden
+          className="text-outline pointer-events-none mt-16 select-none whitespace-nowrap text-center font-display text-[clamp(3.6rem,12.5vw,11.5rem)] font-bold leading-none tracking-[-0.05em]"
+          style={{ maskImage: 'linear-gradient(to bottom, black 45%, transparent 96%)', WebkitMaskImage: 'linear-gradient(to bottom, black 45%, transparent 96%)' }}
+        >
+          TERRACREST
+        </div>
       </div>
     </footer>
   )

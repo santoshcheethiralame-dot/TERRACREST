@@ -73,7 +73,7 @@ export function AdminDashboard() {
   return (
     <AppShell>
       <header>
-        <p className="label text-gold">Operations Centre</p>
+        <p className="label text-accent">Operations Centre</p>
         <h1 className="mt-4 font-display text-5xl text-ivory md:text-6xl">The desk.</h1>
         <p className="mt-4 max-w-2xl text-ivory-dim">Create accounts after offline KYC, verify parcels before they go live, and log the witnessed NDAs that unseal them.</p>
       </header>
@@ -84,7 +84,7 @@ export function AdminDashboard() {
             key={t.key}
             onClick={() => openTab(t.key)}
             className={`label -mb-px border-b-2 px-4 py-3 transition-colors ${
-              tab === t.key ? 'border-gold text-gold' : 'border-transparent text-ivory-faint hover:text-ivory'
+              tab === t.key ? 'border-accent text-accent' : 'border-transparent text-ivory-faint hover:text-ivory'
             }`}
           >
             {t.label}
@@ -156,7 +156,7 @@ function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings:
   return (
     <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
       <form onSubmit={submit} className="border border-line bg-ink-raise/40 p-7">
-        <p className="label text-gold">Log a witnessed NDA</p>
+        <p className="label text-accent">Log a witnessed NDA</p>
         <p className="mt-3 text-sm leading-relaxed text-ivory-dim">This is the gate. Once logged, the builder’s view of the parcel unseals — exact location, ownership and the document vault.</p>
         <div className="mt-6 space-y-5">
           <Field label="Builder">
@@ -166,7 +166,7 @@ function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings:
             <Select value={listingId} onChange={setListingId} placeholder="Select parcel…" options={listings.map((l) => ({ value: l.id, label: `${l.id} — ${l.headline}` }))} />
           </Field>
         </div>
-        <button type="submit" disabled={busy || !builderId || !listingId} className="label mt-7 w-full bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="submit" disabled={busy || !builderId || !listingId} className="label mt-7 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50">
           {busy ? 'Logging…' : 'Log executed NDA'}
         </button>
         {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
@@ -288,8 +288,8 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
   return (
     <div>
       {actionNote && (
-        <div className="mb-6 border border-[color:var(--line-gold)] bg-gold/5 px-5 py-3">
-          <span className="mono text-sm text-gold">{actionNote}</span>
+        <div className="mb-6 border border-[color:var(--line-accent)] bg-accent/5 px-5 py-3">
+          <span className="mono text-sm text-accent">{actionNote}</span>
         </div>
       )}
       <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
@@ -309,11 +309,11 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
                   <div className="text-sm text-ivory">{u.displayName}</div>
                   <div className="mono text-[0.72rem] text-ivory-faint">{u.username}</div>
                 </td>
-                <td className="px-5 py-4"><span className="label text-gold">{u.role}</span></td>
+                <td className="px-5 py-4"><span className="label text-accent">{u.role}</span></td>
                 <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● Verified</span> : <span className="label text-ivory-faint">Pending</span>}</td>
                 <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
-                    <button onClick={() => resetPw(u)} className="label text-gold transition-colors hover:text-gold-bright">Reset PW</button>
+                    <button onClick={() => resetPw(u)} className="label text-accent transition-colors hover:text-accent-bright">Reset PW</button>
                     <button onClick={() => toggleKyc(u)} className="label text-ivory-faint transition-colors hover:text-ivory">KYC</button>
                     <button onClick={() => toggleActive(u)} className="label text-ivory-faint transition-colors hover:text-ivory">
                       {u.active === false ? 'Activate' : 'Deactivate'}
@@ -327,7 +327,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
       </div>
 
       <form onSubmit={submit} className="border border-line bg-ink-raise/40 p-7">
-        <p className="label text-gold">Create account</p>
+        <p className="label text-accent">Create account</p>
         <p className="mt-3 text-sm text-ivory-dim">After offline KYC. A temporary password is issued; the member changes it on first login.</p>
         <div className="mt-6 space-y-5">
           <Field label="Username"><Input value={username} onChange={setUsername} placeholder="builder_new_009" /></Field>
@@ -342,7 +342,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
           </Field>
           <Field label="Office (optional)"><Input value={office} onChange={setOffice} placeholder="Koramangala, Bengaluru" /></Field>
         </div>
-        <button type="submit" disabled={busy} className="label mt-7 w-full bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+        <button type="submit" disabled={busy} className="label mt-7 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Creating…' : 'Create account'}
         </button>
         {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
@@ -373,7 +373,7 @@ function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }
                 col.map((d) => (
                   <div key={d.id} className="border border-line bg-ink p-3">
                     <div className="text-[0.82rem] leading-snug text-ivory">{label(d.listingId)}</div>
-                    <div className="mono mt-2 text-[0.72rem] text-gold">₹{(d.estCommission / 1e5).toFixed(1)} L est.</div>
+                    <div className="mono mt-2 text-[0.72rem] text-accent">₹{(d.estCommission / 1e5).toFixed(1)} L est.</div>
                     <div className="label mt-1 text-ivory-faint">RM {d.rm}</div>
                   </div>
                 ))
@@ -515,7 +515,7 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
       </Section>
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
-        <button type="submit" disabled={busy} className="label bg-gold px-8 py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+        <button type="submit" disabled={busy} className="label bg-accent px-8 py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Creating…' : 'Create parcel'}
         </button>
         {msg && <span className={`text-[0.85rem] ${msg.ok ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>{msg.text}</span>}
@@ -527,7 +527,7 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mt-8 border-t border-line pt-6">
-      <p className="label mb-5 text-gold">{title}</p>
+      <p className="label mb-5 text-accent">{title}</p>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
     </div>
   )
@@ -553,7 +553,7 @@ function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectRe
   return (
     <div className="max-w-3xl space-y-10">
       <div>
-        <p className="label text-gold">Awaiting the desk{pending.length ? ` · ${pending.length}` : ''}</p>
+        <p className="label text-accent">Awaiting the desk{pending.length ? ` · ${pending.length}` : ''}</p>
         <p className="mt-2 text-sm text-ivory-faint">Record the empanelled architect's stamped, validated figure. It lands back in the builder's Studio beside the ML estimate.</p>
         {pending.length === 0 ? (
           <p className="mt-5 text-sm text-ivory-dim">Nothing awaiting delivery.</p>
@@ -624,11 +624,11 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="w-full border border-line bg-ink px-3 py-2 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-gold)]"
+            className="w-full border border-line bg-ink px-3 py-2 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
           />
         </Field>
       </div>
-      <button disabled={busy} className="label mt-4 bg-gold px-6 py-3 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+      <button disabled={busy} className="label mt-4 bg-accent px-6 py-3 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
         {busy ? 'Recording…' : 'Deliver validation'}
       </button>
     </form>
@@ -647,7 +647,7 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
       </div>
       <div className="mono mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs">
         <span className="text-ivory-dim">Studio {cr(ml)}</span>
-        <span className="text-gold">Architect {cr(arch)}</span>
+        <span className="text-accent">Architect {cr(arch)}</span>
         <span className={v >= 0 ? 'text-emerald-bright' : 'text-oxblood-bright'}>
           {v >= 0 ? '+' : ''}
           {v.toFixed(1)}%
@@ -692,12 +692,12 @@ function ModelTab() {
 /* -------------------------------------------------------------- activity */
 const KIND_META: Record<ActivityKind, { label: string; cls: string }> = {
   login: { label: 'Login', cls: 'text-ivory-dim' },
-  nda: { label: 'NDA', cls: 'text-gold' },
+  nda: { label: 'NDA', cls: 'text-accent' },
   message: { label: 'Deal Room', cls: 'text-emerald-bright' },
   listing_created: { label: 'New Parcel', cls: 'text-ivory' },
   status_change: { label: 'Status', cls: 'text-ivory-dim' },
   document: { label: 'Document', cls: 'text-oxblood-bright' },
-  architect: { label: 'Architect', cls: 'text-gold-bright' },
+  architect: { label: 'Architect', cls: 'text-accent-bright' },
 }
 
 function fmtWhen(iso: string): string {
@@ -719,7 +719,7 @@ function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: 
           const meta = KIND_META[e.kind] ?? KIND_META.login
           return (
             <li key={e.id} className="relative pb-7 pl-6 last:pb-0">
-              <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-gold ring-4 ring-ink" />
+              <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-ink" />
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className={`label rounded-full border border-[color:var(--line-strong)] px-2 py-0.5 text-[0.65rem] ${meta.cls}`}>{meta.label}</span>
                 <span className="mono text-xs text-ivory-faint">{fmtWhen(e.createdAt)}</span>
@@ -792,7 +792,7 @@ function PricesTab() {
                     <input
                       value={pb.rates[`${key}:${t}`] ?? ''}
                       onChange={(e) => setRate(`${key}:${t}`, e.target.value)}
-                      className="mono w-20 border border-line bg-ink px-2 py-1.5 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-gold)]"
+                      className="mono w-20 border border-line bg-ink px-2 py-1.5 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
                     />
                   </td>
                 ))}
@@ -802,7 +802,7 @@ function PricesTab() {
         </table>
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button onClick={save} disabled={busy} className="label bg-gold px-8 py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:opacity-50">
+        <button onClick={save} disabled={busy} className="label bg-accent px-8 py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Saving…' : 'Save rates'}
         </button>
         {msg && <span className="text-[0.85rem] text-emerald-bright">{msg}</span>}
@@ -828,7 +828,7 @@ function Input({ value, onChange, placeholder }: { value: string; onChange: (v: 
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       autoComplete="off"
-      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-gold)]"
+      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-accent)]"
     />
   )
 }
@@ -838,7 +838,7 @@ function Select({ value, onChange, options, placeholder }: { value: string; onCh
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-gold)]"
+      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map((o) => (

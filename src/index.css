@@ -4,35 +4,36 @@
 
 /* ============================================================
    DB TERRACREST ADVISORY — Design tokens
-   "The Confidential Dossier" — private-bank deal memo aesthetic
+   "Blueprint Noir" — near-black precision, electric indigo,
+   editorial grotesk scale, mono annotations, redaction theater.
    ============================================================ */
 :root {
   /* surfaces */
-  --ink: #0e0e11;
-  --ink-raise: #15151a;
-  --ink-card: #1a1a20;
-  --navy: #0f172a;
+  --ink: #060608;
+  --ink-raise: #0c0c10;
+  --ink-card: #111116;
+  --navy: #0c0c1c;
 
-  /* text — warm ivories */
-  --ivory: #f4f1e8;
-  --ivory-dim: #b0ab9d;
-  --ivory-faint: #726d61;
+  /* text — cool bone */
+  --ivory: #edece8;
+  --ivory-dim: #a2a1a8;
+  --ivory-faint: #67676f;
 
-  /* brushed gold — the single precious accent */
-  --gold: #c9a227;
-  --gold-bright: #e3c766;
-  --gold-deep: #9a7b1c;
+  /* electric indigo — the single signal accent */
+  --accent: #8a7dff;
+  --accent-bright: #aca3ff;
+  --accent-deep: #5646e6;
 
   /* zone accents — Bull / Bear */
-  --emerald: #3a6b58;
-  --emerald-bright: #5c9b80;
-  --oxblood: #8a3a34;
-  --oxblood-bright: #bd6552;
+  --emerald: #2e8f6b;
+  --emerald-bright: #4ade9e;
+  --oxblood: #a8443a;
+  --oxblood-bright: #ff7a6a;
 
   /* hairlines */
-  --line: rgba(244, 241, 232, 0.09);
-  --line-strong: rgba(244, 241, 232, 0.16);
-  --line-gold: rgba(201, 162, 39, 0.30);
+  --line: rgba(237, 236, 232, 0.08);
+  --line-strong: rgba(237, 236, 232, 0.15);
+  --line-accent: rgba(138, 125, 255, 0.32);
 }
 
 *,
@@ -61,14 +62,15 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 500;
-  line-height: 1.02;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
 ::selection {
-  background: rgba(201, 162, 39, 0.26);
+  background: rgba(138, 125, 255, 0.32);
   color: var(--ivory);
 }
 
@@ -76,13 +78,13 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-track { background: var(--ink); }
 ::-webkit-scrollbar-thumb {
-  background: #2b2b32;
+  background: #232329;
   border: 3px solid var(--ink);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-deep); }
 
 :focus-visible {
-  outline: 1px solid var(--gold);
+  outline: 1px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -107,16 +109,26 @@ h1, h2, h3, h4 {
 
   /* hairline separators */
   .hairline { height: 1px; width: 100%; background: var(--line); }
-  .hairline-gold {
+  .hairline-accent {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--line-gold), transparent);
+    background: linear-gradient(90deg, transparent, var(--line-accent), transparent);
   }
 
-  /* subtle brushed-gold text */
-  .text-gilt {
-    background: linear-gradient(176deg, var(--gold-bright), var(--gold) 52%, var(--gold-deep));
+  /* indigo beam text — the signature gradient */
+  .text-beam {
+    background: linear-gradient(118deg, var(--accent-bright), var(--accent) 55%, var(--accent-deep));
     -webkit-background-clip: text;
     background-clip: text;
+    color: transparent;
+  }
+
+  /* stroked display type — outline wordmarks */
+  .text-outline {
+    -webkit-text-stroke: 1px rgba(237, 236, 232, 0.22);
+    color: transparent;
+  }
+  .text-outline-accent {
+    -webkit-text-stroke: 1px rgba(138, 125, 255, 0.45);
     color: transparent;
   }
 
@@ -129,8 +141,8 @@ h1, h2, h3, h4 {
     background-color: var(--ink-card);
     background-image: repeating-linear-gradient(
       135deg,
-      rgb(10, 10, 12) 0 5px,
-      rgb(40, 40, 47) 5px 10px
+      rgb(9, 9, 12) 0 5px,
+      rgb(35, 35, 44) 5px 10px
     );
     box-shadow: inset 0 0 0 1px var(--line-strong);
   }
@@ -138,13 +150,13 @@ h1, h2, h3, h4 {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(201, 162, 39, 0.05);
+    background: rgba(138, 125, 255, 0.05);
   }
 
   /* verification seal ring */
   .seal-ring {
-    border: 1px solid var(--line-gold);
-    box-shadow: inset 0 0 0 3px rgba(201, 162, 39, 0.06);
+    border: 1px solid var(--line-accent);
+    box-shadow: inset 0 0 0 3px rgba(138, 125, 255, 0.06);
   }
 }
 
@@ -156,12 +168,25 @@ h1, h2, h3, h4 {
   .blueprint {
     background-color: var(--ink);
     background-image:
-      linear-gradient(rgba(201, 162, 39, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(201, 162, 39, 0.045) 1px, transparent 1px),
-      linear-gradient(rgba(244, 241, 232, 0.022) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(244, 241, 232, 0.022) 1px, transparent 1px);
+      linear-gradient(rgba(138, 125, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(138, 125, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(rgba(237, 236, 232, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(237, 236, 232, 0.02) 1px, transparent 1px);
     background-size: 128px 128px, 128px 128px, 32px 32px, 32px 32px;
     background-position: center;
+  }
+
+  /* survey dot grid — hero atmosphere */
+  .dotgrid {
+    background-image: radial-gradient(rgba(237, 236, 232, 0.07) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+
+  /* indigo bloom — hero glow */
+  .bloom {
+    background:
+      radial-gradient(52% 44% at 74% 22%, rgba(86, 70, 230, 0.17) 0%, transparent 70%),
+      radial-gradient(38% 32% at 12% 86%, rgba(138, 125, 255, 0.07) 0%, transparent 70%);
   }
 
   .vignette {
@@ -175,7 +200,7 @@ h1, h2, h3, h4 {
     inset: 0;
     z-index: 80;
     pointer-events: none;
-    opacity: 0.038;
+    opacity: 0.035;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
@@ -200,7 +225,16 @@ h1, h2, h3, h4 {
   animation: unseal 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ---- Leaflet, dark-filtered to match the dossier ---- */
+/* endless ticker strip */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+
+/* ---- Leaflet, dark-filtered to match the terminal ---- */
 .leaflet-container {
   background: var(--ink);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
@@ -210,7 +244,7 @@ h1, h2, h3, h4 {
 }
 .leaflet-control-zoom a {
   background: var(--ink-card) !important;
-  color: var(--gold) !important;
+  color: var(--accent) !important;
   border: 1px solid var(--line) !important;
 }
 .leaflet-control-attribution {

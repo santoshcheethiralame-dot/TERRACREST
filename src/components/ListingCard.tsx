@@ -6,7 +6,7 @@ export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked:
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group relative flex flex-col border border-line bg-ink-raise/40 p-6 transition-colors duration-300 hover:border-[color:var(--line-gold)]"
+      className="group relative flex flex-col border border-line bg-ink-raise/40 p-6 transition-colors duration-300 hover:border-[color:var(--line-accent)]"
     >
       <div className="flex items-center justify-between">
         <span className="mono text-[0.72rem] text-ivory-dim">{listing.id}</span>
@@ -19,16 +19,16 @@ export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked:
         )}
       </div>
 
-      <h3 className="mt-4 font-display text-2xl leading-tight text-ivory">{listing.headline}</h3>
+      <h3 className="mt-4 font-display text-2xl font-semibold leading-tight tracking-tight2 text-ivory">{listing.headline}</h3>
 
       <div className="mt-3 flex items-center gap-2">
-        <span className="label text-gold">{VERTICAL_LABEL[listing.vertical]}</span>
+        <span className="label text-accent">{VERTICAL_LABEL[listing.vertical]}</span>
         <span className="text-ivory-faint">·</span>
         <span className="label text-ivory-faint">{STATUS_LABEL[listing.status]}</span>
       </div>
 
       <p className="mt-3 text-sm text-ivory-dim">{listing.localityLabel}</p>
-      <p className="mt-4 line-clamp-2 flex-1 font-display text-[1.05rem] italic leading-snug text-ivory-faint">
+      <p className="mt-4 line-clamp-2 flex-1 text-[0.88rem] leading-relaxed text-ivory-faint">
         “{listing.localityNote.split('.')[0]}.”
       </p>
 

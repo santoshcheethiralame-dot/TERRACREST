@@ -11,11 +11,11 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
     <div>
       <div className="flex items-baseline justify-between gap-4">
         <div>
-          <p className="label text-gold">Valuation Model</p>
+          <p className="label text-accent">Valuation Model</p>
           <p className="mono mt-1 text-[0.72rem] text-ivory-dim">{card.modelType}</p>
         </div>
         {onRetrain && (
-          <button onClick={onRetrain} disabled={busy} className="label border border-[color:var(--line-gold)] px-4 py-2 text-gold transition-colors hover:bg-gold hover:text-ink disabled:opacity-50">
+          <button onClick={onRetrain} disabled={busy} className="label border border-[color:var(--line-accent)] px-4 py-2 text-accent transition-colors hover:bg-accent hover:text-ink disabled:opacity-50">
             {busy ? 'Retraining…' : 'Retrain'}
           </button>
         )}
@@ -35,9 +35,9 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
             <div key={f.feature} className="flex items-center gap-3">
               <span className="w-40 shrink-0 text-[0.82rem] text-ivory-dim">{f.label}</span>
               <div className="relative h-2 flex-1 bg-[color:var(--line)]">
-                <div className={`absolute inset-y-0 left-0 ${up ? 'bg-emerald-bright' : 'bg-gold'}`} style={{ width: `${(f.weight / max) * 100}%` }} />
+                <div className={`absolute inset-y-0 left-0 ${up ? 'bg-emerald-bright' : 'bg-accent'}`} style={{ width: `${(f.weight / max) * 100}%` }} />
               </div>
-              <span className={`mono w-14 shrink-0 text-right text-[0.7rem] ${up ? 'text-emerald-bright' : 'text-gold'}`}>{up ? '↑' : '↓'} {f.weight.toFixed(3)}</span>
+              <span className={`mono w-14 shrink-0 text-right text-[0.7rem] ${up ? 'text-emerald-bright' : 'text-accent'}`}>{up ? '↑' : '↓'} {f.weight.toFixed(3)}</span>
             </div>
           )
         })}

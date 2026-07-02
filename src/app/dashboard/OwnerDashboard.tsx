@@ -84,14 +84,14 @@ export function OwnerDashboard() {
   return (
     <AppShell>
       <motion.section variants={stagger()} initial="hidden" animate="show">
-        <motion.p variants={rise} className="label text-gold">
+        <motion.p variants={rise} className="label text-accent">
           Your property
         </motion.p>
         <motion.h1 variants={rise} className="mt-4 font-display text-5xl leading-tight text-ivory md:text-6xl">
           {active.headline}
         </motion.h1>
         <motion.div variants={rise} className="mt-4 flex items-center gap-3">
-          <span className="label text-gold">{VERTICAL_LABEL[active.vertical]}</span>
+          <span className="label text-accent">{VERTICAL_LABEL[active.vertical]}</span>
           <span className="text-ivory-faint">·</span>
           <span className="text-sm text-ivory-dim">{active.localityLabel}</span>
         </motion.div>
@@ -134,7 +134,7 @@ function Pipeline({ status, negotiating }: { status: Listing['status']; negotiat
       {PIPELINE.map((s, i) => (
         <div key={s} className="flex items-center gap-3">
           <span
-            className={`label ${i < current ? 'text-ivory-faint' : i === current ? 'text-gold' : 'text-ivory-faint/50'}`}
+            className={`label ${i < current ? 'text-ivory-faint' : i === current ? 'text-accent' : 'text-ivory-faint/50'}`}
           >
             <span className="mono mr-2">{i <= current ? '●' : '○'}</span>
             {s}
@@ -149,7 +149,7 @@ function Pipeline({ status, negotiating }: { status: Listing['status']; negotiat
 function Metric({ n, label, detail }: { n: number; label: string; detail: string[] }) {
   return (
     <motion.div variants={rise} initial="hidden" whileInView="show" viewport={inView} className="bg-ink px-6 py-6">
-      <div className="font-display text-5xl text-gilt">{n}</div>
+      <div className="font-display text-5xl text-beam">{n}</div>
       <div className="label mt-3 text-ivory-faint">{label}</div>
       <ul className="mt-3 space-y-1">
         {detail.length ? (
@@ -204,7 +204,7 @@ function OffersTable({
               <tr key={o.id} className="border-b border-line last:border-0">
                 <td className="px-5 py-4 text-sm text-ivory">{o.builder}</td>
                 <td className="px-5 py-4 text-sm text-ivory-dim">{o.type}</td>
-                <td className="mono px-5 py-4 text-sm text-gold">{o.quote}</td>
+                <td className="mono px-5 py-4 text-sm text-accent">{o.quote}</td>
                 <td className="px-5 py-4 text-sm text-ivory-dim">{o.terms}</td>
                 <td className="px-5 py-4">
                   <StatusPill status={o.status} />
@@ -212,7 +212,7 @@ function OffersTable({
                 <td className="px-5 py-4">
                   {o.status === 'pending' && !negotiating ? (
                     <div className="flex gap-2">
-                      <button onClick={() => setChooseFor(o)} className="label bg-gold px-4 py-2 text-ink transition-colors hover:bg-gold-bright">
+                      <button onClick={() => setChooseFor(o)} className="label bg-accent px-4 py-2 text-ink transition-colors hover:bg-accent-bright">
                         Choose
                       </button>
                       <button
@@ -263,7 +263,7 @@ function OffersTable({
 function StatusPill({ status }: { status: Offer['status'] }) {
   if (status === 'chosen') return <span className="label text-emerald-bright">● Preferred</span>
   if (status === 'declined') return <span className="label text-ivory-faint">Declined</span>
-  return <span className="label text-gold">Pending</span>
+  return <span className="label text-accent">Pending</span>
 }
 
 function ModalShell({ children, onClose }: { children: ReactNode; onClose: () => void }) {
@@ -275,7 +275,7 @@ function ModalShell({ children, onClose }: { children: ReactNode; onClose: () =>
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.45, ease: EASE }}
-        className="relative w-full max-w-lg border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
+        className="relative w-full max-w-lg border border-[color:var(--line-accent)] bg-ink-card p-8 shadow-deep"
       >
         {children}
       </motion.div>
@@ -298,14 +298,14 @@ function ConfirmModal({
 }) {
   return (
     <ModalShell onClose={onClose}>
-      <p className="label text-gold">Confirm</p>
+      <p className="label text-accent">Confirm</p>
       <h3 className="mt-4 font-display text-3xl text-ivory">{title}</h3>
       <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">{body}</p>
       <div className="mt-7 flex gap-3">
         <button onClick={onClose} className="label flex-1 border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory">
           Cancel
         </button>
-        <button onClick={onConfirm} className="label flex-1 bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright">
+        <button onClick={onConfirm} className="label flex-1 bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright">
           {confirmLabel}
         </button>
       </div>
@@ -317,7 +317,7 @@ function LeaveModal({ builder, onConfirm, onClose }: { builder: string; onConfir
   const [reason, setReason] = useState<string | null>(null)
   return (
     <ModalShell onClose={onClose}>
-      <p className="label text-gold">Decline</p>
+      <p className="label text-accent">Decline</p>
       <h3 className="mt-4 font-display text-3xl text-ivory">Pass on {builder}</h3>
       <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
         Your reason stays private — the builder receives an admin-curated message and your RM offers alternatives.
@@ -328,7 +328,7 @@ function LeaveModal({ builder, onConfirm, onClose }: { builder: string; onConfir
             key={r}
             onClick={() => setReason(r)}
             className={`label w-full border px-4 py-3 text-left transition-colors ${
-              reason === r ? 'border-[color:var(--line-gold)] bg-gold/10 text-gold' : 'border-line text-ivory-dim hover:text-ivory'
+              reason === r ? 'border-[color:var(--line-accent)] bg-accent/10 text-accent' : 'border-line text-ivory-dim hover:text-ivory'
             }`}
           >
             {r}
@@ -342,7 +342,7 @@ function LeaveModal({ builder, onConfirm, onClose }: { builder: string; onConfir
         <button
           onClick={onConfirm}
           disabled={!reason}
-          className="label flex-1 bg-gold py-3.5 text-ink transition-colors hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-50"
+          className="label flex-1 bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50"
         >
           Confirm decline
         </button>
