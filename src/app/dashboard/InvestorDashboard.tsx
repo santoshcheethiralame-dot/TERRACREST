@@ -5,7 +5,7 @@ import type { Listing } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { AppShell } from '@/components/AppShell'
 import { formatCr } from '@/lib/format'
-import { rise, stagger, inView } from '@/lib/motion'
+import { rise, stagger } from '@/lib/motion'
 
 /** Illustrative existing holdings for the portfolio view. */
 const PORTFOLIO = [
@@ -19,11 +19,13 @@ export function InvestorDashboard() {
 
   useEffect(() => {
     let alive = true
-    repo.listListings().then((ls) => {
-      if (!alive) return
-      setOpps(ls.filter((l) => l.vertical === 'big-land'))
-      setLoading(false)
-    })
+    repo
+      .listListings()
+      .then((ls) => {
+        if (!alive) return
+        setOpps(ls.filter((l) => l.vertical === 'big-land'))
+      })
+      .finally(() => alive && setLoading(false))
     return () => {
       alive = false
     }
@@ -81,7 +83,9 @@ export function InvestorDashboard() {
       {/* opportunities */}
       <section className="mt-16">
         <h2 className="font-display text-3xl text-ink">Open opportunities</h2>
-        <motion.div variants={stagger(0.1, 0.1)} initial="hidden" whileInView="show" viewport={inView} className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {/* Animate when the data lands, not on scroll — late-mounting cards must
+            never be stranded in a consumed observer's "hidden" state. */}
+        <motion.div variants={stagger(0.1, 0.1)} initial="hidden" animate={loading ? 'hidden' : 'show'} className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
           {loading ? (
             <div className="h-56 animate-pulse border border-line bg-paper-raise/30" />
           ) : (

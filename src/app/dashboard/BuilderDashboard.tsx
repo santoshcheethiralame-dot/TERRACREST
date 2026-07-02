@@ -6,7 +6,7 @@ import { repo } from '@/data/repository'
 import { useAuth } from '@/auth/AuthContext'
 import { AppShell } from '@/components/AppShell'
 import { ListingCard } from '@/components/ListingCard'
-import { rise, stagger, inView } from '@/lib/motion'
+import { rise, stagger } from '@/lib/motion'
 
 export function BuilderDashboard() {
   const { user } = useAuth()
@@ -19,14 +19,17 @@ export function BuilderDashboard() {
     if (!user) return
     let alive = true
     ;(async () => {
-      const ls = await repo.listListings()
-      const flags = await Promise.all(ls.map((l) => repo.isUnlocked(l.id, user.id)))
-      const nd = await repo.ndasForBuilder(user.id)
-      if (!alive) return
-      setListings(ls)
-      setUnlocked(new Set(ls.filter((_, i) => flags[i]).map((l) => l.id)))
-      setNdas(nd)
-      setLoading(false)
+      try {
+        const ls = await repo.listListings()
+        const flags = await Promise.all(ls.map((l) => repo.isUnlocked(l.id, user.id)))
+        const nd = await repo.ndasForBuilder(user.id)
+        if (!alive) return
+        setListings(ls)
+        setUnlocked(new Set(ls.filter((_, i) => flags[i]).map((l) => l.id)))
+        setNdas(nd)
+      } finally {
+        if (alive) setLoading(false)
+      }
     })()
     return () => {
       alive = false
@@ -46,20 +49,27 @@ export function BuilderDashboard() {
         </p>
       </section>
 
+      {/* Animate when the data lands, not on scroll — cards mounted after a slow
+          fetch must never be stranded in the observer's consumed "hidden" state. */}
       <motion.div
         variants={stagger(0.1, 0.09)}
         initial="hidden"
-        whileInView="show"
-        viewport={inView}
+        animate={loading ? 'hidden' : 'show'}
         className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
       >
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-          : listings.map((l) => (
-              <motion.div key={l.id} variants={rise}>
-                <ListingCard listing={l} unlocked={unlocked.has(l.id)} />
-              </motion.div>
-            ))}
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : listings.length === 0 ? (
+          <p className="label col-span-full border border-line px-6 py-10 text-center text-ink-faint">
+            The desk is preparing your book — check back shortly.
+          </p>
+        ) : (
+          listings.map((l) => (
+            <motion.div key={l.id} variants={rise}>
+              <ListingCard listing={l} unlocked={unlocked.has(l.id)} />
+            </motion.div>
+          ))
+        )}
       </motion.div>
 
       {/* NDA log */}

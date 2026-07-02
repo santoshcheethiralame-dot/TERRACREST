@@ -120,7 +120,7 @@ function Hero() {
 
         {/* the massing — drawn, not photographed */}
         <motion.div variants={fade} initial="hidden" animate="show" transition={{ delay: 0.5 }} className="relative">
-          <MassingArt className="mx-auto w-full max-w-[560px]" />
+          <MassingArt className="mx-auto w-full max-w-[620px]" />
         </motion.div>
       </div>
     </section>
