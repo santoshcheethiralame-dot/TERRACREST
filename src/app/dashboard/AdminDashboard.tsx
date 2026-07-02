@@ -74,8 +74,8 @@ export function AdminDashboard() {
     <AppShell>
       <header>
         <p className="label text-accent">Operations Centre</p>
-        <h1 className="mt-4 font-display text-5xl text-ivory md:text-6xl">The desk.</h1>
-        <p className="mt-4 max-w-2xl text-ivory-dim">Create accounts after offline KYC, verify parcels before they go live, and log the witnessed NDAs that unseal them.</p>
+        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">The desk.</h1>
+        <p className="mt-4 max-w-2xl text-ink-dim">Create accounts after offline KYC, verify parcels before they go live, and log the witnessed NDAs that unseal them.</p>
       </header>
 
       <nav className="mt-10 flex flex-wrap gap-2 border-b border-line">
@@ -84,7 +84,7 @@ export function AdminDashboard() {
             key={t.key}
             onClick={() => openTab(t.key)}
             className={`label -mb-px border-b-2 px-4 py-3 transition-colors ${
-              tab === t.key ? 'border-accent text-accent' : 'border-transparent text-ivory-faint hover:text-ivory'
+              tab === t.key ? 'border-accent text-accent' : 'border-transparent text-ink-faint hover:text-ink'
             }`}
           >
             {t.label}
@@ -93,7 +93,7 @@ export function AdminDashboard() {
             ) : t.key === 'architect' ? (
               pendingReviews > 0 && <NotifyBadge n={pendingReviews} />
             ) : t.key !== 'new' && t.key !== 'prices' && t.key !== 'model' ? (
-              <span className="ml-1 text-ivory-faint">{counts[t.key]}</span>
+              <span className="ml-1 text-ink-faint">{counts[t.key]}</span>
             ) : null}
           </button>
         ))}
@@ -101,7 +101,7 @@ export function AdminDashboard() {
 
       <div className="mt-10">
         {loading ? (
-          <p className="label animate-pulse py-16 text-center text-ivory-faint">Loading the desk…</p>
+          <p className="label animate-pulse py-16 text-center text-ink-faint">Loading the desk…</p>
         ) : tab === 'ndas' ? (
           <NdaDesk users={users} listings={listings} ndas={ndas} onLogged={reload} />
         ) : tab === 'listings' ? (
@@ -155,9 +155,9 @@ function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings:
 
   return (
     <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <form onSubmit={submit} className="border border-line bg-ink-raise/40 p-7">
+      <form onSubmit={submit} className="border border-line bg-paper-raise/40 p-7">
         <p className="label text-accent">Log a witnessed NDA</p>
-        <p className="mt-3 text-sm leading-relaxed text-ivory-dim">This is the gate. Once logged, the builder’s view of the parcel unseals — exact location, ownership and the document vault.</p>
+        <p className="mt-3 text-sm leading-relaxed text-ink-dim">This is the gate. Once logged, the builder’s view of the parcel unseals — exact location, ownership and the document vault.</p>
         <div className="mt-6 space-y-5">
           <Field label="Builder">
             <Select value={builderId} onChange={setBuilderId} placeholder="Select builder…" options={builders.map((b) => ({ value: b.id, label: b.displayName.split('·')[0].trim() }))} />
@@ -166,7 +166,7 @@ function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings:
             <Select value={listingId} onChange={setListingId} placeholder="Select parcel…" options={listings.map((l) => ({ value: l.id, label: `${l.id} — ${l.headline}` }))} />
           </Field>
         </div>
-        <button type="submit" disabled={busy || !builderId || !listingId} className="label mt-7 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="submit" disabled={busy || !builderId || !listingId} className="label mt-7 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50">
           {busy ? 'Logging…' : 'Log executed NDA'}
         </button>
         {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
@@ -174,24 +174,24 @@ function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings:
 
       <div>
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-2xl text-ivory">NDA register</h2>
-          <span className="label text-ivory-faint">{ndas.length} on file</span>
+          <h2 className="font-display text-2xl text-ink">NDA register</h2>
+          <span className="label text-ink-faint">{ndas.length} on file</span>
         </div>
         <div className="mt-5 overflow-x-auto border border-line">
           <table className="w-full min-w-[520px] text-left">
             <thead>
-              <tr className="border-b border-line bg-ink-raise/40">
+              <tr className="border-b border-line bg-paper-raise/40">
                 {['Parcel', 'Builder', 'Signed'].map((h) => (
-                  <th key={h} className="label px-4 py-3 text-ivory-faint">{h}</th>
+                  <th key={h} className="label px-4 py-3 text-ink-faint">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {ndas.map((n) => (
                 <tr key={n.id} className="border-b border-line last:border-0">
-                  <td className="mono px-4 py-3 text-sm text-ivory">{n.listingId}</td>
-                  <td className="px-4 py-3 text-sm text-ivory-dim">{who(n.builderId)}</td>
-                  <td className="mono px-4 py-3 text-sm text-ivory-faint">{n.signedOn}</td>
+                  <td className="mono px-4 py-3 text-sm text-ink">{n.listingId}</td>
+                  <td className="px-4 py-3 text-sm text-ink-dim">{who(n.builderId)}</td>
+                  <td className="mono px-4 py-3 text-sm text-ink-faint">{n.signedOn}</td>
                 </tr>
               ))}
             </tbody>
@@ -212,9 +212,9 @@ function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: 
     <div className="overflow-x-auto border border-line">
       <table className="w-full min-w-[720px] text-left">
         <thead>
-          <tr className="border-b border-line bg-ink-raise/40">
+          <tr className="border-b border-line bg-paper-raise/40">
             {['Parcel', 'Vertical', 'Locality', 'Status'].map((h) => (
-              <th key={h} className="label px-5 py-3.5 text-ivory-faint">{h}</th>
+              <th key={h} className="label px-5 py-3.5 text-ink-faint">{h}</th>
             ))}
           </tr>
         </thead>
@@ -222,11 +222,11 @@ function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: 
           {listings.map((l) => (
             <tr key={l.id} className="border-b border-line last:border-0">
               <td className="px-5 py-4">
-                <div className="mono text-[0.72rem] text-ivory-dim">{l.id}</div>
-                <div className="text-sm text-ivory">{l.headline}</div>
+                <div className="mono text-[0.72rem] text-ink-dim">{l.id}</div>
+                <div className="text-sm text-ink">{l.headline}</div>
               </td>
-              <td className="px-5 py-4 text-sm text-ivory-dim">{VERTICAL_LABEL[l.vertical]}</td>
-              <td className="px-5 py-4 text-sm text-ivory-faint">{l.localityLabel}</td>
+              <td className="px-5 py-4 text-sm text-ink-dim">{VERTICAL_LABEL[l.vertical]}</td>
+              <td className="px-5 py-4 text-sm text-ink-faint">{l.localityLabel}</td>
               <td className="px-5 py-4">
                 <Select
                   value={l.status}
@@ -296,9 +296,9 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
         <div className="overflow-x-auto border border-line">
           <table className="w-full min-w-[560px] text-left">
           <thead>
-            <tr className="border-b border-line bg-ink-raise/40">
+            <tr className="border-b border-line bg-paper-raise/40">
               {['Member', 'Role', 'KYC', 'Actions'].map((h) => (
-                <th key={h} className="label px-5 py-3.5 text-ivory-faint">{h}</th>
+                <th key={h} className="label px-5 py-3.5 text-ink-faint">{h}</th>
               ))}
             </tr>
           </thead>
@@ -306,16 +306,16 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
             {users.map((u) => (
               <tr key={u.id} className={`border-b border-line last:border-0 ${u.active === false ? 'opacity-45' : ''}`}>
                 <td className="px-5 py-4">
-                  <div className="text-sm text-ivory">{u.displayName}</div>
-                  <div className="mono text-[0.72rem] text-ivory-faint">{u.username}</div>
+                  <div className="text-sm text-ink">{u.displayName}</div>
+                  <div className="mono text-[0.72rem] text-ink-faint">{u.username}</div>
                 </td>
                 <td className="px-5 py-4"><span className="label text-accent">{u.role}</span></td>
-                <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● Verified</span> : <span className="label text-ivory-faint">Pending</span>}</td>
+                <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● Verified</span> : <span className="label text-ink-faint">Pending</span>}</td>
                 <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     <button onClick={() => resetPw(u)} className="label text-accent transition-colors hover:text-accent-bright">Reset PW</button>
-                    <button onClick={() => toggleKyc(u)} className="label text-ivory-faint transition-colors hover:text-ivory">KYC</button>
-                    <button onClick={() => toggleActive(u)} className="label text-ivory-faint transition-colors hover:text-ivory">
+                    <button onClick={() => toggleKyc(u)} className="label text-ink-faint transition-colors hover:text-ink">KYC</button>
+                    <button onClick={() => toggleActive(u)} className="label text-ink-faint transition-colors hover:text-ink">
                       {u.active === false ? 'Activate' : 'Deactivate'}
                     </button>
                   </div>
@@ -326,9 +326,9 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
         </table>
       </div>
 
-      <form onSubmit={submit} className="border border-line bg-ink-raise/40 p-7">
+      <form onSubmit={submit} className="border border-line bg-paper-raise/40 p-7">
         <p className="label text-accent">Create account</p>
-        <p className="mt-3 text-sm text-ivory-dim">After offline KYC. A temporary password is issued; the member changes it on first login.</p>
+        <p className="mt-3 text-sm text-ink-dim">After offline KYC. A temporary password is issued; the member changes it on first login.</p>
         <div className="mt-6 space-y-5">
           <Field label="Username"><Input value={username} onChange={setUsername} placeholder="builder_new_009" /></Field>
           <Field label="Display name"><Input value={displayName} onChange={setDisplayName} placeholder="Name · Firm" /></Field>
@@ -342,7 +342,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
           </Field>
           <Field label="Office (optional)"><Input value={office} onChange={setOffice} placeholder="Koramangala, Bengaluru" /></Field>
         </div>
-        <button type="submit" disabled={busy} className="label mt-7 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
+        <button type="submit" disabled={busy} className="label mt-7 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Creating…' : 'Create account'}
         </button>
         {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
@@ -361,20 +361,20 @@ function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }
       {stages.map((s) => {
         const col = deals.filter((d) => d.stage === s)
         return (
-          <div key={s} className="border border-line bg-ink-raise/30">
+          <div key={s} className="border border-line bg-paper-raise/30">
             <div className="flex items-center justify-between border-b border-line px-4 py-3">
-              <span className="label text-ivory-dim">{DEAL_STAGE_LABEL[s]}</span>
-              <span className="mono text-[0.72rem] text-ivory-faint">{col.length}</span>
+              <span className="label text-ink-dim">{DEAL_STAGE_LABEL[s]}</span>
+              <span className="mono text-[0.72rem] text-ink-faint">{col.length}</span>
             </div>
             <div className="space-y-3 p-3">
               {col.length === 0 ? (
-                <p className="px-1 py-4 text-center text-[0.72rem] text-ivory-faint/60">—</p>
+                <p className="px-1 py-4 text-center text-[0.72rem] text-ink-faint/60">—</p>
               ) : (
                 col.map((d) => (
-                  <div key={d.id} className="border border-line bg-ink p-3">
-                    <div className="text-[0.82rem] leading-snug text-ivory">{label(d.listingId)}</div>
+                  <div key={d.id} className="border border-line bg-paper p-3">
+                    <div className="text-[0.82rem] leading-snug text-ink">{label(d.listingId)}</div>
                     <div className="mono mt-2 text-[0.72rem] text-accent">₹{(d.estCommission / 1e5).toFixed(1)} L est.</div>
-                    <div className="label mt-1 text-ivory-faint">RM {d.rm}</div>
+                    <div className="label mt-1 text-ink-faint">RM {d.rm}</div>
                   </div>
                 ))
               )}
@@ -486,7 +486,7 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
       </Section>
 
       <label className="mt-5 block">
-        <span className="label text-ivory-faint">Locality note (admin assessment)</span>
+        <span className="label text-ink-faint">Locality note (admin assessment)</span>
         <div className="mt-2"><Input value={f.localityNote} onChange={(v) => set('localityNote', v)} placeholder="Personally inspected on…" /></div>
       </label>
 
@@ -515,7 +515,7 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
       </Section>
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
-        <button type="submit" disabled={busy} className="label bg-accent px-8 py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
+        <button type="submit" disabled={busy} className="label bg-accent px-8 py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Creating…' : 'Create parcel'}
         </button>
         {msg && <span className={`text-[0.85rem] ${msg.ok ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>{msg.text}</span>}
@@ -536,7 +536,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 /* --------------------------------------------------------------- badges */
 function NotifyBadge({ n }: { n: number }) {
   return (
-    <span className="ml-1.5 inline-flex min-w-[1.15rem] justify-center rounded-full bg-oxblood-bright px-1.5 text-[0.7rem] font-semibold leading-[1.15rem] text-ivory">
+    <span className="ml-1.5 inline-flex min-w-[1.15rem] justify-center rounded-full bg-oxblood-bright px-1.5 text-[0.7rem] font-semibold leading-[1.15rem] text-paper">
       {n}
     </span>
   )
@@ -546,7 +546,7 @@ function NotifyBadge({ n }: { n: number }) {
 const cr = (rupees: number) => `₹${(rupees / 1e7).toFixed(1)} Cr`
 
 function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectReview[]; listings: Listing[]; onDelivered: () => void }) {
-  if (!reviews.length) return <p className="label py-16 text-center text-ivory-faint">No architect engagements yet.</p>
+  if (!reviews.length) return <p className="label py-16 text-center text-ink-faint">No architect engagements yet.</p>
   const parcel = (id: string) => listings.find((l) => l.id === id)?.headline ?? id
   const pending = reviews.filter((r) => r.status === 'requested')
   const done = reviews.filter((r) => r.status === 'delivered')
@@ -554,9 +554,9 @@ function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectRe
     <div className="max-w-3xl space-y-10">
       <div>
         <p className="label text-accent">Awaiting the desk{pending.length ? ` · ${pending.length}` : ''}</p>
-        <p className="mt-2 text-sm text-ivory-faint">Record the empanelled architect's stamped, validated figure. It lands back in the builder's Studio beside the ML estimate.</p>
+        <p className="mt-2 text-sm text-ink-faint">Record the empanelled architect's stamped, validated figure. It lands back in the builder's Studio beside the ML estimate.</p>
         {pending.length === 0 ? (
-          <p className="mt-5 text-sm text-ivory-dim">Nothing awaiting delivery.</p>
+          <p className="mt-5 text-sm text-ink-dim">Nothing awaiting delivery.</p>
         ) : (
           <div className="mt-6 space-y-5">
             {pending.map((r) => (
@@ -567,7 +567,7 @@ function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectRe
       </div>
       {done.length > 0 && (
         <div>
-          <p className="label text-ivory-faint">Delivered</p>
+          <p className="label text-ink-faint">Delivered</p>
           <div className="mt-5 space-y-4">
             {done.map((r) => (
               <DeliveredCard key={r.id} review={r} parcel={parcel(r.listingId)} />
@@ -604,10 +604,10 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
   return (
     <form onSubmit={submit} className="border border-line p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-sm text-ivory">{parcel}</p>
-        <span className="mono text-xs text-ivory-faint">{review.builderName}</span>
+        <p className="text-sm text-ink">{parcel}</p>
+        <span className="mono text-xs text-ink-faint">{review.builderName}</span>
       </div>
-      <p className="mono mt-2 text-xs text-ivory-faint">
+      <p className="mono mt-2 text-xs text-ink-faint">
         Studio estimate: {cr(review.mlSnapshot.baseNet)} · {review.mlSnapshot.units} units · commissioned {fmtWhen(review.requestedAt)}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -624,11 +624,11 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="w-full border border-line bg-ink px-3 py-2 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
+            className="w-full border border-line bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-[color:var(--line-accent)]"
           />
         </Field>
       </div>
-      <button disabled={busy} className="label mt-4 bg-accent px-6 py-3 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
+      <button disabled={busy} className="label mt-4 bg-accent px-6 py-3 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
         {busy ? 'Recording…' : 'Deliver validation'}
       </button>
     </form>
@@ -642,18 +642,18 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
   return (
     <div className="border border-line p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-sm text-ivory">{parcel}</p>
-        <span className="mono text-xs text-ivory-faint">{review.architectName}</span>
+        <p className="text-sm text-ink">{parcel}</p>
+        <span className="mono text-xs text-ink-faint">{review.architectName}</span>
       </div>
       <div className="mono mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs">
-        <span className="text-ivory-dim">Studio {cr(ml)}</span>
+        <span className="text-ink-dim">Studio {cr(ml)}</span>
         <span className="text-accent">Architect {cr(arch)}</span>
         <span className={v >= 0 ? 'text-emerald-bright' : 'text-oxblood-bright'}>
           {v >= 0 ? '+' : ''}
           {v.toFixed(1)}%
         </span>
       </div>
-      {review.architectNotes && <p className="mt-3 text-[0.85rem] leading-relaxed text-ivory-dim">{review.architectNotes}</p>}
+      {review.architectNotes && <p className="mt-3 text-[0.85rem] leading-relaxed text-ink-dim">{review.architectNotes}</p>}
     </div>
   )
 }
@@ -676,10 +676,10 @@ function ModelTab() {
     }
   }
 
-  if (!card) return <p className="label animate-pulse py-16 text-center text-ivory-faint">Loading the model…</p>
+  if (!card) return <p className="label animate-pulse py-16 text-center text-ink-faint">Loading the model…</p>
   return (
     <div className="max-w-2xl">
-      <p className="text-sm text-ivory-faint">
+      <p className="text-sm text-ink-faint">
         The valuation model behind the Studio. Every architect delivery is a labelled example — retrain to fold the latest deliveries into the corpus and watch the numbers move.
       </p>
       <div className="mt-8 border border-line p-6">
@@ -691,11 +691,11 @@ function ModelTab() {
 
 /* -------------------------------------------------------------- activity */
 const KIND_META: Record<ActivityKind, { label: string; cls: string }> = {
-  login: { label: 'Login', cls: 'text-ivory-dim' },
+  login: { label: 'Login', cls: 'text-ink-dim' },
   nda: { label: 'NDA', cls: 'text-accent' },
   message: { label: 'Deal Room', cls: 'text-emerald-bright' },
-  listing_created: { label: 'New Parcel', cls: 'text-ivory' },
-  status_change: { label: 'Status', cls: 'text-ivory-dim' },
+  listing_created: { label: 'New Parcel', cls: 'text-ink' },
+  status_change: { label: 'Status', cls: 'text-ink-dim' },
   document: { label: 'Document', cls: 'text-oxblood-bright' },
   architect: { label: 'Architect', cls: 'text-accent-bright' },
 }
@@ -707,11 +707,11 @@ function fmtWhen(iso: string): string {
 }
 
 function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: Listing[] }) {
-  if (!events.length) return <p className="label py-16 text-center text-ivory-faint">No activity recorded yet.</p>
+  if (!events.length) return <p className="label py-16 text-center text-ink-faint">No activity recorded yet.</p>
   const parcel = (id?: string) => (id ? listings.find((l) => l.id === id)?.id ?? id : null)
   return (
     <div className="max-w-3xl">
-      <p className="text-sm text-ivory-faint">
+      <p className="text-sm text-ink-faint">
         Append-only audit trail. Every sign-in, NDA unlock, document view and Deal Room message is recorded here — nothing on this feed is editable.
       </p>
       <ol className="mt-8 border-l border-line">
@@ -719,13 +719,13 @@ function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: 
           const meta = KIND_META[e.kind] ?? KIND_META.login
           return (
             <li key={e.id} className="relative pb-7 pl-6 last:pb-0">
-              <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-ink" />
+              <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-paper" />
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className={`label rounded-full border border-[color:var(--line-strong)] px-2 py-0.5 text-[0.65rem] ${meta.cls}`}>{meta.label}</span>
-                <span className="mono text-xs text-ivory-faint">{fmtWhen(e.createdAt)}</span>
-                {e.listingId && <span className="mono text-xs text-ivory-faint">· {parcel(e.listingId)}</span>}
+                <span className="mono text-xs text-ink-faint">{fmtWhen(e.createdAt)}</span>
+                {e.listingId && <span className="mono text-xs text-ink-faint">· {parcel(e.listingId)}</span>}
               </div>
-              <p className="mt-2 text-sm text-ivory">{e.summary}</p>
+              <p className="mt-2 text-sm text-ink">{e.summary}</p>
             </li>
           )
         })}
@@ -754,7 +754,7 @@ function PricesTab() {
     repo.getPriceBook().then(setPb)
   }, [])
 
-  if (!pb) return <p className="label animate-pulse py-10 text-center text-ivory-faint">Loading rates…</p>
+  if (!pb) return <p className="label animate-pulse py-10 text-center text-ink-faint">Loading rates…</p>
 
   const setRate = (key: string, v: string) => setPb({ ...pb, rates: { ...pb.rates, [key]: Number(v) || 0 } })
   const save = async () => {
@@ -767,7 +767,7 @@ function PricesTab() {
 
   return (
     <div className="max-w-4xl">
-      <p className="text-sm text-ivory-faint">Monthly Bangalore rates. The Studio reads these live — change one and every builder's GDV recomputes.</p>
+      <p className="text-sm text-ink-faint">Monthly Bangalore rates. The Studio reads these live — change one and every builder's GDV recomputes.</p>
       <div className="mt-6 max-w-xs">
         <Field label="Base build ₹/sq ft (structure + MEP)">
           <Input value={String(pb.baseBuildPsf)} onChange={(v) => setPb({ ...pb, baseBuildPsf: Number(v) || 0 })} />
@@ -776,23 +776,23 @@ function PricesTab() {
       <div className="mt-6 overflow-x-auto border border-line">
         <table className="w-full min-w-[560px] text-left">
           <thead>
-            <tr className="border-b border-line bg-ink-raise/40">
-              <th className="label px-4 py-3 text-ivory-faint">Finish · ₹/sq ft</th>
+            <tr className="border-b border-line bg-paper-raise/40">
+              <th className="label px-4 py-3 text-ink-faint">Finish · ₹/sq ft</th>
               {RATE_TIERS.map((t) => (
-                <th key={t} className="label px-4 py-3 text-ivory-faint">{t}</th>
+                <th key={t} className="label px-4 py-3 text-ink-faint">{t}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {RATE_CATS.map(([key, name]) => (
               <tr key={key} className="border-b border-line last:border-0">
-                <td className="px-4 py-3 text-sm text-ivory">{name}</td>
+                <td className="px-4 py-3 text-sm text-ink">{name}</td>
                 {RATE_TIERS.map((t) => (
                   <td key={t} className="px-4 py-2">
                     <input
                       value={pb.rates[`${key}:${t}`] ?? ''}
                       onChange={(e) => setRate(`${key}:${t}`, e.target.value)}
-                      className="mono w-20 border border-line bg-ink px-2 py-1.5 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
+                      className="mono w-20 border border-line bg-paper px-2 py-1.5 text-sm text-ink outline-none transition-colors focus:border-[color:var(--line-accent)]"
                     />
                   </td>
                 ))}
@@ -802,7 +802,7 @@ function PricesTab() {
         </table>
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button onClick={save} disabled={busy} className="label bg-accent px-8 py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
+        <button onClick={save} disabled={busy} className="label bg-accent px-8 py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
           {busy ? 'Saving…' : 'Save rates'}
         </button>
         {msg && <span className="text-[0.85rem] text-emerald-bright">{msg}</span>}
@@ -815,7 +815,7 @@ function PricesTab() {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="label text-ivory-faint">{label}</span>
+      <span className="label text-ink-faint">{label}</span>
       <div className="mt-2">{children}</div>
     </label>
   )
@@ -828,7 +828,7 @@ function Input({ value, onChange, placeholder }: { value: string; onChange: (v: 
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       autoComplete="off"
-      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-accent)]"
+      className="mono w-full border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-[color:var(--line-accent)]"
     />
   )
 }
@@ -838,7 +838,7 @@ function Select({ value, onChange, options, placeholder }: { value: string; onCh
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="mono w-full border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors focus:border-[color:var(--line-accent)]"
+      className="mono w-full border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-[color:var(--line-accent)]"
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map((o) => (

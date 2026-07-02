@@ -32,8 +32,8 @@ export function Studio() {
 
 function StudioLoading() {
   return (
-    <div className="grid min-h-screen place-items-center bg-ink">
-      <p className="label animate-pulse text-ivory-faint">Loading parcel…</p>
+    <div className="grid min-h-screen place-items-center bg-paper">
+      <p className="label animate-pulse text-ink-faint">Loading parcel…</p>
     </div>
   )
 }
@@ -92,7 +92,7 @@ function StudioInner({ listing }: { listing: Listing }) {
   }, [valCtx])
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink text-ivory lg:h-screen lg:overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-paper text-ink lg:h-screen lg:overflow-hidden">
       <StudioBar listing={listing} review={review} onEngage={() => setEngage(true)} />
 
       <div className="grid flex-1 grid-cols-1 lg:min-h-0 lg:grid-cols-[1.55fr_1fr]">
@@ -105,7 +105,7 @@ function StudioInner({ listing }: { listing: Listing }) {
         </section>
 
         {/* controls */}
-        <aside className="bg-ink-raise/40 px-6 py-7 md:px-8 lg:min-h-0 lg:overflow-y-auto">
+        <aside className="bg-paper-raise/40 px-6 py-7 md:px-8 lg:min-h-0 lg:overflow-y-auto">
           <Controls feas={feas} set={set} listing={listing} />
           <div className="hairline my-8" />
           <Materials selection={selection} onSelect={(k, t) => setSelection((s) => ({ ...s, [k]: t }))} finishesPsf={gdv.finishesPsf} />
@@ -130,13 +130,13 @@ function StudioBar({ listing, review, onEngage }: { listing: Listing; review: Ar
   return (
     <header className="flex items-center justify-between border-b border-line px-6 py-4 md:px-10">
       <div className="flex items-center gap-6">
-        <Link to="/app" className="label text-ivory-faint transition-colors hover:text-ivory">
+        <Link to="/app" className="label text-ink-faint transition-colors hover:text-ink">
           ← Terracrest
         </Link>
         <div className="hidden h-4 w-px bg-[color:var(--line-strong)] sm:block" />
         <div className="hidden sm:block">
           <p className="label text-accent">Feasibility Studio</p>
-          <p className="mono mt-1 text-[0.72rem] text-ivory-dim">
+          <p className="mono mt-1 text-[0.72rem] text-ink-dim">
             {listing.id} · {VERTICAL_LABEL[listing.vertical]} · {listing.localityLabel.split('·')[0].trim()}
           </p>
         </div>
@@ -145,8 +145,8 @@ function StudioBar({ listing, review, onEngage }: { listing: Listing; review: Ar
         onClick={onEngage}
         className={`label group inline-flex items-center gap-3 border px-5 py-3 transition-colors duration-500 ${
           delivered
-            ? 'border-emerald/50 text-emerald-bright hover:bg-emerald hover:text-ink'
-            : 'border-[color:var(--line-accent)] text-accent hover:bg-accent hover:text-ink'
+            ? 'border-emerald/50 text-emerald-bright hover:bg-emerald hover:text-paper'
+            : 'border-[color:var(--line-accent)] text-accent hover:bg-accent hover:text-paper'
         }`}
       >
         {delivered && <span aria-hidden>✓</span>}
@@ -172,14 +172,14 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
     <svg viewBox={vb} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Live parcel massing schematic">
       {/* road along frontage (bottom) */}
       <g>
-        <rect x={0} y={plot.h + road * 0.35} width={plot.w} height={road * 0.5} fill="#67676F" fillOpacity="0.08" stroke="#67676F" strokeOpacity="0.4" strokeWidth={sw * 0.7} />
-        <text x={plot.w / 2} y={plot.h + road * 0.72} textAnchor="middle" fill="#67676F" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.82} letterSpacing={fs * 0.03}>
+        <rect x={0} y={plot.h + road * 0.35} width={plot.w} height={road * 0.5} fill="#7C857D" fillOpacity="0.08" stroke="#7C857D" strokeOpacity="0.4" strokeWidth={sw * 0.7} />
+        <text x={plot.w / 2} y={plot.h + road * 0.72} textAnchor="middle" fill="#7C857D" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.82} letterSpacing={fs * 0.03}>
           {feas.roadWidthFt} FT ROAD · FRONTAGE
         </text>
       </g>
 
       {/* parcel boundary */}
-      <rect x={0} y={0} width={plot.w} height={plot.h} fill="none" stroke="#8A7DFF" strokeOpacity="0.7" strokeWidth={sw} />
+      <rect x={0} y={0} width={plot.w} height={plot.h} fill="none" stroke="#1E4D3B" strokeOpacity="0.7" strokeWidth={sw} />
       {/* setback envelope */}
       <rect
         x={plan.buildable.x}
@@ -187,7 +187,7 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
         width={plan.buildable.w}
         height={plan.buildable.h}
         fill="none"
-        stroke="#8A7DFF"
+        stroke="#1E4D3B"
         strokeOpacity="0.32"
         strokeWidth={sw * 0.8}
         strokeDasharray={`${U * 0.02} ${U * 0.02}`}
@@ -200,16 +200,16 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
           initial={false}
           animate={{ x: t.x, y: t.y, width: t.w, height: t.h }}
           transition={{ duration: 0.6, ease: EASE }}
-          fill="#8A7DFF"
+          fill="#1E4D3B"
           fillOpacity="0.13"
-          stroke="#8A7DFF"
+          stroke="#1E4D3B"
           strokeOpacity="0.62"
           strokeWidth={sw}
         />
       ))}
 
       {/* dimension — frontage */}
-      <g stroke="#67676F" strokeWidth={sw * 0.6} fill="#67676F">
+      <g stroke="#7C857D" strokeWidth={sw * 0.6} fill="#7C857D">
         <line x1={0} y1={-padY * 0.5} x2={plot.w} y2={-padY * 0.5} strokeOpacity="0.5" />
         <line x1={0} y1={-padY * 0.62} x2={0} y2={-padY * 0.38} strokeOpacity="0.5" />
         <line x1={plot.w} y1={-padY * 0.62} x2={plot.w} y2={-padY * 0.38} strokeOpacity="0.5" />
@@ -218,7 +218,7 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
         </text>
       </g>
       {/* dimension — depth */}
-      <g stroke="#67676F" strokeWidth={sw * 0.6} fill="#67676F">
+      <g stroke="#7C857D" strokeWidth={sw * 0.6} fill="#7C857D">
         <line x1={-padX * 0.5} y1={0} x2={-padX * 0.5} y2={plot.h} strokeOpacity="0.5" />
         <text
           x={-padX * 0.62}
@@ -235,9 +235,9 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
       </g>
 
       {/* north arrow */}
-      <g transform={`translate(${plot.w + padX * 0.45} ${padY * 0.2})`} stroke="#67676F" strokeWidth={sw * 0.8} fill="none">
+      <g transform={`translate(${plot.w + padX * 0.45} ${padY * 0.2})`} stroke="#7C857D" strokeWidth={sw * 0.8} fill="none">
         <path d={`M0 ${fs * 1.6} L0 0 M${-fs * 0.35} ${fs * 0.4} L0 0 L${fs * 0.35} ${fs * 0.4}`} />
-        <text x={0} y={fs * 2.6} textAnchor="middle" fill="#67676F" stroke="none" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.9}>
+        <text x={0} y={fs * 2.6} textAnchor="middle" fill="#7C857D" stroke="none" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.9}>
           N
         </text>
       </g>
@@ -260,8 +260,8 @@ function MetricsStrip({ gdv }: { gdv: GdvResult }) {
     <div className="grid grid-cols-3 border-t border-line md:grid-cols-6">
       {cells.map((c, i) => (
         <div key={c.k} className={`px-4 py-4 ${i % 3 !== 2 ? 'border-r border-line' : ''} ${i < 3 ? 'border-b border-line md:border-b-0' : ''} md:border-r`}>
-          <div className="label text-ivory-faint">{c.k}</div>
-          <div className="mono mt-1.5 whitespace-nowrap text-[0.82rem] text-ivory">{c.v}</div>
+          <div className="label text-ink-faint">{c.k}</div>
+          <div className="mono mt-1.5 whitespace-nowrap text-[0.82rem] text-ink">{c.v}</div>
         </div>
       ))}
     </div>
@@ -301,7 +301,7 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
     <div>
       <div className="flex items-baseline justify-between">
         <p className="label text-accent">Material Specification</p>
-        <span className="mono text-xs text-ivory-dim">finishes +₹{groupIN(finishesPsf)}/sq ft</span>
+        <span className="mono text-xs text-ink-dim">finishes +₹{groupIN(finishesPsf)}/sq ft</span>
       </div>
       <div className="mt-6 space-y-5">
         {MATERIALS.map((cat) => {
@@ -309,8 +309,8 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
           return (
             <div key={cat.key}>
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-[0.9rem] text-ivory-dim">{cat.name}</span>
-                <span className="mono text-[0.72rem] text-ivory-faint">{cat.options[tier].label}</span>
+                <span className="text-[0.9rem] text-ink-dim">{cat.name}</span>
+                <span className="mono text-[0.72rem] text-ink-faint">{cat.options[tier].label}</span>
               </div>
               <div className="mt-2 grid grid-cols-4 gap-1.5">
                 {TIERS.map((t) => {
@@ -320,7 +320,7 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
                       key={t}
                       onClick={() => onSelect(cat.key, t)}
                       className={`label border px-2 py-2 text-[0.58rem] transition-colors duration-300 ${
-                        active ? 'border-[color:var(--line-accent)] bg-accent/10 text-accent' : 'border-line text-ivory-faint hover:text-ivory'
+                        active ? 'border-[color:var(--line-accent)] bg-accent/10 text-accent' : 'border-line text-ink-faint hover:text-ink'
                       }`}
                     >
                       {TIER_LABEL[t]}
@@ -346,15 +346,15 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
   const basePos = ((base.netValue - bear.netValue) / span) * 100
 
   return (
-    <footer className="sticky bottom-0 z-30 border-t border-line bg-ink-raise/80 px-6 py-5 backdrop-blur-md md:px-10 lg:static lg:backdrop-blur-none">
+    <footer className="sticky bottom-0 z-30 border-t border-line bg-paper-raise/80 px-6 py-5 backdrop-blur-md md:px-10 lg:static lg:backdrop-blur-none">
       <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_1.4fr_0.9fr]">
         {/* headline — ML-adjusted net value with its calibrated band */}
         <div>
-          <p className="label text-ivory-faint">ML-adjusted NDV · Market</p>
+          <p className="label text-ink-faint">ML-adjusted NDV · Market</p>
           <p className="font-display text-4xl font-semibold tracking-tight2 text-beam md:text-5xl">{crFromRupees(headline)}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             {prediction && (
-              <span className="mono text-[0.72rem] text-ivory-dim">
+              <span className="mono text-[0.72rem] text-ink-dim">
                 P10–P90 {crFromRupees(prediction.p10)}–{crFromRupees(prediction.p90)}
               </span>
             )}
@@ -380,16 +380,16 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
           </div>
           <div className="mt-3 flex justify-between">
             <ZoneLabel tone="text-oxblood-bright" name="Bear" value={crFromRupees(bear.netValue)} />
-            <ZoneLabel tone="text-accent" name="Base" value={crFromRupees(base.netValue)} center />
+            <ZoneLabel tone="text-gold" name="Base" value={crFromRupees(base.netValue)} center />
             <ZoneLabel tone="text-emerald-bright" name="Bull" value={crFromRupees(bull.netValue)} right />
           </div>
         </div>
 
         {/* construction cost */}
         <div className="lg:text-right">
-          <p className="label text-ivory-faint">Construction Cost</p>
-          <p className="mono mt-1 text-xl text-ivory">{crFromRupees(cost)}</p>
-          <p className="mono mt-1 text-[0.72rem] text-ivory-faint">₹{groupIN(gdv.constructionPsfBase)}/sq ft built-up</p>
+          <p className="label text-ink-faint">Construction Cost</p>
+          <p className="mono mt-1 text-xl text-ink">{crFromRupees(cost)}</p>
+          <p className="mono mt-1 text-[0.72rem] text-ink-faint">₹{groupIN(gdv.constructionPsfBase)}/sq ft built-up</p>
         </div>
       </div>
     </footer>
@@ -397,7 +397,7 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
 }
 
 function Tick({ pos, tone }: { pos: number; tone: 'oxblood' | 'accent' | 'emerald' }) {
-  const color = tone === 'oxblood' ? '#FF7A6A' : tone === 'emerald' ? '#4ADE9E' : '#8A7DFF'
+  const color = tone === 'oxblood' ? '#C14E33' : tone === 'emerald' ? '#1F8A55' : '#A8842C'
   return (
     <span
       className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 border"
@@ -410,7 +410,7 @@ function ZoneLabel({ name, value, tone, center, right }: { name: string; value: 
   return (
     <div className={center ? 'text-center' : right ? 'text-right' : ''}>
       <div className={`label ${tone}`}>{name}</div>
-      <div className="mono mt-1 text-[0.82rem] text-ivory-dim">{value}</div>
+      <div className="mono mt-1 text-[0.82rem] text-ink-dim">{value}</div>
     </div>
   )
 }
@@ -450,13 +450,13 @@ function EngageModal({
 
   return (
     <motion.div className="fixed inset-0 z-[70] grid place-items-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="absolute inset-0 bg-ink/80" onClick={onClose} />
+      <div className="absolute inset-0 bg-paper/80" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto border border-[color:var(--line-accent)] bg-ink-card p-8 shadow-deep"
+        className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto border border-[color:var(--line-accent)] bg-paper-card p-8 shadow-deep"
       >
         {review?.status === 'delivered' ? (
           <DeliveredView review={review} onClose={onClose} />
@@ -474,22 +474,22 @@ function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: List
   return (
     <div>
       <p className="label text-accent">Stage Two · Original Architecture</p>
-      <h3 className="mt-4 font-display text-3xl text-ivory">Engage the empanelled architect</h3>
-      <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
-        Your feasibility on <span className="mono text-ivory">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a market
+      <h3 className="mt-4 font-display text-3xl text-ink">Engage the empanelled architect</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">
+        Your feasibility on <span className="mono text-ink">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a market
         Net Development Value of <span className="text-accent">{crFromRupees(gdv.zones.base.netValue)}</span> — is snapshotted and handed to our empanelled architect for
         stamped, buildable drawings validated against this model.
       </p>
       <div className="mt-6 flex items-baseline justify-between border-y border-line py-4">
-        <span className="label text-ivory-faint">Engagement fee</span>
-        <span className="mono text-lg text-ivory">₹2,50,000</span>
+        <span className="label text-ink-faint">Engagement fee</span>
+        <span className="mono text-lg text-ink">₹2,50,000</span>
       </div>
-      <p className="mt-3 text-[0.78rem] text-ivory-faint">Adjustable against Terracrest commission on closure.</p>
+      <p className="mt-3 text-[0.78rem] text-ink-faint">Adjustable against Terracrest commission on closure.</p>
       <div className="mt-7 flex gap-3">
-        <button onClick={onClose} disabled={busy} className="label flex-1 border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory disabled:opacity-50">
+        <button onClick={onClose} disabled={busy} className="label flex-1 border border-line py-3.5 text-ink-dim transition-colors hover:text-ink disabled:opacity-50">
           Not yet
         </button>
-        <button onClick={onProceed} disabled={busy} className="label flex-1 bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright disabled:opacity-60">
+        <button onClick={onProceed} disabled={busy} className="label flex-1 bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-60">
           {busy ? 'Commissioning…' : 'Proceed →'}
         </button>
       </div>
@@ -501,9 +501,9 @@ function RequestedView({ review, listing, onClose }: { review: ArchitectReview; 
   return (
     <div>
       <p className="label text-accent">Stage Two · In Progress</p>
-      <h3 className="mt-4 font-display text-3xl text-ivory">Validation commissioned</h3>
-      <p className="mt-4 text-[0.95rem] leading-relaxed text-ivory-dim">
-        Your model on <span className="mono text-ivory">{listing.id}</span> is with the empanelled architect. They return stamped drawings and an independent Net
+      <h3 className="mt-4 font-display text-3xl text-ink">Validation commissioned</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">
+        Your model on <span className="mono text-ink">{listing.id}</span> is with the empanelled architect. They return stamped drawings and an independent Net
         Development Value — typically within three working days — which will appear here alongside your ML estimate.
       </p>
       <div className="mt-6 space-y-3 border-y border-line py-4">
@@ -511,7 +511,7 @@ function RequestedView({ review, listing, onClose }: { review: ArchitectReview; 
         <Row k="ML estimate (Market)" v={crFromRupees(review.mlSnapshot.baseNet)} />
         <Row k="Status" v="Awaiting architect" tone="text-accent" />
       </div>
-      <button onClick={onClose} className="label mt-7 w-full border border-line py-3.5 text-ivory-dim transition-colors hover:text-ivory">
+      <button onClick={onClose} className="label mt-7 w-full border border-line py-3.5 text-ink-dim transition-colors hover:text-ink">
         Close
       </button>
     </div>
@@ -526,22 +526,22 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
   return (
     <div>
       <p className="label text-emerald-bright">Stage Two · Validated</p>
-      <h3 className="mt-4 font-display text-3xl text-ivory">Architect-validated feasibility</h3>
-      <p className="mt-3 text-[0.88rem] text-ivory-dim">{review.architectName}</p>
+      <h3 className="mt-4 font-display text-3xl text-ink">Architect-validated feasibility</h3>
+      <p className="mt-3 text-[0.88rem] text-ink-dim">{review.architectName}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border border-line bg-[color:var(--line)]">
-        <div className="bg-ink-card p-5">
-          <p className="label text-ivory-faint">Studio · at commission</p>
-          <p className="mono mt-2 text-2xl text-ivory">{crFromRupees(ml)}</p>
+        <div className="bg-paper-card p-5">
+          <p className="label text-ink-faint">Studio · at commission</p>
+          <p className="mono mt-2 text-2xl text-ink">{crFromRupees(ml)}</p>
         </div>
-        <div className="bg-ink-card p-5">
+        <div className="bg-paper-card p-5">
           <p className="label text-accent">Architect · Validated</p>
           <p className="mono mt-2 text-2xl text-beam">{crFromRupees(arch)}</p>
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between border border-line px-5 py-3">
-        <span className="label text-ivory-faint">Variance to model</span>
+        <span className="label text-ink-faint">Variance to model</span>
         <span className={`mono text-sm ${up ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>
           {up ? '+' : ''}
           {variancePct.toFixed(1)}%
@@ -550,13 +550,13 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
 
       {review.architectNotes && (
         <div className="mt-5">
-          <p className="label text-ivory-faint">Architect's note</p>
-          <p className="mt-2 text-[0.9rem] leading-relaxed text-ivory-dim">{review.architectNotes}</p>
+          <p className="label text-ink-faint">Architect's note</p>
+          <p className="mt-2 text-[0.9rem] leading-relaxed text-ink-dim">{review.architectNotes}</p>
         </div>
       )}
 
-      <p className="mono mt-5 text-[0.72rem] text-ivory-faint">Delivered {fmtDate(review.deliveredAt ?? review.requestedAt)} · stamped drawings issued to your Deal Room.</p>
-      <button onClick={onClose} className="label mt-6 w-full bg-accent py-3.5 text-ink transition-colors hover:bg-accent-bright">
+      <p className="mono mt-5 text-[0.72rem] text-ink-faint">Delivered {fmtDate(review.deliveredAt ?? review.requestedAt)} · stamped drawings issued to your Deal Room.</p>
+      <button onClick={onClose} className="label mt-6 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright">
         Close
       </button>
     </div>
@@ -566,8 +566,8 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
 function Row({ k, v, tone }: { k: string; v: string; tone?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <span className="label text-ivory-faint">{k}</span>
-      <span className={`mono text-sm ${tone ?? 'text-ivory'}`}>{v}</span>
+      <span className="label text-ink-faint">{k}</span>
+      <span className={`mono text-sm ${tone ?? 'text-ink'}`}>{v}</span>
     </div>
   )
 }
@@ -586,16 +586,16 @@ function ModelCardModal({ onClose }: { onClose: () => void }) {
   }, [])
   return (
     <motion.div className="fixed inset-0 z-[70] grid place-items-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="absolute inset-0 bg-ink/80" onClick={onClose} />
+      <div className="absolute inset-0 bg-paper/80" onClick={onClose} />
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.99 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-accent)] bg-ink-card p-8 shadow-deep"
+        className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-accent)] bg-paper-card p-8 shadow-deep"
       >
-        {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ivory-faint">Loading the model…</p>}
-        <button onClick={onClose} className="label mt-7 w-full border border-line py-3 text-ivory-dim transition-colors hover:text-ivory">
+        {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ink-faint">Loading the model…</p>}
+        <button onClick={onClose} className="label mt-7 w-full border border-line py-3 text-ink-dim transition-colors hover:text-ink">
           Close
         </button>
       </motion.div>

@@ -21,26 +21,26 @@ export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNo
   }
 
   return (
-    <div className="grain min-h-screen bg-ink text-ivory">
-      <header className="sticky top-0 z-40 border-b border-line bg-ink/80 backdrop-blur-md">
+    <div className="grain min-h-screen bg-paper text-ink">
+      <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-shell items-center justify-between px-6 py-4 md:px-10">
           <div className="flex items-center gap-8">
             <Link to="/app" className="flex items-baseline gap-2.5">
               <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
-              <span className="font-display text-[0.98rem] font-bold tracking-tight2 text-ivory">TERRACREST</span>
+              <span className="font-display text-[0.98rem] font-bold tracking-tight2 text-ink">TERRACREST</span>
             </Link>
             {nav}
           </div>
           <div className="flex items-center gap-5">
             {user && (
               <div className="hidden text-right sm:block">
-                <p className="mono text-[0.72rem] text-ivory">{user.displayName.split('·')[0].trim()}</p>
-                <p className="label text-ivory-faint">{ROLE_LABEL[user.role]}</p>
+                <p className="mono text-[0.72rem] text-ink">{user.displayName.split('·')[0].trim()}</p>
+                <p className="label text-ink-faint">{ROLE_LABEL[user.role]}</p>
               </div>
             )}
             <button
               onClick={onLogout}
-              className="label border border-line px-4 py-2.5 text-ivory-faint transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
+              className="label border border-line px-4 py-2.5 text-ink-faint transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
             >
               Sign out
             </button>

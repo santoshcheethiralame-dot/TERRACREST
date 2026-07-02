@@ -39,8 +39,8 @@ export function BuilderDashboard() {
     <AppShell nav={<BuilderNav />}>
       <section>
         <p className="label text-accent">Discovery</p>
-        <h1 className="mt-4 font-display text-5xl text-ivory md:text-6xl">Curated for you.</h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ivory-dim">
+        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">Curated for you.</h1>
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-dim">
           Parcels chosen by your relationship manager — not an algorithm. Location, ownership and documents stay sealed
           until a witnessed NDA is executed and logged by our desk.
         </p>
@@ -65,15 +65,15 @@ export function BuilderDashboard() {
       {/* NDA log */}
       <section className="mt-20" id="ndas">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-3xl text-ivory">NDA log</h2>
-          <span className="label text-ivory-faint">{ndas.length} on file</span>
+          <h2 className="font-display text-3xl text-ink">NDA log</h2>
+          <span className="label text-ink-faint">{ndas.length} on file</span>
         </div>
         <div className="mt-6 overflow-hidden border border-line">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-line bg-ink-raise/40">
+              <tr className="border-b border-line bg-paper-raise/40">
                 {['Property', 'Land owner', 'Signed', 'Witnessed by'].map((h) => (
-                  <th key={h} className="label px-5 py-3.5 text-ivory-faint">
+                  <th key={h} className="label px-5 py-3.5 text-ink-faint">
                     {h}
                   </th>
                 ))}
@@ -82,17 +82,17 @@ export function BuilderDashboard() {
             <tbody>
               {ndas.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-8 text-center text-sm text-ivory-faint">
+                  <td colSpan={4} className="px-5 py-8 text-center text-sm text-ink-faint">
                     No NDAs executed yet. Request an unlock on a parcel to begin.
                   </td>
                 </tr>
               ) : (
                 ndas.map((n) => (
                   <tr key={n.id} className="border-b border-line last:border-0">
-                    <td className="mono px-5 py-4 text-sm text-ivory">{byId(n.listingId)?.headline ?? n.listingId}</td>
-                    <td className="px-5 py-4 text-sm text-ivory-dim">{byId(n.listingId)?.sealed?.ownerName ?? '—'}</td>
-                    <td className="mono px-5 py-4 text-sm text-ivory-dim">{n.signedOn}</td>
-                    <td className="px-5 py-4 text-sm text-ivory-dim">{n.witnessedBy}</td>
+                    <td className="mono px-5 py-4 text-sm text-ink">{byId(n.listingId)?.headline ?? n.listingId}</td>
+                    <td className="px-5 py-4 text-sm text-ink-dim">{byId(n.listingId)?.sealed?.ownerName ?? '—'}</td>
+                    <td className="mono px-5 py-4 text-sm text-ink-dim">{n.signedOn}</td>
+                    <td className="px-5 py-4 text-sm text-ink-dim">{n.witnessedBy}</td>
                   </tr>
                 ))
               )}
@@ -106,13 +106,13 @@ export function BuilderDashboard() {
 
 function BuilderNav() {
   const linkCls = ({ isActive }: { isActive: boolean }) =>
-    `label transition-colors ${isActive ? 'text-accent' : 'text-ivory-faint hover:text-ivory'}`
+    `label transition-colors ${isActive ? 'text-accent' : 'text-ink-faint hover:text-ink'}`
   return (
     <nav className="hidden items-center gap-7 md:flex">
       <NavLink to="/app" end className={linkCls}>
         Discovery
       </NavLink>
-      <a href="#ndas" className="label text-ivory-faint transition-colors hover:text-ivory">
+      <a href="#ndas" className="label text-ink-faint transition-colors hover:text-ink">
         NDA Log
       </a>
     </nav>
@@ -120,5 +120,5 @@ function BuilderNav() {
 }
 
 function SkeletonCard() {
-  return <div className="h-64 animate-pulse border border-line bg-ink-raise/30" />
+  return <div className="h-64 animate-pulse border border-line bg-paper-raise/30" />
 }

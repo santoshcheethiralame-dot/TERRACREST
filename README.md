@@ -22,9 +22,11 @@ The product's two signatures:
 ## Stack
 
 - **Frontend** — Vite + React + TypeScript, Tailwind, Framer Motion, Leaflet.
-  Design language: "Blueprint Noir" — near-black ink, electric indigo, bone type;
-  Space Grotesk display over Satoshi body and IBM Plex Mono annotations, with
-  wireframe massing art and redaction bars as the house motifs.
+  Design language: "The Land Ledger" — warm paper stock, forest green for land and
+  growth, old gold reserved for the money; Space Grotesk display over Satoshi body
+  and IBM Plex Mono annotations, with wireframe massing art and redaction bars as
+  the house motifs. Palette chosen for the audience: green and gold read prosperity
+  and auspiciousness to Indian principals; black canvases and violet gradients do not.
 - **Backend** — FastAPI + SQLAlchemy + Postgres (SQLite in dev), JWT access/refresh,
   bcrypt, watermarked-PDF document vault, an append-only audit trail.
 - **Seam** — the frontend talks to a single async repository

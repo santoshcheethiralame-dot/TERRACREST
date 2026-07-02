@@ -4,21 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: {
-          DEFAULT: 'var(--ink)',
-          raise: 'var(--ink-raise)',
-          card: 'var(--ink-card)',
+        paper: {
+          DEFAULT: 'var(--paper)',
+          raise: 'var(--paper-raise)',
+          card: 'var(--paper-card)',
         },
         navy: 'var(--navy)',
-        ivory: {
-          DEFAULT: 'var(--ivory)',
-          dim: 'var(--ivory-dim)',
-          faint: 'var(--ivory-faint)',
+        ink: {
+          DEFAULT: 'var(--ink)',
+          dim: 'var(--ink-dim)',
+          faint: 'var(--ink-faint)',
         },
         accent: {
           DEFAULT: 'var(--accent)',
           bright: 'var(--accent-bright)',
           deep: 'var(--accent-deep)',
+        },
+        gold: {
+          DEFAULT: 'var(--gold)',
+          bright: 'var(--gold-bright)',
+          deep: 'var(--gold-deep)',
         },
         emerald: {
           DEFAULT: 'var(--emerald)',
@@ -43,9 +48,9 @@ export default {
         shell: '1320px',
       },
       boxShadow: {
-        deep: '0 30px 80px -30px rgba(0,0,0,0.85)',
-        lift: '0 12px 40px -20px rgba(0,0,0,0.7)',
-        glow: '0 0 60px -12px rgba(138,125,255,0.45)',
+        deep: '0 30px 80px -30px rgba(26,30,27,0.28)',
+        lift: '0 12px 40px -20px rgba(26,30,27,0.18)',
+        glow: '0 16px 50px -16px rgba(30,77,59,0.35)',
       },
     },
   },

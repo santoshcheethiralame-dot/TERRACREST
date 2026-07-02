@@ -38,18 +38,18 @@ export function Login() {
         <div className="relative flex h-full flex-col justify-between p-12">
           <Link to="/" className="flex items-baseline gap-2.5">
             <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
-            <span className="font-display text-[1.05rem] font-bold tracking-tight2 text-ivory">TERRACREST</span>
+            <span className="font-display text-[1.05rem] font-bold tracking-tight2 text-ink">TERRACREST</span>
           </Link>
 
           <MassingArt className="mx-auto w-full max-w-[440px] opacity-80" />
 
           <div>
-            <p className="font-display text-4xl font-semibold leading-[1.02] tracking-tight2 text-ivory xl:text-5xl">
+            <p className="font-display text-4xl font-semibold leading-[1.02] tracking-tight2 text-ink xl:text-5xl">
               The market you were
               <br />
               <span className="text-beam">never meant to see.</span>
             </p>
-            <p className="mono mt-6 text-[0.7rem] tracking-widest text-ivory-faint">
+            <p className="mono mt-6 text-[0.7rem] tracking-widest text-ink-faint">
               BY INVITATION ONLY · 20–200 PRINCIPALS · BENGALURU
             </p>
           </div>
@@ -62,17 +62,17 @@ export function Login() {
           <motion.div variants={rise} className="mb-10 lg:hidden">
             <Link to="/" className="flex items-baseline gap-2.5">
               <span className="h-2 w-2 shrink-0 self-center bg-accent" aria-hidden />
-              <span className="font-display text-[1.05rem] font-bold tracking-tight2 text-ivory">TERRACREST</span>
+              <span className="font-display text-[1.05rem] font-bold tracking-tight2 text-ink">TERRACREST</span>
             </Link>
           </motion.div>
 
           <motion.p variants={rise} className="label text-accent">
             Member access
           </motion.p>
-          <motion.h1 variants={rise} className="mt-5 font-display text-5xl font-semibold tracking-tight2 text-ivory">
+          <motion.h1 variants={rise} className="mt-5 font-display text-5xl font-semibold tracking-tight2 text-ink">
             State your name.
           </motion.h1>
-          <motion.p variants={rise} className="mt-4 text-sm text-ivory-faint">
+          <motion.p variants={rise} className="mt-4 text-sm text-ink-faint">
             Credentials are issued by the desk after in-person KYC.
           </motion.p>
 
@@ -87,18 +87,18 @@ export function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="label mt-8 w-full bg-accent py-4 text-ink transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50"
+              className="label mt-8 w-full bg-accent py-4 text-paper transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Verifying…' : 'Enter →'}
             </button>
 
-            <p className="mono mt-6 text-center text-[0.68rem] leading-relaxed tracking-widest text-ivory-faint">
+            <p className="mono mt-6 text-center text-[0.68rem] leading-relaxed tracking-widest text-ink-faint">
               NO SIGN-UP · NO OTP · NO ONLINE RESET
             </p>
           </motion.form>
 
           <motion.div variants={rise} className="mt-10 border-t border-line pt-8">
-            <p className="label mb-3 text-ivory-faint">Demo access — password "demo"</p>
+            <p className="label mb-3 text-ink-faint">Demo access — password "demo"</p>
             <div className="grid grid-cols-3 gap-2">
               {DEMO.map((d) => (
                 <button
@@ -108,7 +108,7 @@ export function Login() {
                     setUsername(d.u)
                     setPassword('demo')
                   }}
-                  className="label border border-line px-2 py-3 text-[0.58rem] text-ivory-dim transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
+                  className="label border border-line px-2 py-3 text-[0.58rem] text-ink-dim transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
                 >
                   {d.label}
                 </button>
@@ -117,7 +117,7 @@ export function Login() {
           </motion.div>
 
           <motion.div variants={rise} className="mt-10">
-            <Link to="/" className="label text-ivory-faint transition-colors hover:text-ivory">
+            <Link to="/" className="label text-ink-faint transition-colors hover:text-ink">
               ← Return
             </Link>
           </motion.div>
@@ -144,7 +144,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="label text-ivory-faint">{label}</span>
+      <span className="label text-ink-faint">{label}</span>
       <input
         type={type}
         value={value}
@@ -152,7 +152,7 @@ function Field({
         placeholder={placeholder}
         autoFocus={autoFocus}
         autoComplete="off"
-        className="mono mt-2.5 w-full border border-line bg-transparent px-4 py-3.5 text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--accent)]"
+        className="mono mt-2.5 w-full border border-line bg-transparent px-4 py-3.5 text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-[color:var(--accent)]"
       />
     </label>
   )

@@ -36,8 +36,8 @@ const TOWERS: Box[] = [
   { x: 2.6, y: 4.4, w: 2.2, d: 2.2, z: 0.7, h: 7.4 },
 ]
 
-const ACCENT = '#8A7DFF'
-const FAINT = '#67676F'
+const ACCENT = '#1E4D3B'
+const FAINT = '#7C857D'
 
 function Wire({ b, delay }: { b: Box; delay: number }) {
   const { top, verticals, base, hidden } = box(b)
@@ -91,7 +91,7 @@ export function MassingArt({ className = '' }: { className?: string }) {
       <svg viewBox="-268 -290 590 640" className="h-auto w-full" role="img" aria-label="Axonometric massing of a verified parcel">
         {/* floor grid */}
         {gridLines.map((d) => (
-          <path key={d} d={d} fill="none" stroke="#EDECE8" strokeOpacity="0.05" strokeWidth="1" />
+          <path key={d} d={d} fill="none" stroke="#1A1E1B" strokeOpacity="0.07" strokeWidth="1" />
         ))}
 
         {/* parcel boundary + road */}
@@ -107,7 +107,7 @@ export function MassingArt({ className = '' }: { className?: string }) {
         {/* survey callouts */}
         <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1, duration: 1 }}>
           <line x1={tallX} y1={tallY} x2={tallX + 46} y2={tallY - 26} stroke={FAINT} strokeWidth="0.8" />
-          <text x={tallX + 52} y={tallY - 30} fill="#A2A1A8" fontFamily="'IBM Plex Mono', monospace" fontSize="12" letterSpacing="2">
+          <text x={tallX + 52} y={tallY - 30} fill="#4F5852" fontFamily="'IBM Plex Mono', monospace" fontSize="12" letterSpacing="2">
             G+14
           </text>
 
@@ -122,7 +122,7 @@ export function MassingArt({ className = '' }: { className?: string }) {
           <text x={60} y={-258} fill={FAINT} fontFamily="'IBM Plex Mono', monospace" fontSize="11" letterSpacing="2">
             13.2█°N · 77.7█°E
           </text>
-          <text x={60} y={-240} fill={ACCENT} fillOpacity="0.75" fontFamily="'IBM Plex Mono', monospace" fontSize="10" letterSpacing="2.4">
+          <text x={60} y={-240} fill="#8A6B1F" fontFamily="'IBM Plex Mono', monospace" fontSize="10" letterSpacing="2.4">
             SEALED · NDA REQUIRED
           </text>
 

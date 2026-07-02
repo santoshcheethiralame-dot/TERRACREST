@@ -91,7 +91,7 @@ export function ListingDetail() {
   if (listing === undefined) {
     return (
       <AppShell>
-        <p className="label animate-pulse py-20 text-center text-ivory-faint">Retrieving parcel…</p>
+        <p className="label animate-pulse py-20 text-center text-ink-faint">Retrieving parcel…</p>
       </AppShell>
     )
   }
@@ -99,7 +99,7 @@ export function ListingDetail() {
     return (
       <AppShell nav={<BackNav />}>
         <div className="py-24 text-center">
-          <h1 className="font-display text-4xl text-ivory">Parcel not found</h1>
+          <h1 className="font-display text-4xl text-ink">Parcel not found</h1>
           <Link to="/app" className="label mt-6 inline-block text-accent">
             ← Back to discovery
           </Link>
@@ -136,21 +136,21 @@ export function ListingDetail() {
         {/* ---------- public / masked-safe ---------- */}
         <motion.div variants={rise}>
           <div className="flex items-center gap-3">
-            <span className="mono text-[0.72rem] text-ivory-dim">{listing.id}</span>
-            <span className="text-ivory-faint">·</span>
+            <span className="mono text-[0.72rem] text-ink-dim">{listing.id}</span>
+            <span className="text-ink-faint">·</span>
             <span className="label text-accent">{VERTICAL_LABEL[listing.vertical]}</span>
-            <span className="text-ivory-faint">·</span>
-            <span className="label text-ivory-faint">{STATUS_LABEL[listing.status]}</span>
+            <span className="text-ink-faint">·</span>
+            <span className="label text-ink-faint">{STATUS_LABEL[listing.status]}</span>
           </div>
 
-          <h1 className="mt-5 font-display text-4xl leading-tight text-ivory md:text-5xl">{listing.headline}</h1>
-          <p className="mt-4 text-lg text-ivory-dim">{listing.localityLabel}</p>
+          <h1 className="mt-5 font-display text-4xl leading-tight text-ink md:text-5xl">{listing.headline}</h1>
+          <p className="mt-4 text-lg text-ink-dim">{listing.localityLabel}</p>
 
           <div className="mt-8 flex items-start gap-5 border-y border-line py-6">
             <Seal size={58} text="· PHYSICALLY VERIFIED · TERRACREST " />
             <div>
-              <p className="border-l-2 border-[color:var(--line-accent)] pl-4 text-[0.98rem] leading-relaxed text-ivory">“{listing.localityNote}”</p>
-              <p className="label mt-3 text-ivory-faint">
+              <p className="border-l-2 border-[color:var(--line-accent)] pl-4 text-[0.98rem] leading-relaxed text-ink">“{listing.localityNote}”</p>
+              <p className="label mt-3 text-ink-faint">
                 {listing.verification.by} · {listing.verification.on}
               </p>
             </div>
@@ -168,22 +168,22 @@ export function ListingDetail() {
         {/* ---------- the sealed dossier ---------- */}
         <motion.div variants={rise}>
           <div className="sticky top-24">
-            <div className="relative overflow-hidden border border-line bg-ink-raise/50 p-7 shadow-deep">
+            <div className="relative overflow-hidden border border-line bg-paper-raise/50 p-7 shadow-deep">
               {/* watermark on unlock */}
               {unlocked && user && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <span className="mono -rotate-45 select-none whitespace-nowrap text-[0.7rem] tracking-widest text-ivory-faint/20">
+                  <span className="mono -rotate-45 select-none whitespace-nowrap text-[0.7rem] tracking-widest text-ink-faint/20">
                     CONFIDENTIAL · {user.username.toUpperCase()} · {TODAY}
                   </span>
                 </div>
               )}
 
               <div className="relative flex items-center justify-between">
-                <p className="label text-ivory-faint">Sealed dossier</p>
+                <p className="label text-ink-faint">Sealed dossier</p>
                 {unlocked ? (
                   <span className="label text-emerald-bright">● Unlocked</span>
                 ) : (
-                  <span className="label text-ivory-faint">◆ NDA required</span>
+                  <span className="label text-ink-faint">◆ NDA required</span>
                 )}
               </div>
 
@@ -195,7 +195,7 @@ export function ListingDetail() {
 
               {/* document vault */}
               <div className="relative mt-5 border-t border-line pt-5">
-                <p className="label text-ivory-faint">Document vault</p>
+                <p className="label text-ink-faint">Document vault</p>
                 <div className="mt-3 space-y-2">
                   {VAULT_CATEGORIES.map((cat) => (
                     <VaultRow
@@ -213,13 +213,13 @@ export function ListingDetail() {
               <div className="relative mt-7">
                 {unlocked ? (
                   <div className="space-y-3">
-                    <p className="text-[0.82rem] leading-relaxed text-ivory-faint">
+                    <p className="text-[0.82rem] leading-relaxed text-ink-faint">
                       NDA on file — witnessed by Adv. Meera Krishnan. Every view and download is watermarked and logged.
                     </p>
                     {listing.vertical === 'joint-development' && (
                       <Link
                         to={`/studio/${listing.id}`}
-                        className="label group flex items-center justify-center gap-3 bg-accent py-4 text-ink transition-colors hover:bg-accent-bright"
+                        className="label group flex items-center justify-center gap-3 bg-accent py-4 text-paper transition-colors hover:bg-accent-bright"
                       >
                         Open Feasibility Studio
                         <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
@@ -227,24 +227,24 @@ export function ListingDetail() {
                     )}
                     <button
                       onClick={() => setUnlocked(false)}
-                      className="label w-full border border-line py-3 text-ivory-faint transition-colors hover:text-ivory"
+                      className="label w-full border border-line py-3 text-ink-faint transition-colors hover:text-ink"
                     >
                       ⟲ Re-seal (demo)
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-[0.82rem] leading-relaxed text-ivory-faint">
+                    <p className="text-[0.82rem] leading-relaxed text-ink-faint">
                       Full location, ownership and the document vault unseal only after a physical NDA is signed before
                       our lawyer and logged by the desk.
                     </p>
-                    <button disabled className="label w-full cursor-not-allowed border border-line py-3.5 text-ivory-faint opacity-50">
+                    <button disabled className="label w-full cursor-not-allowed border border-line py-3.5 text-ink-faint opacity-50">
                       Request Unlock · NDA required
                     </button>
                     <button
                       onClick={unlock}
                       disabled={unlocking}
-                      className="label group flex w-full items-center justify-center gap-3 border border-[color:var(--line-accent)] py-3.5 text-accent transition-colors duration-500 hover:bg-accent hover:text-ink disabled:opacity-50"
+                      className="label group flex w-full items-center justify-center gap-3 border border-[color:var(--line-accent)] py-3.5 text-accent transition-colors duration-500 hover:bg-accent hover:text-paper disabled:opacity-50"
                     >
                       {unlocking ? 'Desk logging NDA…' : '▶ Simulate executed NDA (demo)'}
                     </button>
@@ -269,10 +269,10 @@ function RiskScorecard({ risk }: { risk: RiskScore | null }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="label text-accent">Risk Scorecard</p>
-          <p className="mt-1.5 text-[0.82rem] text-ivory-faint">Transparent and rules-based — every point is an auditable factor, not a black box.</p>
+          <p className="mt-1.5 text-[0.82rem] text-ink-faint">Transparent and rules-based — every point is an auditable factor, not a black box.</p>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="mono text-3xl text-ivory">{risk.overall}</span>
+          <span className="mono text-3xl text-ink">{risk.overall}</span>
           <span className={`font-display text-3xl ${gradeColor}`}>{risk.grade}</span>
         </div>
       </div>
@@ -280,8 +280,8 @@ function RiskScorecard({ risk }: { risk: RiskScore | null }) {
         {risk.bands.map((b) => (
           <div key={b.key}>
             <div className="flex items-center justify-between">
-              <span className="text-[0.9rem] text-ivory-dim">{b.label}</span>
-              <span className="mono text-sm text-ivory">{b.score}</span>
+              <span className="text-[0.9rem] text-ink-dim">{b.label}</span>
+              <span className="mono text-sm text-ink">{b.score}</span>
             </div>
             <div className="mt-1.5 h-1.5 bg-[color:var(--line)]">
               <div className="h-full bg-accent" style={{ width: `${b.score}%` }} />
@@ -326,21 +326,21 @@ function DealRoom({
   return (
     <section className="mt-14 border-t border-line pt-10">
       <div className="flex items-baseline gap-3">
-        <h2 className="font-display text-3xl text-ivory">Deal Room</h2>
-        <span className="label text-ivory-faint">logged · admin-visible</span>
+        <h2 className="font-display text-3xl text-ink">Deal Room</h2>
+        <span className="label text-ink-faint">logged · admin-visible</span>
       </div>
-      <p className="mt-2 text-sm text-ivory-faint">Correspondence with the counterparty — not real-time. Every message is logged; the platform stays the principal.</p>
+      <p className="mt-2 text-sm text-ink-faint">Correspondence with the counterparty — not real-time. Every message is logged; the platform stays the principal.</p>
       <div className="mt-6 max-w-3xl space-y-4">
-        {msgs.length === 0 && <p className="text-sm text-ivory-faint">No messages yet — start the conversation below.</p>}
+        {msgs.length === 0 && <p className="text-sm text-ink-faint">No messages yet — start the conversation below.</p>}
         {msgs.map((m) => {
           const mine = m.authorId === currentUserId
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] border px-4 py-3 ${mine ? 'border-[color:var(--line-accent)] bg-accent/10' : 'border-line bg-ink-raise/50'}`}>
-                <div className="label text-ivory-faint">
+              <div className={`max-w-[80%] border px-4 py-3 ${mine ? 'border-[color:var(--line-accent)] bg-accent/10' : 'border-line bg-paper-raise/50'}`}>
+                <div className="label text-ink-faint">
                   {m.authorName.split('·')[0].trim()} · {new Date(m.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </div>
-                <p className="mt-1.5 text-[0.92rem] leading-relaxed text-ivory">{m.body}</p>
+                <p className="mt-1.5 text-[0.92rem] leading-relaxed text-ink">{m.body}</p>
               </div>
             </div>
           )
@@ -351,9 +351,9 @@ function DealRoom({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Write a message…"
-          className="mono flex-1 border border-line bg-ink px-4 py-3 text-sm text-ivory outline-none transition-colors placeholder:text-ivory-faint focus:border-[color:var(--line-accent)]"
+          className="mono flex-1 border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-[color:var(--line-accent)]"
         />
-        <button type="submit" disabled={sending || !draft.trim()} className="label bg-accent px-6 py-3 text-ink transition-colors hover:bg-accent-bright disabled:opacity-50">
+        <button type="submit" disabled={sending || !draft.trim()} className="label bg-accent px-6 py-3 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
           {sending ? '…' : 'Send'}
         </button>
       </form>
@@ -365,8 +365,8 @@ function DealRoom({
 function SealedField({ label, value, unlocked }: { label: string; value: string; unlocked: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-line py-3.5">
-      <dt className="label shrink-0 text-ivory-faint">{label}</dt>
-      <dd className="relative min-h-[1.35em] flex-1 text-right text-[0.92rem] text-ivory">
+      <dt className="label shrink-0 text-ink-faint">{label}</dt>
+      <dd className="relative min-h-[1.35em] flex-1 text-right text-[0.92rem] text-ink">
         <span>{value}</span>
         {!unlocked && (
           <span
@@ -385,13 +385,13 @@ function SealedField({ label, value, unlocked }: { label: string; value: string;
 function VaultRow({ name, unlocked, doc, onOpen }: { name: string; unlocked: boolean; doc?: Document; onOpen: (doc: Document) => void }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[0.86rem] text-ivory-dim">{name}</span>
+      <span className="text-[0.86rem] text-ink-dim">{name}</span>
       {unlocked && doc ? (
         <button onClick={() => onOpen(doc)} className="label text-accent transition-colors hover:text-accent-bright">
           View ↓
         </button>
       ) : (
-        <span className="label text-ivory-faint">● Sealed</span>
+        <span className="label text-ink-faint">● Sealed</span>
       )}
     </div>
   )
@@ -430,8 +430,8 @@ function Specs({ listing }: { listing: Listing }) {
       <dl className="mt-4 divide-y divide-[color:var(--line)] border-y border-line">
         {rows.map(([k, v]) => (
           <div key={k} className="flex items-baseline justify-between gap-6 py-3">
-            <dt className="label text-ivory-faint">{k}</dt>
-            <dd className="text-right text-[0.92rem] text-ivory">{v}</dd>
+            <dt className="label text-ink-faint">{k}</dt>
+            <dd className="text-right text-[0.92rem] text-ink">{v}</dd>
           </div>
         ))}
       </dl>
@@ -446,9 +446,9 @@ function Comps({ listing }: { listing: Listing }) {
       <div className="mt-4 overflow-hidden border border-line">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-line bg-ink-raise/40">
+            <tr className="border-b border-line bg-paper-raise/40">
               {['Project', 'Distance', 'Rate', 'Year'].map((h) => (
-                <th key={h} className="label px-4 py-3 text-ivory-faint">
+                <th key={h} className="label px-4 py-3 text-ink-faint">
                   {h}
                 </th>
               ))}
@@ -457,13 +457,13 @@ function Comps({ listing }: { listing: Listing }) {
           <tbody>
             {listing.comps.map((c) => (
               <tr key={c.project} className="border-b border-line last:border-0">
-                <td className="px-4 py-3 text-sm text-ivory">
+                <td className="px-4 py-3 text-sm text-ink">
                   {c.project}
-                  <span className="mt-0.5 block text-[0.72rem] text-ivory-faint">{c.note}</span>
+                  <span className="mt-0.5 block text-[0.72rem] text-ink-faint">{c.note}</span>
                 </td>
-                <td className="mono px-4 py-3 text-sm text-ivory-dim">{c.distanceKm} km</td>
-                <td className="mono px-4 py-3 text-sm text-ivory">₹{c.psf.toLocaleString('en-IN')}/sq ft</td>
-                <td className="mono px-4 py-3 text-sm text-ivory-dim">{c.year}</td>
+                <td className="mono px-4 py-3 text-sm text-ink-dim">{c.distanceKm} km</td>
+                <td className="mono px-4 py-3 text-sm text-ink">₹{c.psf.toLocaleString('en-IN')}/sq ft</td>
+                <td className="mono px-4 py-3 text-sm text-ink-dim">{c.year}</td>
               </tr>
             ))}
           </tbody>
@@ -475,7 +475,7 @@ function Comps({ listing }: { listing: Listing }) {
 
 function BackNav() {
   return (
-    <Link to="/app" className="label text-ivory-faint transition-colors hover:text-ivory">
+    <Link to="/app" className="label text-ink-faint transition-colors hover:text-ink">
       ← Discovery
     </Link>
   )

@@ -12,10 +12,10 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
       <div className="flex items-baseline justify-between gap-4">
         <div>
           <p className="label text-accent">Valuation Model</p>
-          <p className="mono mt-1 text-[0.72rem] text-ivory-dim">{card.modelType}</p>
+          <p className="mono mt-1 text-[0.72rem] text-ink-dim">{card.modelType}</p>
         </div>
         {onRetrain && (
-          <button onClick={onRetrain} disabled={busy} className="label border border-[color:var(--line-accent)] px-4 py-2 text-accent transition-colors hover:bg-accent hover:text-ink disabled:opacity-50">
+          <button onClick={onRetrain} disabled={busy} className="label border border-[color:var(--line-accent)] px-4 py-2 text-accent transition-colors hover:bg-accent hover:text-paper disabled:opacity-50">
             {busy ? 'Retraining…' : 'Retrain'}
           </button>
         )}
@@ -27,13 +27,13 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
         <Stat k="Corpus" v={String(card.nExamples)} sub={`${card.nReal} real · ${card.nSynthetic} synth`} />
       </div>
 
-      <p className="label mt-6 text-ivory-faint">What the model learned drives value</p>
+      <p className="label mt-6 text-ink-faint">What the model learned drives value</p>
       <div className="mt-3 space-y-2.5">
         {top.map((f) => {
           const up = f.direction === 'raises'
           return (
             <div key={f.feature} className="flex items-center gap-3">
-              <span className="w-40 shrink-0 text-[0.82rem] text-ivory-dim">{f.label}</span>
+              <span className="w-40 shrink-0 text-[0.82rem] text-ink-dim">{f.label}</span>
               <div className="relative h-2 flex-1 bg-[color:var(--line)]">
                 <div className={`absolute inset-y-0 left-0 ${up ? 'bg-emerald-bright' : 'bg-accent'}`} style={{ width: `${(f.weight / max) * 100}%` }} />
               </div>
@@ -43,18 +43,18 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
         })}
       </div>
 
-      <p className="mt-6 text-[0.8rem] leading-relaxed text-ivory-faint">{card.provenance}</p>
-      <p className="mono mt-3 text-[0.68rem] text-ivory-faint">Target: {card.target} · trained {when}</p>
+      <p className="mt-6 text-[0.8rem] leading-relaxed text-ink-faint">{card.provenance}</p>
+      <p className="mono mt-3 text-[0.68rem] text-ink-faint">Target: {card.target} · trained {when}</p>
     </div>
   )
 }
 
 function Stat({ k, v, sub }: { k: string; v: string; sub?: string }) {
   return (
-    <div className="bg-ink-card p-4">
-      <p className="label text-ivory-faint">{k}</p>
-      <p className="mono mt-1.5 text-xl text-ivory">{v}</p>
-      {sub && <p className="mono mt-0.5 text-[0.68rem] text-ivory-faint">{sub}</p>}
+    <div className="bg-paper-card p-4">
+      <p className="label text-ink-faint">{k}</p>
+      <p className="mono mt-1.5 text-xl text-ink">{v}</p>
+      {sub && <p className="mono mt-0.5 text-[0.68rem] text-ink-faint">{sub}</p>}
     </div>
   )
 }
