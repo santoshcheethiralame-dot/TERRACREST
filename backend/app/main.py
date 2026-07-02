@@ -2,11 +2,21 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
+from .database import SessionLocal
+from .ml import valuation as vmodel
 from .seed import seed_if_empty
-from .routers import admin, architect, auth, dashboard, documents, listings, messages, pricebook
+from .routers import admin, architect, auth, dashboard, documents, listings, messages, pricebook, valuation
 
 # Ensure tables exist and a fresh database is populated (idempotent).
 seed_if_empty()
+
+# Fold any real architect deliveries into the valuation model at boot, so the
+# model card reflects them from the first request.
+_db = SessionLocal()
+try:
+    vmodel.retrain(valuation.build_examples(_db))
+finally:
+    _db.close()
 
 app = FastAPI(
     title="DB Terracrest Advisory API",
@@ -33,6 +43,7 @@ app.include_router(documents.router)
 app.include_router(messages.router)
 app.include_router(pricebook.router)
 app.include_router(architect.router)
+app.include_router(valuation.router)
 
 
 @app.get("/health", tags=["meta"])

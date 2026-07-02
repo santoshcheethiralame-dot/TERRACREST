@@ -242,5 +242,9 @@ def deliver_architect_review(review_id: str, body: schemas.DeliverArchitectRevie
         summary=f"Architect {body.architectName} delivered a validated GDV — {listing.headline if listing else review.listing_id}",
         actor_name="Terracrest Desk", listing_id=review.listing_id,
     )
+    # The flywheel: this delivery is a new labelled example — refit the model.
+    from ..ml import valuation as vmodel
+    from .valuation import build_examples
+    vmodel.retrain(build_examples(db))
     names = {u.id: u.display_name for u in db.query(models.User).all()}
     return schemas.serialize_architect_review(review, names.get(review.builder_id, review.builder_id))

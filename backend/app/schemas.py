@@ -172,6 +172,19 @@ class RequestArchitectReviewRequest(BaseModel):
     mlSnapshot: dict
 
 
+class ValuationRequest(BaseModel):
+    vertical: str
+    fsi: float
+    floors: int
+    towers: int
+    plotAreaSqft: float
+    floorPlateEfficiency: float
+    avgUnitSqft: float
+    baseSalePsf: float
+    roadWidthFt: float = 40
+    parametricNet: float
+
+
 class DeliverArchitectReviewRequest(BaseModel):
     architectName: str
     architectGdv: int

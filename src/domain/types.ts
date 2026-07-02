@@ -240,6 +240,68 @@ export interface ArchitectReview {
   deliveredAt?: string
 }
 
+/** The ML model's adjusted GDV + calibrated band for a Studio feasibility. */
+export interface ValuationPrediction {
+  parametricNet: number
+  mlGdv: number
+  p10: number
+  p90: number
+  adjustmentPct: number
+}
+
+export interface FeatureImportance {
+  feature: string
+  label: string
+  weight: number
+  direction: string // 'raises' | 'lowers'
+}
+
+/** Full transparency on the learned valuation model. */
+export interface ModelCard {
+  modelType: string
+  target: string
+  nExamples: number
+  nReal: number
+  nSynthetic: number
+  provenance: string
+  metrics: { maePct: number; r2: number }
+  importances: FeatureImportance[]
+  trainedAt: string
+}
+
+export interface RiskFactor {
+  label: string
+  delta: number
+}
+
+export interface RiskBand {
+  key: string
+  label: string
+  score: number
+  factors: RiskFactor[]
+}
+
+/** Transparent, rules-based due-diligence scorecard for a parcel. */
+export interface RiskScore {
+  overall: number
+  grade: string
+  bands: RiskBand[]
+}
+
+/** Payload the Studio posts for an ML valuation. */
+export interface ValuationContext {
+  vertical: Vertical
+  fsi: number
+  floors: number
+  towers: number
+  plotAreaSqft: number
+  floorPlateEfficiency: number
+  avgUnitSqft: number
+  baseSalePsf: number
+  roadWidthFt: number
+  parametricNet: number
+}
+
 export type ActivityKind =
   | 'login'
   | 'nda'

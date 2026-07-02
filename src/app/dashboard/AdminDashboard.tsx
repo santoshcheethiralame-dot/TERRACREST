@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
-import type { ActivityEvent, ActivityKind, ArchitectReview, Deal, Listing, ListingStatus, Nda, PriceBook, Role, User, Vertical } from '@/domain/types'
+import type { ActivityEvent, ActivityKind, ArchitectReview, Deal, Listing, ListingStatus, ModelCard as ModelCardData, Nda, PriceBook, Role, User, Vertical } from '@/domain/types'
 import { DEAL_STAGE_LABEL, STATUS_LABEL, VERTICAL_LABEL } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { AppShell } from '@/components/AppShell'
+import { ModelCard } from '@/components/ModelCard'
 
-type Tab = 'ndas' | 'listings' | 'new' | 'users' | 'pipeline' | 'prices' | 'architect' | 'activity'
+type Tab = 'ndas' | 'listings' | 'new' | 'users' | 'pipeline' | 'prices' | 'architect' | 'model' | 'activity'
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'ndas', label: 'NDA Desk' },
@@ -14,6 +15,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'pipeline', label: 'Pipeline' },
   { key: 'prices', label: 'Prices' },
   { key: 'architect', label: 'Architect' },
+  { key: 'model', label: 'Model' },
   { key: 'activity', label: 'Activity' },
 ]
 
@@ -66,7 +68,7 @@ export function AdminDashboard() {
   }
 
   const pendingReviews = reviews.filter((r) => r.status === 'requested').length
-  const counts: Record<Tab, number> = { ndas: ndas.length, listings: listings.length, users: users.length, pipeline: deals.length, new: 0, prices: 0, architect: reviews.length, activity: activity.length }
+  const counts: Record<Tab, number> = { ndas: ndas.length, listings: listings.length, users: users.length, pipeline: deals.length, new: 0, prices: 0, architect: reviews.length, model: 0, activity: activity.length }
 
   return (
     <AppShell>
@@ -90,7 +92,7 @@ export function AdminDashboard() {
               unreadActivity > 0 && <NotifyBadge n={unreadActivity} />
             ) : t.key === 'architect' ? (
               pendingReviews > 0 && <NotifyBadge n={pendingReviews} />
-            ) : t.key !== 'new' && t.key !== 'prices' ? (
+            ) : t.key !== 'new' && t.key !== 'prices' && t.key !== 'model' ? (
               <span className="ml-1 text-ivory-faint">{counts[t.key]}</span>
             ) : null}
           </button>
@@ -112,6 +114,8 @@ export function AdminDashboard() {
           <PricesTab />
         ) : tab === 'architect' ? (
           <ArchitectTab reviews={reviews} listings={listings} onDelivered={reload} />
+        ) : tab === 'model' ? (
+          <ModelTab />
         ) : tab === 'activity' ? (
           <ActivityTab events={activity} listings={listings} />
         ) : (
@@ -604,7 +608,7 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
         <span className="mono text-xs text-ivory-faint">{review.builderName}</span>
       </div>
       <p className="mono mt-2 text-xs text-ivory-faint">
-        ML estimate (Market): {cr(review.mlSnapshot.baseNet)} · {review.mlSnapshot.units} units · commissioned {fmtWhen(review.requestedAt)}
+        Studio estimate: {cr(review.mlSnapshot.baseNet)} · {review.mlSnapshot.units} units · commissioned {fmtWhen(review.requestedAt)}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <Field label="Architect (name · CoA reg)">
@@ -642,7 +646,7 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
         <span className="mono text-xs text-ivory-faint">{review.architectName}</span>
       </div>
       <div className="mono mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs">
-        <span className="text-ivory-dim">ML {cr(ml)}</span>
+        <span className="text-ivory-dim">Studio {cr(ml)}</span>
         <span className="text-gold">Architect {cr(arch)}</span>
         <span className={v >= 0 ? 'text-emerald-bright' : 'text-oxblood-bright'}>
           {v >= 0 ? '+' : ''}
@@ -650,6 +654,37 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
         </span>
       </div>
       {review.architectNotes && <p className="mt-3 text-[0.85rem] leading-relaxed text-ivory-dim">{review.architectNotes}</p>}
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------- model */
+function ModelTab() {
+  const [card, setCard] = useState<ModelCardData | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    repo.getModelCard().then(setCard)
+  }, [])
+
+  const retrain = async () => {
+    setBusy(true)
+    try {
+      setCard(await repo.adminRetrainModel())
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!card) return <p className="label animate-pulse py-16 text-center text-ivory-faint">Loading the model…</p>
+  return (
+    <div className="max-w-2xl">
+      <p className="text-sm text-ivory-faint">
+        The valuation model behind the Studio. Every architect delivery is a labelled example — retrain to fold the latest deliveries into the corpus and watch the numbers move.
+      </p>
+      <div className="mt-8 border border-line p-6">
+        <ModelCard card={card} onRetrain={retrain} busy={busy} />
+      </div>
     </div>
   )
 }

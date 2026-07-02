@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { ArchitectReview, FeasibilityInput, Listing, MlSnapshot, PriceBook } from '@/domain/types'
+import type { ArchitectReview, FeasibilityInput, Listing, MlSnapshot, ModelCard as ModelCardData, PriceBook, ValuationContext, ValuationPrediction } from '@/domain/types'
 import { VERTICAL_LABEL } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { computeGdv, defaultSelection, type MaterialSelection, type GdvResult } from '@/lib/gdv'
@@ -10,6 +10,7 @@ import { MATERIALS, TIERS, TIER_LABEL, type Tier } from '@/lib/materials'
 import { crFromRupees, sqft, pct, groupIN } from '@/lib/format'
 import { useCountUp } from '@/lib/hooks'
 import { Slider } from '@/components/Slider'
+import { ModelCard } from '@/components/ModelCard'
 import { EASE } from '@/lib/motion'
 
 export function Studio() {
@@ -43,6 +44,8 @@ function StudioInner({ listing }: { listing: Listing }) {
   const [engage, setEngage] = useState(false)
   const [priceBook, setPriceBook] = useState<PriceBook | undefined>(undefined)
   const [review, setReview] = useState<ArchitectReview | null>(null)
+  const [prediction, setPrediction] = useState<ValuationPrediction | null>(null)
+  const [showModel, setShowModel] = useState(false)
 
   useEffect(() => {
     repo.getPriceBook().then(setPriceBook).catch(() => {})
@@ -62,6 +65,31 @@ function StudioInner({ listing }: { listing: Listing }) {
   const gdv = useMemo(() => computeGdv(feas, selection, priceBook), [feas, selection, priceBook])
   const plan = useMemo(() => buildSitePlan(feas, gdv.feas.footprintSqft), [feas, gdv.feas.footprintSqft])
   const set = (patch: Partial<FeasibilityInput>) => setFeas((f) => ({ ...f, ...patch }))
+
+  const parametricNet = Math.round(gdv.zones.base.netValue)
+  const valCtx = useMemo<ValuationContext>(
+    () => ({
+      vertical: listing.vertical,
+      fsi: feas.fsi,
+      floors: feas.floors,
+      towers: feas.towers,
+      plotAreaSqft: feas.plotAreaSqft,
+      floorPlateEfficiency: feas.floorPlateEfficiency,
+      avgUnitSqft: feas.avgUnitSqft,
+      baseSalePsf: feas.baseSalePsf,
+      roadWidthFt: feas.roadWidthFt,
+      parametricNet,
+    }),
+    [listing.vertical, feas, parametricNet],
+  )
+
+  // Debounced so a slider drag doesn't hammer the model endpoint.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      repo.predictValuation(valCtx).then(setPrediction).catch(() => {})
+    }, 250)
+    return () => clearTimeout(t)
+  }, [valCtx])
 
   return (
     <div className="flex min-h-screen flex-col bg-ink text-ivory lg:h-screen lg:overflow-hidden">
@@ -84,10 +112,11 @@ function StudioInner({ listing }: { listing: Listing }) {
         </aside>
       </div>
 
-      <GdvTicker gdv={gdv} />
+      <GdvTicker gdv={gdv} prediction={prediction} onModelCard={() => setShowModel(true)} />
 
       <AnimatePresence>
         {engage && <EngageModal listing={listing} gdv={gdv} review={review} onRequested={setReview} onClose={() => setEngage(false)} />}
+        {showModel && <ModelCardModal onClose={() => setShowModel(false)} />}
       </AnimatePresence>
     </div>
   )
@@ -308,9 +337,10 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
 }
 
 /* ----------------------------------------------------------- GDV ticker */
-function GdvTicker({ gdv }: { gdv: GdvResult }) {
+function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; prediction: ValuationPrediction | null; onModelCard: () => void }) {
   const { bear, base, bull } = gdv.zones
-  const baseNet = useCountUp(base.netValue)
+  const mlNet = prediction?.mlGdv ?? base.netValue
+  const headline = useCountUp(mlNet)
   const cost = useCountUp(base.constructionCost)
   const span = Math.max(1, bull.netValue - bear.netValue)
   const basePos = ((base.netValue - bear.netValue) / span) * 100
@@ -318,10 +348,26 @@ function GdvTicker({ gdv }: { gdv: GdvResult }) {
   return (
     <footer className="sticky bottom-0 z-30 border-t border-line bg-ink-raise/80 px-6 py-5 backdrop-blur-md md:px-10 lg:static lg:backdrop-blur-none">
       <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_1.4fr_0.9fr]">
-        {/* headline net value */}
+        {/* headline — ML-adjusted net value with its calibrated band */}
         <div>
-          <p className="label text-ivory-faint">Net Development Value · Market</p>
-          <p className="font-display text-4xl text-gilt md:text-5xl">{crFromRupees(baseNet)}</p>
+          <p className="label text-ivory-faint">ML-adjusted NDV · Market</p>
+          <p className="font-display text-4xl text-gilt md:text-5xl">{crFromRupees(headline)}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {prediction && (
+              <span className="mono text-[0.72rem] text-ivory-dim">
+                P10–P90 {crFromRupees(prediction.p10)}–{crFromRupees(prediction.p90)}
+              </span>
+            )}
+            {prediction && (
+              <span className={`mono text-[0.72rem] ${prediction.adjustmentPct < 0 ? 'text-oxblood-bright' : 'text-emerald-bright'}`}>
+                {prediction.adjustmentPct > 0 ? '+' : ''}
+                {prediction.adjustmentPct}% vs parametric {crFromRupees(base.netValue)}
+              </span>
+            )}
+            <button onClick={onModelCard} className="label text-gold transition-colors hover:text-gold-bright">
+              Model card ›
+            </button>
+          </div>
         </div>
 
         {/* three-zone bar */}
@@ -485,7 +531,7 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
 
       <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border border-line bg-[color:var(--line)]">
         <div className="bg-ink-card p-5">
-          <p className="label text-ivory-faint">ML Studio · Market</p>
+          <p className="label text-ivory-faint">Studio · at commission</p>
           <p className="mono mt-2 text-2xl text-ivory">{crFromRupees(ml)}</p>
         </div>
         <div className="bg-ink-card p-5">
@@ -530,4 +576,29 @@ function fmtDate(iso: string): string {
   const d = new Date(iso)
   if (isNaN(d.getTime())) return iso
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+/* ----------------------------------------------------------- model card */
+function ModelCardModal({ onClose }: { onClose: () => void }) {
+  const [card, setCard] = useState<ModelCardData | null>(null)
+  useEffect(() => {
+    repo.getModelCard().then(setCard).catch(() => {})
+  }, [])
+  return (
+    <motion.div className="fixed inset-0 z-[70] grid place-items-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="absolute inset-0 bg-ink/80" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 12, scale: 0.99 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-gold)] bg-ink-card p-8 shadow-deep"
+      >
+        {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ivory-faint">Loading the model…</p>}
+        <button onClick={onClose} className="label mt-7 w-full border border-line py-3 text-ivory-dim transition-colors hover:text-ivory">
+          Close
+        </button>
+      </motion.div>
+    </motion.div>
+  )
 }

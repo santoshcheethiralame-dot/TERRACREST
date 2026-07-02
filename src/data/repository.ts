@@ -1,7 +1,8 @@
-import type { User, Listing, Nda, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot } from '@/domain/types'
+import type { User, Listing, Nda, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
 import { users, listings, ndas as seedNdas, engagements, offers, deals, documents, messages, activityEvents, architectReviews } from '@/data/seed'
 import { api, apiEnabled, ApiError, getBlobUrl } from '@/data/api'
 import { defaultPriceBook } from '@/lib/gdv'
+import { fallbackPredict, fallbackModelCard, fallbackRisk } from '@/lib/mlFallback'
 
 /* ============================================================
    Repository — the single seam between the UI and the data.
@@ -291,6 +292,27 @@ export const repo = {
   async adminActivity(): Promise<ActivityEvent[]> {
     if (apiEnabled) return api.get<ActivityEvent[]>('/admin/activity')
     return latency([...activityEvents].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+  },
+
+  // --- valuation intelligence ---
+  async predictValuation(ctx: ValuationContext): Promise<ValuationPrediction> {
+    if (apiEnabled) return api.post<ValuationPrediction>('/valuation/predict', ctx)
+    return latency(fallbackPredict(ctx), 120)
+  },
+
+  async getModelCard(): Promise<ModelCard> {
+    if (apiEnabled) return api.get<ModelCard>('/valuation/model-card')
+    return latency(fallbackModelCard())
+  },
+
+  async getListingRisk(listingId: string): Promise<RiskScore> {
+    if (apiEnabled) return api.get<RiskScore>(`/listings/${listingId}/risk`)
+    return latency(fallbackRisk(listingId))
+  },
+
+  async adminRetrainModel(): Promise<ModelCard> {
+    if (apiEnabled) return api.post<ModelCard>('/admin/valuation/retrain')
+    return latency(fallbackModelCard())
   },
 
   // --- architect validation (Studio Stage Two) ---

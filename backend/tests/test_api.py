@@ -272,3 +272,47 @@ def test_architect_review_flow(client):
     assert mine[rid]["status"] == "delivered" and mine[rid]["architectName"] == "Test Architect · CoA 1"
     # a non-admin cannot deliver
     assert client.patch(f"/admin/architect-reviews/{rid}", headers=rajesh, json=payload).status_code == 403
+
+
+# --------------------------------------------------- valuation intelligence
+def test_valuation_predict_and_bands(client):
+    h = headers(client, "builder_rajesh_001")
+    body = {
+        "vertical": "joint-development", "fsi": 2.25, "floors": 14, "towers": 4,
+        "plotAreaSqft": 104444, "floorPlateEfficiency": 0.78, "avgUnitSqft": 1400,
+        "baseSalePsf": 8200, "roadWidthFt": 40, "parametricNet": 862_000_000,
+    }
+    r = client.post("/valuation/predict", headers=h, json=body)
+    assert r.status_code == 200
+    p = r.json()
+    # a sensible, bounded correction with a coherent P10<ML<P90 band
+    assert p["p10"] < p["mlGdv"] < p["p90"]
+    assert -15 < p["adjustmentPct"] < 8
+    # aggressive high-rise is trimmed harder than the base case
+    agg = client.post("/valuation/predict", headers=h, json={**body, "floors": 22, "fsi": 3.1, "baseSalePsf": 11500, "parametricNet": 900_000_000}).json()
+    assert agg["adjustmentPct"] < p["adjustmentPct"]
+
+
+def test_model_card_is_transparent(client):
+    card = client.get("/valuation/model-card", headers=headers(client, "builder_rajesh_001")).json()
+    assert card["nExamples"] > 100
+    assert card["nReal"] >= 1  # the seed JD delivery folds in at boot
+    assert 0.0 <= card["metrics"]["r2"] <= 1.0
+    assert card["importances"][0]["feature"] in {f["feature"] for f in card["importances"]}
+    assert len(card["importances"]) == 11
+
+
+def test_listing_risk_scorecard(client):
+    r = client.get("/listings/JD-BLR-2026-012/risk", headers=headers(client, "builder_rajesh_001"))
+    assert r.status_code == 200
+    body = r.json()
+    assert 0 <= body["overall"] <= 100 and body["grade"] in {"A", "B", "C", "D"}
+    assert {b["key"] for b in body["bands"]} == {"title", "liquidity", "appreciation"}
+    # every point is explained by at least one factor
+    assert all(b["factors"] for b in body["bands"])
+
+
+def test_retrain_admin_only(client):
+    assert client.post("/admin/valuation/retrain", headers=headers(client, "builder_rajesh_001")).status_code == 403
+    card = client.post("/admin/valuation/retrain", headers=headers(client, "admin_terracrest")).json()
+    assert card["nExamples"] > 100

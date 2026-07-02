@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import type { Document, Listing, Message } from '@/domain/types'
+import type { Document, Listing, Message, RiskScore } from '@/domain/types'
 import { VERTICAL_LABEL, STATUS_LABEL } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { useAuth } from '@/auth/AuthContext'
@@ -28,6 +28,7 @@ export function ListingDetail() {
   const [docs, setDocs] = useState<Document[]>([])
   const [msgs, setMsgs] = useState<Message[]>([])
   const [sending, setSending] = useState(false)
+  const [risk, setRisk] = useState<RiskScore | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -65,6 +66,16 @@ export function ListingDetail() {
       alive = false
     }
   }, [listing, unlocked])
+
+  // Risk is masked-safe (public attributes only) — load it as soon as the parcel does.
+  useEffect(() => {
+    if (!listing) return
+    let alive = true
+    repo.getListingRisk(listing.id).then((r) => alive && setRisk(r)).catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [listing])
 
   const sealedFields = useMemo(() => {
     const s = listing?.sealed
@@ -151,6 +162,7 @@ export function ListingDetail() {
 
           <Specs listing={listing} />
           <Comps listing={listing} />
+          <RiskScorecard risk={risk} />
         </motion.div>
 
         {/* ---------- the sealed dossier ---------- */}
@@ -246,6 +258,49 @@ export function ListingDetail() {
 
       {unlocked && <DealRoom currentUserId={user?.id} msgs={msgs} onSend={sendMessage} sending={sending} />}
     </AppShell>
+  )
+}
+
+function RiskScorecard({ risk }: { risk: RiskScore | null }) {
+  if (!risk) return null
+  const gradeColor = risk.grade === 'A' ? 'text-emerald-bright' : risk.grade === 'B' ? 'text-gold' : 'text-oxblood-bright'
+  return (
+    <div className="mt-10 border-t border-line pt-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="label text-gold">Risk Scorecard</p>
+          <p className="mt-1.5 text-[0.82rem] text-ivory-faint">Transparent and rules-based — every point is an auditable factor, not a black box.</p>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <span className="mono text-3xl text-ivory">{risk.overall}</span>
+          <span className={`font-display text-3xl ${gradeColor}`}>{risk.grade}</span>
+        </div>
+      </div>
+      <div className="mt-6 space-y-5">
+        {risk.bands.map((b) => (
+          <div key={b.key}>
+            <div className="flex items-center justify-between">
+              <span className="text-[0.9rem] text-ivory-dim">{b.label}</span>
+              <span className="mono text-sm text-ivory">{b.score}</span>
+            </div>
+            <div className="mt-1.5 h-1.5 bg-[color:var(--line)]">
+              <div className="h-full bg-gold" style={{ width: `${b.score}%` }} />
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {b.factors.map((f, i) => (
+                <span
+                  key={i}
+                  className={`mono border border-[color:var(--line-strong)] px-1.5 py-0.5 text-[0.66rem] ${f.delta >= 0 ? 'text-emerald-bright' : 'text-oxblood-bright'}`}
+                >
+                  {f.delta >= 0 ? '+' : ''}
+                  {f.delta} {f.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
