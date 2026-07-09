@@ -58,23 +58,13 @@ class ListingOut(CamelModel):
     verification: dict
     guidance: dict
     public_area: Optional[dict] = None  # coarse area, always shown
-    sealed: Optional[dict] = None  # withheld unless caller is entitled
+    sealed: dict  # full location/ownership detail — visible to any verified member
     jd: Optional[dict] = None
     warehouse: Optional[dict] = None
     big_land: Optional[dict] = None
     comps: list[Any]
     feasibility: dict
     created_at: str
-
-
-class NdaOut(CamelModel):
-    id: str
-    builder_id: str
-    landowner_id: str
-    listing_id: str
-    signed_on: str
-    witnessed_by: str
-    scan_ref: str
 
 
 class OfferOut(CamelModel):
@@ -123,21 +113,12 @@ class DealOut(CamelModel):
     rm: str
 
 
-class UnlockState(BaseModel):
-    unlocked: bool
-
-
 # --- admin request bodies (camelCase to match the frontend) ---
 class CreateUserRequest(BaseModel):
     username: str
     displayName: str
     role: str
     officeLocation: Optional[str] = None
-
-
-class CreateNdaRequest(BaseModel):
-    builderId: str
-    listingId: str
 
 
 class SetActiveRequest(BaseModel):
@@ -236,7 +217,7 @@ class CreateListingRequest(BaseModel):
     ownerId: str
     guidanceLow: int
     guidanceHigh: int
-    # public map (coarse, pre-NDA)
+    # public map (coarse area view)
     areaLat: float
     areaLng: float
     areaRadiusKm: float
@@ -256,12 +237,9 @@ class CreateListingRequest(BaseModel):
     baseSalePsf: int
 
 
-def serialize_listing(listing: "models.Listing", include_sealed: bool) -> ListingOut:
-    """The heart of the moat: sealed details are attached only when entitled;
-    otherwise they never leave the server."""
+def serialize_listing(listing: "models.Listing") -> ListingOut:
+    """Full location and ownership detail travels with every listing — the
+    server only ever serves it to an authenticated member in the first place."""
     out = ListingOut.model_validate(listing)
-    if include_sealed:
-        out.sealed = {**listing.sealed, "ownerId": listing.owner_id}
-    else:
-        out.sealed = None
+    out.sealed = {**listing.sealed, "ownerId": listing.owner_id}
     return out

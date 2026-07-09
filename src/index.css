@@ -59,7 +59,7 @@ body {
   min-height: 100vh;
   background-color: var(--paper);
   color: var(--ink);
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: 'Satoshi', 'Noto Sans Kannada', system-ui, sans-serif;
   font-feature-settings: 'ss01';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -68,7 +68,7 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Noto Sans Kannada', system-ui, sans-serif;
   font-weight: 600;
   line-height: 1.0;
   letter-spacing: -0.03em;
@@ -100,7 +100,7 @@ h1, h2, h3, h4 {
 @layer components {
   /* ledger label — monospaced, wide-tracked small caps */
   .label {
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-family: 'IBM Plex Mono', 'Noto Sans Kannada', ui-monospace, monospace;
     text-transform: uppercase;
     letter-spacing: 0.24em;
     font-size: 0.66rem;
@@ -136,27 +136,6 @@ h1, h2, h3, h4 {
   .text-outline-ink {
     -webkit-text-stroke: 1px rgba(26, 30, 27, 0.25);
     color: transparent;
-  }
-
-  /* REDACTION — black bars on paper, like a real dossier */
-  .redaction {
-    position: relative;
-    color: transparent !important;
-    user-select: none;
-    border-radius: 2px;
-    background-color: #23251f;
-    background-image: repeating-linear-gradient(
-      135deg,
-      rgb(28, 30, 26) 0 5px,
-      rgb(48, 51, 44) 5px 10px
-    );
-    box-shadow: inset 0 0 0 1px rgba(26, 30, 27, 0.35);
-  }
-  .redaction::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(168, 132, 44, 0.07);
   }
 
   /* verification seal ring */

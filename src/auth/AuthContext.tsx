@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { User } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { setTokens, configureAuth } from '@/data/api'
+import { useLang } from '@/i18n/LanguageContext'
 
 /* ============================================================
    Auth — real JWT semantics against the backend when enabled,
@@ -45,6 +46,7 @@ function persist(user: User, accessToken: string | null, refreshToken: string | 
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { t } = useLang()
   const [user, setUser] = useState<User | null>(() => {
     const session = readSession()
     if (session) setTokens(session.accessToken, session.refreshToken)
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       result = await repo.authenticate(username, password)
     } catch {
       setLoading(false)
-      setError('Could not reach the advisory server. Please try again.')
+      setError(t('login.errorServer'))
       return null
     }
     setLoading(false)
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       persist(result.user, result.accessToken, result.refreshToken)
       return result.user
     }
-    setError('Credentials not recognised. Access is by admin-issued login only.')
+    setError(t('login.errorCredentials'))
     return null
   }
 

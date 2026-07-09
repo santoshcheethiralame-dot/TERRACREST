@@ -35,9 +35,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
-        sans: ['Satoshi', 'system-ui', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
+        display: ['Space Grotesk', 'Noto Sans Kannada', 'system-ui', 'sans-serif'],
+        sans: ['Satoshi', 'Noto Sans Kannada', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'Noto Sans Kannada', 'ui-monospace', 'monospace'],
       },
       letterSpacing: {
         label: '0.24em',

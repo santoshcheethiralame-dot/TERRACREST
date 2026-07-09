@@ -3,15 +3,15 @@
 An invitation-only deal platform for high-value Bengaluru real estate — joint
 developments, Grade-A warehousing, and large contiguous land. Access is granted by
 the desk after offline KYC; there is no self-signup. Every parcel is verified on the
-ground before it is shown, and its sensitive details stay **sealed** behind a masking
-layer until a witnessed NDA is logged.
+ground before it is shown, and membership itself is the gate — once verified, a
+member sees every parcel in full.
 
 The product's two signatures:
 
-- **The masking moat.** Coordinates, owner identity, survey numbers, and contacts
-  are withheld by the server and revealed only to entitled parties. This is enforced
-  in the API (`backend/app/routers/listings.py:can_see_sealed`), not the UI — the
-  sealed fields never leave the server without a logged NDA.
+- **The membership moat.** Coordinates, owner identity, survey numbers, and contacts
+  never reach an unauthenticated request. This is enforced in the API — every
+  listing, document, and Deal Room endpoint requires a verified, admin-issued
+  account; there is no separate per-parcel unlock step.
 - **The Feasibility Studio.** A live, parametric GDV engine: adjust towers, FSI,
   floor-plate efficiency, unit mix, sale price, and material finishes, and watch the
   three-zone Net Development Value (Bear / Base / Bull) recompute in real time —
@@ -38,9 +38,9 @@ The product's two signatures:
 
 - Cinematic landing page and an exclusive, admin-issued login
 - Role dashboards — builder, landowner, investor, and the admin **Operations Centre**
-- Masked discovery → NDA unlock → sealed reveal, with an NDA-gated precision map
-- Document vault (gated, watermarked PDFs)
-- Deal Room (post-NDA messaging between entitled parties)
+- Discovery with full detail on every parcel — an exact-location precision map
+- Document vault (watermarked PDFs, every open logged)
+- Deal Room (messaging between verified members)
 - Feasibility & GDV Studio with a live, admin-maintained price book
 - Architect validation workflow (ML estimate vs. stamped human figure)
 - Operations Centre: account management, parcel lifecycle, price book, architect
@@ -68,7 +68,7 @@ npm run dev
 ```
 
 All demo logins use the password `demo`. Try `admin_terracrest` (the desk),
-`builder_rajesh_001` (an NDA'd builder), or `landowner_ramanathan_002`.
+`builder_rajesh_001` (a builder), or `landowner_ramanathan_002`.
 
 ## Deployment
 

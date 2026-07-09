@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ArchitectReview, FeasibilityInput, Listing, MlSnapshot, ModelCard as ModelCardData, PriceBook, ValuationContext, ValuationPrediction } from '@/domain/types'
-import { VERTICAL_LABEL } from '@/domain/types'
+import { useLang } from '@/i18n/LanguageContext'
+import { MATERIAL_CATEGORY_KEY, VERTICAL_KEY } from '@/i18n/translations'
 import { repo } from '@/data/repository'
 import { computeGdv, defaultSelection, type MaterialSelection, type GdvResult } from '@/lib/gdv'
 import { buildSitePlan, type SitePlan } from '@/lib/siteplan'
-import { MATERIALS, TIERS, TIER_LABEL, type Tier } from '@/lib/materials'
+import { MATERIALS, TIERS, type Tier } from '@/lib/materials'
 import { crFromRupees, sqft, pct, groupIN } from '@/lib/format'
 import { useCountUp } from '@/lib/hooks'
 import { Slider } from '@/components/Slider'
@@ -15,6 +16,7 @@ import { EASE } from '@/lib/motion'
 
 export function Studio() {
   const { id } = useParams()
+  const { t } = useLang()
   const listingId = id ?? 'JD-BLR-2026-012'
   const [listing, setListing] = useState<Listing | null>(null)
 
@@ -26,14 +28,14 @@ export function Studio() {
     }
   }, [listingId])
 
-  if (!listing) return <StudioLoading />
+  if (!listing) return <StudioLoading label={t('studio.loadingParcel')} />
   return <StudioInner listing={listing} />
 }
 
-function StudioLoading() {
+function StudioLoading({ label }: { label: string }) {
   return (
     <div className="grid min-h-screen place-items-center bg-paper">
-      <p className="label animate-pulse text-ink-faint">Loading parcel…</p>
+      <p className="label animate-pulse text-ink-faint">{label}</p>
     </div>
   )
 }
@@ -124,20 +126,21 @@ function StudioInner({ listing }: { listing: Listing }) {
 
 /* --------------------------------------------------------------- top bar */
 function StudioBar({ listing, review, onEngage }: { listing: Listing; review: ArchitectReview | null; onEngage: () => void }) {
+  const { t } = useLang()
   const delivered = review?.status === 'delivered'
   const requested = review?.status === 'requested'
-  const label = delivered ? 'Architect Validated' : requested ? 'Validation Requested' : 'Confirm & Engage Architect'
+  const label = delivered ? t('studio.architectValidated') : requested ? t('studio.validationRequested') : t('studio.confirmEngage')
   return (
     <header className="flex items-center justify-between border-b border-line px-6 py-4 md:px-10">
       <div className="flex items-center gap-6">
         <Link to="/app" className="label text-ink-faint transition-colors hover:text-ink">
-          ← Terracrest
+          ← {t('studio.terracrest')}
         </Link>
         <div className="hidden h-4 w-px bg-[color:var(--line-strong)] sm:block" />
         <div className="hidden sm:block">
-          <p className="label text-accent">Feasibility Studio</p>
+          <p className="label text-accent">{t('studio.eyebrow')}</p>
           <p className="mono mt-1 text-[0.72rem] text-ink-dim">
-            {listing.id} · {VERTICAL_LABEL[listing.vertical]} · {listing.localityLabel.split('·')[0].trim()}
+            {listing.id} · {t(VERTICAL_KEY[listing.vertical])} · {listing.localityLabel.split('·')[0].trim()}
           </p>
         </div>
       </div>
@@ -159,6 +162,7 @@ function StudioBar({ listing, review, onEngage }: { listing: Listing; review: Ar
 
 /* ----------------------------------------------------------- site plan */
 function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput }) {
+  const { t } = useLang()
   const { plot } = plan
   const padX = plot.w * 0.17
   const padY = plot.h * 0.13
@@ -169,12 +173,12 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
   const fs = U * 0.03
 
   return (
-    <svg viewBox={vb} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label="Live parcel massing schematic">
+    <svg viewBox={vb} preserveAspectRatio="xMidYMid meet" className="h-full w-full" role="img" aria-label={t('a11y.massingSchematic')}>
       {/* road along frontage (bottom) */}
       <g>
         <rect x={0} y={plot.h + road * 0.35} width={plot.w} height={road * 0.5} fill="#7C857D" fillOpacity="0.08" stroke="#7C857D" strokeOpacity="0.4" strokeWidth={sw * 0.7} />
         <text x={plot.w / 2} y={plot.h + road * 0.72} textAnchor="middle" fill="#7C857D" fontFamily="'IBM Plex Mono', monospace" fontSize={fs * 0.82} letterSpacing={fs * 0.03}>
-          {feas.roadWidthFt} FT ROAD · FRONTAGE
+          {feas.roadWidthFt} {t('studio.roadFrontage')}
         </text>
       </g>
 
@@ -247,14 +251,15 @@ function SitePlanCanvas({ plan, feas }: { plan: SitePlan; feas: FeasibilityInput
 
 /* ----------------------------------------------------------- metrics */
 function MetricsStrip({ gdv }: { gdv: GdvResult }) {
+  const { t } = useLang()
   const m = gdv.feas
   const cells = [
-    { k: 'Built-up', v: sqft(m.builtUpAreaSqft) },
-    { k: 'Saleable', v: sqft(m.saleableAreaSqft) },
-    { k: 'Units', v: String(m.unitCount) },
-    { k: 'Parking', v: String(m.parkingCount) },
-    { k: 'Efficiency', v: pct(m.efficiencyPct) },
-    { k: 'Open / green', v: pct(m.greenPct) },
+    { k: t('studio.builtUp'), v: sqft(m.builtUpAreaSqft) },
+    { k: t('studio.saleable'), v: sqft(m.saleableAreaSqft) },
+    { k: t('studio.units'), v: String(m.unitCount) },
+    { k: t('studio.parking'), v: String(m.parkingCount) },
+    { k: t('studio.efficiency'), v: pct(m.efficiencyPct) },
+    { k: t('studio.openGreen'), v: pct(m.greenPct) },
   ]
   return (
     <div className="grid grid-cols-3 border-t border-line md:grid-cols-6">
@@ -270,26 +275,36 @@ function MetricsStrip({ gdv }: { gdv: GdvResult }) {
 
 /* ----------------------------------------------------------- controls */
 function Controls({ feas, set, listing }: { feas: FeasibilityInput; set: (p: Partial<FeasibilityInput>) => void; listing: Listing }) {
+  const { t } = useLang()
   const fsiCap = listing.jd?.fsi
   return (
     <div>
-      <p className="label text-accent">Design Parameters</p>
+      <p className="label text-accent">{t('studio.designParameters')}</p>
       <div className="mt-6 space-y-6">
-        <Slider label="Towers" value={feas.towers} min={1} max={6} onChange={(v) => set({ towers: v })} />
-        <Slider label="Floors (G +)" value={feas.floors} min={2} max={24} onChange={(v) => set({ floors: v })} format={(v) => `G+${v}`} />
+        <Slider label={t('studio.towers')} value={feas.towers} min={1} max={6} onChange={(v) => set({ towers: v })} />
+        <Slider label={t('studio.floors')} value={feas.floors} min={2} max={24} onChange={(v) => set({ floors: v })} format={(v) => `G+${v}`} />
         <Slider
-          label="FSI"
+          label={t('studio.fsi')}
           value={feas.fsi}
           min={1}
           max={3.5}
           step={0.05}
           onChange={(v) => set({ fsi: v })}
           format={(v) => v.toFixed(2)}
-          hint={fsiCap ? `By-law sanction: ${fsiCap.toFixed(2)}` : undefined}
+          hint={fsiCap ? `${t('studio.bylawSanction')}: ${fsiCap.toFixed(2)}` : undefined}
         />
-        <Slider label="Floor-plate efficiency" value={feas.floorPlateEfficiency} min={0.68} max={0.88} step={0.01} onChange={(v) => set({ floorPlateEfficiency: v })} format={(v) => pct(v)} />
-        <Slider label="Avg unit size" value={feas.avgUnitSqft} min={800} max={2400} step={50} onChange={(v) => set({ avgUnitSqft: v })} format={(v) => `${groupIN(v)} sq ft`} />
-        <Slider label="Market sale price" value={feas.baseSalePsf} min={4000} max={13000} step={100} onChange={(v) => set({ baseSalePsf: v })} format={(v) => `₹${groupIN(v)}/sq ft`} hint="Anchored to admin-verified comparables" />
+        <Slider label={t('studio.floorPlateEfficiency')} value={feas.floorPlateEfficiency} min={0.68} max={0.88} step={0.01} onChange={(v) => set({ floorPlateEfficiency: v })} format={(v) => pct(v)} />
+        <Slider label={t('studio.avgUnitSize')} value={feas.avgUnitSqft} min={800} max={2400} step={50} onChange={(v) => set({ avgUnitSqft: v })} format={(v) => `${groupIN(v)} sq ft`} />
+        <Slider
+          label={t('studio.marketSalePrice')}
+          value={feas.baseSalePsf}
+          min={4000}
+          max={13000}
+          step={100}
+          onChange={(v) => set({ baseSalePsf: v })}
+          format={(v) => `₹${groupIN(v)}/sq ft`}
+          hint={t('studio.anchoredComps')}
+        />
       </div>
     </div>
   )
@@ -297,11 +312,12 @@ function Controls({ feas, set, listing }: { feas: FeasibilityInput; set: (p: Par
 
 /* ----------------------------------------------------------- materials */
 function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSelection; onSelect: (key: string, tier: Tier) => void; finishesPsf: number }) {
+  const { t } = useLang()
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="label text-accent">Material Specification</p>
-        <span className="mono text-xs text-ink-dim">finishes +₹{groupIN(finishesPsf)}/sq ft</span>
+        <p className="label text-accent">{t('studio.materialSpec')}</p>
+        <span className="mono text-xs text-ink-dim">{t('studio.finishes')} +₹{groupIN(finishesPsf)}/sq ft</span>
       </div>
       <div className="mt-6 space-y-5">
         {MATERIALS.map((cat) => {
@@ -309,21 +325,21 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
           return (
             <div key={cat.key}>
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-[0.9rem] text-ink-dim">{cat.name}</span>
+                <span className="text-[0.9rem] text-ink-dim">{t(MATERIAL_CATEGORY_KEY[cat.key])}</span>
                 <span className="mono text-[0.72rem] text-ink-faint">{cat.options[tier].label}</span>
               </div>
               <div className="mt-2 grid grid-cols-4 gap-1.5">
-                {TIERS.map((t) => {
-                  const active = t === tier
+                {TIERS.map((tierOption) => {
+                  const active = tierOption === tier
                   return (
                     <button
-                      key={t}
-                      onClick={() => onSelect(cat.key, t)}
+                      key={tierOption}
+                      onClick={() => onSelect(cat.key, tierOption)}
                       className={`label border px-2 py-2 text-[0.58rem] transition-colors duration-300 ${
                         active ? 'border-[color:var(--line-accent)] bg-accent/10 text-accent' : 'border-line text-ink-faint hover:text-ink'
                       }`}
                     >
-                      {TIER_LABEL[t]}
+                      {t(`tier.${tierOption}`)}
                     </button>
                   )
                 })}
@@ -338,6 +354,7 @@ function Materials({ selection, onSelect, finishesPsf }: { selection: MaterialSe
 
 /* ----------------------------------------------------------- GDV ticker */
 function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; prediction: ValuationPrediction | null; onModelCard: () => void }) {
+  const { t } = useLang()
   const { bear, base, bull } = gdv.zones
   const mlNet = prediction?.mlGdv ?? base.netValue
   const headline = useCountUp(mlNet)
@@ -350,7 +367,7 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
       <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1fr_1.4fr_0.9fr]">
         {/* headline — ML-adjusted net value with its calibrated band */}
         <div>
-          <p className="label text-ink-faint">ML-adjusted NDV · Market</p>
+          <p className="label text-ink-faint">{t('studio.ndvLabel')}</p>
           <p className="font-display text-4xl font-semibold tracking-tight2 text-beam md:text-5xl">{crFromRupees(headline)}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             {prediction && (
@@ -361,11 +378,11 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
             {prediction && (
               <span className={`mono text-[0.72rem] ${prediction.adjustmentPct < 0 ? 'text-oxblood-bright' : 'text-emerald-bright'}`}>
                 {prediction.adjustmentPct > 0 ? '+' : ''}
-                {prediction.adjustmentPct}% vs parametric {crFromRupees(base.netValue)}
+                {prediction.adjustmentPct}% {t('studio.vsParametric')} {crFromRupees(base.netValue)}
               </span>
             )}
             <button onClick={onModelCard} className="label text-accent transition-colors hover:text-accent-bright">
-              Model card ›
+              {t('studio.modelCard')} ›
             </button>
           </div>
         </div>
@@ -379,17 +396,19 @@ function GdvTicker({ gdv, prediction, onModelCard }: { gdv: GdvResult; predictio
             <Tick pos={100} tone="emerald" />
           </div>
           <div className="mt-3 flex justify-between">
-            <ZoneLabel tone="text-oxblood-bright" name="Bear" value={crFromRupees(bear.netValue)} />
-            <ZoneLabel tone="text-gold" name="Base" value={crFromRupees(base.netValue)} center />
-            <ZoneLabel tone="text-emerald-bright" name="Bull" value={crFromRupees(bull.netValue)} right />
+            <ZoneLabel tone="text-oxblood-bright" name={t('zone.bear')} value={crFromRupees(bear.netValue)} />
+            <ZoneLabel tone="text-gold" name={t('zone.base')} value={crFromRupees(base.netValue)} center />
+            <ZoneLabel tone="text-emerald-bright" name={t('zone.bull')} value={crFromRupees(bull.netValue)} right />
           </div>
         </div>
 
         {/* construction cost */}
         <div className="lg:text-right">
-          <p className="label text-ink-faint">Construction Cost</p>
+          <p className="label text-ink-faint">{t('studio.constructionCost')}</p>
           <p className="mono mt-1 text-xl text-ink">{crFromRupees(cost)}</p>
-          <p className="mono mt-1 text-[0.72rem] text-ink-faint">₹{groupIN(gdv.constructionPsfBase)}/sq ft built-up</p>
+          <p className="mono mt-1 text-[0.72rem] text-ink-faint">
+            ₹{groupIN(gdv.constructionPsfBase)}/{t('studio.builtUpSqft')}
+          </p>
         </div>
       </div>
     </footer>
@@ -471,26 +490,28 @@ function EngageModal({
 }
 
 function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: Listing; gdv: GdvResult; busy: boolean; onProceed: () => void; onClose: () => void }) {
+  const { t } = useLang()
+  const body = t('studio.engageBody')
+    .replace('{id}', listing.id)
+    .replace('{units}', String(gdv.feas.unitCount))
+    .replace('{saleable}', sqft(gdv.feas.saleableAreaSqft))
+    .replace('{ndv}', crFromRupees(gdv.zones.base.netValue))
   return (
     <div>
-      <p className="label text-accent">Stage Two · Original Architecture</p>
-      <h3 className="mt-4 font-display text-3xl text-ink">Engage the empanelled architect</h3>
-      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">
-        Your feasibility on <span className="mono text-ink">{listing.id}</span> — {gdv.feas.unitCount} units, {sqft(gdv.feas.saleableAreaSqft)} saleable, a market
-        Net Development Value of <span className="text-accent">{crFromRupees(gdv.zones.base.netValue)}</span> — is snapshotted and handed to our empanelled architect for
-        stamped, buildable drawings validated against this model.
-      </p>
+      <p className="label text-accent">{t('studio.stageTwoOriginal')}</p>
+      <h3 className="mt-4 font-display text-3xl text-ink">{t('studio.engageArchitect')}</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">{body}</p>
       <div className="mt-6 flex items-baseline justify-between border-y border-line py-4">
-        <span className="label text-ink-faint">Engagement fee</span>
+        <span className="label text-ink-faint">{t('studio.engagementFee')}</span>
         <span className="mono text-lg text-ink">₹2,50,000</span>
       </div>
-      <p className="mt-3 text-[0.78rem] text-ink-faint">Adjustable against Terracrest commission on closure.</p>
+      <p className="mt-3 text-[0.78rem] text-ink-faint">{t('studio.adjustableCommission')}</p>
       <div className="mt-7 flex gap-3">
         <button onClick={onClose} disabled={busy} className="label flex-1 border border-line py-3.5 text-ink-dim transition-colors hover:text-ink disabled:opacity-50">
-          Not yet
+          {t('studio.notYet')}
         </button>
         <button onClick={onProceed} disabled={busy} className="label flex-1 bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-60">
-          {busy ? 'Commissioning…' : 'Proceed →'}
+          {busy ? t('studio.commissioning') : `${t('studio.proceed')} →`}
         </button>
       </div>
     </div>
@@ -498,50 +519,50 @@ function RequestView({ listing, gdv, busy, onProceed, onClose }: { listing: List
 }
 
 function RequestedView({ review, listing, onClose }: { review: ArchitectReview; listing: Listing; onClose: () => void }) {
+  const { t } = useLang()
+  const body = t('studio.validationBody').replace('{id}', listing.id)
   return (
     <div>
-      <p className="label text-accent">Stage Two · In Progress</p>
-      <h3 className="mt-4 font-display text-3xl text-ink">Validation commissioned</h3>
-      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">
-        Your model on <span className="mono text-ink">{listing.id}</span> is with the empanelled architect. They return stamped drawings and an independent Net
-        Development Value — typically within three working days — which will appear here alongside your ML estimate.
-      </p>
+      <p className="label text-accent">{t('studio.stageTwoProgress')}</p>
+      <h3 className="mt-4 font-display text-3xl text-ink">{t('studio.validationCommissioned')}</h3>
+      <p className="mt-4 text-[0.95rem] leading-relaxed text-ink-dim">{body}</p>
       <div className="mt-6 space-y-3 border-y border-line py-4">
-        <Row k="Commissioned" v={fmtDate(review.requestedAt)} />
-        <Row k="ML estimate (Market)" v={crFromRupees(review.mlSnapshot.baseNet)} />
-        <Row k="Status" v="Awaiting architect" tone="text-accent" />
+        <Row k={t('studio.commissioned')} v={fmtDate(review.requestedAt)} />
+        <Row k={t('studio.mlEstimateMarket')} v={crFromRupees(review.mlSnapshot.baseNet)} />
+        <Row k={t('studio.status')} v={t('studio.awaitingArchitect')} tone="text-accent" />
       </div>
       <button onClick={onClose} className="label mt-7 w-full border border-line py-3.5 text-ink-dim transition-colors hover:text-ink">
-        Close
+        {t('studio.close')}
       </button>
     </div>
   )
 }
 
 function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: () => void }) {
+  const { t } = useLang()
   const ml = review.mlSnapshot.baseNet
   const arch = review.architectGdv ?? ml
   const variancePct = ml > 0 ? ((arch - ml) / ml) * 100 : 0
   const up = variancePct >= 0
   return (
     <div>
-      <p className="label text-emerald-bright">Stage Two · Validated</p>
-      <h3 className="mt-4 font-display text-3xl text-ink">Architect-validated feasibility</h3>
+      <p className="label text-emerald-bright">{t('studio.stageTwoValidated')}</p>
+      <h3 className="mt-4 font-display text-3xl text-ink">{t('studio.architectValidatedFeasibility')}</h3>
       <p className="mt-3 text-[0.88rem] text-ink-dim">{review.architectName}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden border border-line bg-[color:var(--line)]">
         <div className="bg-paper-card p-5">
-          <p className="label text-ink-faint">Studio · at commission</p>
+          <p className="label text-ink-faint">{t('studio.studioAtCommission')}</p>
           <p className="mono mt-2 text-2xl text-ink">{crFromRupees(ml)}</p>
         </div>
         <div className="bg-paper-card p-5">
-          <p className="label text-accent">Architect · Validated</p>
+          <p className="label text-accent">{t('studio.architectValidatedLabel')}</p>
           <p className="mono mt-2 text-2xl text-beam">{crFromRupees(arch)}</p>
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between border border-line px-5 py-3">
-        <span className="label text-ink-faint">Variance to model</span>
+        <span className="label text-ink-faint">{t('studio.varianceToModel')}</span>
         <span className={`mono text-sm ${up ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>
           {up ? '+' : ''}
           {variancePct.toFixed(1)}%
@@ -550,14 +571,14 @@ function DeliveredView({ review, onClose }: { review: ArchitectReview; onClose: 
 
       {review.architectNotes && (
         <div className="mt-5">
-          <p className="label text-ink-faint">Architect's note</p>
+          <p className="label text-ink-faint">{t('studio.architectsNote')}</p>
           <p className="mt-2 text-[0.9rem] leading-relaxed text-ink-dim">{review.architectNotes}</p>
         </div>
       )}
 
-      <p className="mono mt-5 text-[0.72rem] text-ink-faint">Delivered {fmtDate(review.deliveredAt ?? review.requestedAt)} · stamped drawings issued to your Deal Room.</p>
+      <p className="mono mt-5 text-[0.72rem] text-ink-faint">{t('studio.deliveredNote').replace('{date}', fmtDate(review.deliveredAt ?? review.requestedAt))}</p>
       <button onClick={onClose} className="label mt-6 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright">
-        Close
+        {t('studio.close')}
       </button>
     </div>
   )
@@ -580,6 +601,7 @@ function fmtDate(iso: string): string {
 
 /* ----------------------------------------------------------- model card */
 function ModelCardModal({ onClose }: { onClose: () => void }) {
+  const { t } = useLang()
   const [card, setCard] = useState<ModelCardData | null>(null)
   useEffect(() => {
     repo.getModelCard().then(setCard).catch(() => {})
@@ -594,9 +616,9 @@ function ModelCardModal({ onClose }: { onClose: () => void }) {
         transition={{ duration: 0.5, ease: EASE }}
         className="relative max-h-[88vh] w-full max-w-xl overflow-y-auto border border-[color:var(--line-accent)] bg-paper-card p-8 shadow-deep"
       >
-        {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ink-faint">Loading the model…</p>}
+        {card ? <ModelCard card={card} /> : <p className="label py-10 text-center text-ink-faint">{t('studio.loadingModel')}</p>}
         <button onClick={onClose} className="label mt-7 w-full border border-line py-3 text-ink-dim transition-colors hover:text-ink">
-          Close
+          {t('studio.close')}
         </button>
       </motion.div>
     </motion.div>

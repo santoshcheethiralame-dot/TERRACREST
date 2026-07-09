@@ -156,16 +156,6 @@ def _listings():
     ]
 
 
-def _ndas():
-    return [
-        models.Nda(
-            id="NDA-JD-012-rajesh", builder_id="builder_rajesh_001", landowner_id="landowner_ramanathan_002",
-            listing_id="JD-BLR-2026-012", signed_on="2026-06-24", witnessed_by="Adv. Meera Krishnan",
-            scan_ref="/deals/deal_001/nda/",
-        ),
-    ]
-
-
 def _offers():
     data = [
         ("OF-1", "WH-BLR-2026-047", "Rajesh Developers", "Lease", "₹18.0 / sq ft", "5-year lock · 15% escalation", "pending"),
@@ -196,7 +186,7 @@ def _engagements():
 def _deals():
     return [
         models.Deal(id="deal_001", listing_id="JD-BLR-2026-012", builder_id="builder_rajesh_001",
-                    stage="nda-signed", est_commission=17000000, rm="Kavya R."),
+                    stage="engaged", est_commission=17000000, rm="Kavya R."),
     ]
 
 
@@ -270,12 +260,12 @@ def _architect_reviews():
 def _activity():
     # A little history so the operations-centre feed isn't empty on first boot.
     rows = [
+        ("ev_0", "Terracrest Desk", "builder_rajesh_001", "access", None, "Rajesh Menon · Rajesh Developers granted membership access", "2026-03-11T09:00:00+00:00"),
         ("ev_1", "Terracrest Desk", None, "listing_created", "JD-BLR-2026-012", "Parcel JD-BLR-2026-012 created — North-corridor JD parcel", "2026-06-14T09:12:00+00:00"),
         ("ev_2", "Terracrest Desk", None, "status_change", "JD-BLR-2026-012", "JD-BLR-2026-012 → live", "2026-06-20T15:41:00+00:00"),
         ("ev_3", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "login", None, "Rajesh Menon · Rajesh Developers signed in", "2026-06-24T08:03:00+00:00"),
-        ("ev_4", "Terracrest Desk", "builder_rajesh_001", "nda", "JD-BLR-2026-012", "Desk recorded a witnessed NDA — Rajesh Menon · Rajesh Developers on North-corridor JD parcel", "2026-06-24T10:22:00+00:00"),
-        ("ev_5", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "document", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel", "2026-06-24T10:31:00+00:00"),
-        ("ev_6", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "message", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room", "2026-06-25T11:40:00+00:00"),
+        ("ev_4", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "document", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel", "2026-06-24T10:31:00+00:00"),
+        ("ev_5", "Rajesh Menon · Rajesh Developers", "builder_rajesh_001", "message", "JD-BLR-2026-012", "Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room", "2026-06-25T11:40:00+00:00"),
     ]
     return [
         models.ActivityEvent(id=i, actor_name=an, actor_id=aid, kind=k, listing_id=lid, summary=s, created_at=ts)
@@ -286,7 +276,6 @@ def _activity():
 def _insert_all(db) -> None:
     db.add_all(_users())
     db.add_all(_listings())
-    db.add_all(_ndas())
     db.add_all(_offers())
     db.add_all(_engagements())
     db.add_all(_deals())
@@ -305,7 +294,7 @@ def seed() -> None:
     db = SessionLocal()
     try:
         _insert_all(db)
-        print("Seeded: 7 users, 3 listings, 1 NDA, 4 offers, 2 engagements, 1 deal.")
+        print("Seeded: 7 users, 3 listings, 4 offers, 2 engagements, 1 deal.")
         print(f"All demo logins use password: {DEMO_PASSWORD!r}")
     finally:
         db.close()

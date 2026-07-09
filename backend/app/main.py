@@ -22,8 +22,9 @@ app = FastAPI(
     title="DB Terracrest Advisory API",
     version="0.1.0",
     description="Backend for the invitation-only real estate deal portal. "
-    "Enforces the masking moat server-side: sealed parcel details are never "
-    "returned without a logged NDA.",
+    "Membership itself is the gate: full parcel detail, the document vault, "
+    "and the Deal Room open to any verified, admin-issued account — never "
+    "to the public.",
 )
 
 app.add_middleware(

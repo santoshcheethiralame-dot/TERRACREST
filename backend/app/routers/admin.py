@@ -36,6 +36,10 @@ def create_user(body: schemas.CreateUserRequest, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    activity.log(
+        db, kind="access", summary=f"{user.display_name} granted membership access",
+        actor_id=user.id, actor_name="Terracrest Desk",
+    )
     return user
 
 
@@ -77,7 +81,7 @@ def set_kyc(user_id: str, body: schemas.SetKycRequest, db: Session = Depends(get
 # ------------------------------------------------------------- listings
 @router.get("/listings", response_model=list[schemas.ListingOut], response_model_exclude_none=True)
 def list_all_listings(db: Session = Depends(get_db)):
-    return [schemas.serialize_listing(l, True) for l in db.query(models.Listing).all()]
+    return [schemas.serialize_listing(l) for l in db.query(models.Listing).all()]
 
 
 @router.patch("/listings/{listing_id}/status", response_model=schemas.ListingOut, response_model_exclude_none=True)
@@ -89,7 +93,7 @@ def set_listing_status(listing_id: str, body: schemas.UpdateStatusRequest, db: S
     db.commit()
     db.refresh(listing)
     activity.log(db, kind="status_change", summary=f"{listing.id} → {body.status}", actor_name="Terracrest Desk", listing_id=listing.id)
-    return schemas.serialize_listing(listing, True)
+    return schemas.serialize_listing(listing)
 
 
 _VAULT = [
@@ -152,49 +156,13 @@ def create_listing(body: schemas.CreateListingRequest, db: Session = Depends(get
         created_at=dt.date.today().isoformat(),
     )
     db.add(listing)
-    # give the new parcel a document vault so unlock reveals real files
+    # give the new parcel a document vault so a member's view has real files
     for key, name, kind in _VAULT:
         db.add(models.Document(id=f"{body.id}-{key}", listing_id=body.id, name=name, kind=kind))
     db.commit()
     db.refresh(listing)
     activity.log(db, kind="listing_created", summary=f"Parcel {listing.id} created — {listing.headline}", actor_name="Terracrest Desk", listing_id=listing.id)
-    return schemas.serialize_listing(listing, True)
-
-
-# ------------------------------------------------------------------ ndas
-@router.get("/ndas", response_model=list[schemas.NdaOut])
-def list_all_ndas(db: Session = Depends(get_db)):
-    return db.query(models.Nda).all()
-
-
-@router.post("/ndas", response_model=schemas.NdaOut, status_code=status.HTTP_201_CREATED)
-def log_nda(body: schemas.CreateNdaRequest, db: Session = Depends(get_db)):
-    """The desk records a witnessed NDA — this is what unseals a parcel for a builder."""
-    listing = db.get(models.Listing, body.listingId)
-    builder = db.get(models.User, body.builderId)
-    if listing is None or builder is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Builder or parcel not found")
-    nda_id = f"NDA-{body.listingId}-{body.builderId}"
-    existing = db.get(models.Nda, nda_id)
-    if existing is not None:
-        return existing
-    nda = models.Nda(
-        id=nda_id,
-        builder_id=body.builderId,
-        landowner_id=listing.owner_id,
-        listing_id=body.listingId,
-        signed_on=dt.date.today().isoformat(),
-        witnessed_by="Adv. Meera Krishnan",
-        scan_ref=f"/deals/{body.listingId}/nda/",
-    )
-    db.add(nda)
-    db.commit()
-    db.refresh(nda)
-    activity.log(
-        db, kind="nda", summary=f"Desk recorded a witnessed NDA — {builder.display_name} on {listing.headline}",
-        actor_name="Terracrest Desk", actor_id=builder.id, listing_id=listing.id,
-    )
-    return nda
+    return schemas.serialize_listing(listing)
 
 
 # ----------------------------------------------------------------- deals

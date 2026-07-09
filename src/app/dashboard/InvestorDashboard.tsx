@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import type { Listing } from '@/domain/types'
 import { repo } from '@/data/repository'
+import { useLang } from '@/i18n/LanguageContext'
 import { AppShell } from '@/components/AppShell'
 import { formatCr } from '@/lib/format'
 import { rise, stagger } from '@/lib/motion'
@@ -14,6 +15,7 @@ const PORTFOLIO = [
 ]
 
 export function InvestorDashboard() {
+  const { t } = useLang()
   const [opps, setOpps] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -38,27 +40,25 @@ export function InvestorDashboard() {
   return (
     <AppShell>
       <section>
-        <p className="label text-accent">Big Land</p>
-        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">Land, held for the long arc.</h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-dim">
-          Verified, contiguous parcels for patient capital — sized by investment, holding period and admin-assessed appreciation.
-        </p>
+        <p className="label text-accent">{t('investor.eyebrow')}</p>
+        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">{t('investor.headline')}</h1>
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-dim">{t('investor.body')}</p>
       </section>
 
       {/* portfolio */}
       <section className="mt-14">
         <div className="grid grid-cols-1 gap-px overflow-hidden border border-line bg-[color:var(--line)] sm:grid-cols-3">
-          <Stat label="Invested" value={formatCr(totalInvested, 0)} />
-          <Stat label="Current value" value={formatCr(totalCurrent, 0)} />
-          <Stat label="Unrealised gain" value={`+${(gain * 100).toFixed(0)}%`} tone="text-emerald-bright" />
+          <Stat label={t('investor.invested')} value={formatCr(totalInvested, 0)} />
+          <Stat label={t('investor.currentValue')} value={formatCr(totalCurrent, 0)} />
+          <Stat label={t('investor.unrealisedGain')} value={`+${(gain * 100).toFixed(0)}%`} tone="text-emerald-bright" />
         </div>
 
-        <h2 className="mt-12 font-display text-3xl text-ink">Your portfolio</h2>
+        <h2 className="mt-12 font-display text-3xl text-ink">{t('investor.yourPortfolio')}</h2>
         <div className="mt-6 overflow-x-auto border border-line">
           <table className="w-full min-w-[640px] text-left">
             <thead>
               <tr className="border-b border-line bg-paper-raise/40">
-                {['Parcel', 'Acquired', 'Invested', 'Current', 'Admin note'].map((h) => (
+                {[t('investor.colParcel'), t('investor.colAcquired'), t('investor.colInvested'), t('investor.colCurrent'), t('investor.colAdminNote')].map((h) => (
                   <th key={h} className="label px-5 py-3.5 text-ink-faint">
                     {h}
                   </th>
@@ -82,7 +82,7 @@ export function InvestorDashboard() {
 
       {/* opportunities */}
       <section className="mt-16">
-        <h2 className="font-display text-3xl text-ink">Open opportunities</h2>
+        <h2 className="font-display text-3xl text-ink">{t('investor.openOpportunities')}</h2>
         {/* Animate when the data lands, not on scroll — late-mounting cards must
             never be stranded in a consumed observer's "hidden" state. */}
         <motion.div variants={stagger(0.1, 0.1)} initial="hidden" animate={loading ? 'hidden' : 'show'} className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -97,15 +97,15 @@ export function InvestorDashboard() {
                 >
                   <div className="flex items-center justify-between">
                     <span className="mono text-[0.72rem] text-ink-dim">{l.id}</span>
-                    <span className="label text-ink-faint">Sealed</span>
+                    <span className="label text-emerald-bright">● {t('listingCard.fullAccess')}</span>
                   </div>
                   <h3 className="mt-4 font-display text-2xl text-ink">{l.headline}</h3>
                   <p className="mt-2 text-sm text-ink-dim">{l.localityLabel}</p>
 
                   <div className="mt-5 grid grid-cols-3 gap-4 border-t border-line pt-5">
-                    <MiniStat label="Investment" value={`₹${l.guidance.low}–${l.guidance.high} Cr`} />
-                    <MiniStat label="Horizon" value={`${l.bigLand?.horizonYears ?? '—'} yrs`} />
-                    <MiniStat label="Area" value={l.areaLabel.replace('≈ ', '')} />
+                    <MiniStat label={t('investor.investment')} value={`₹${l.guidance.low}–${l.guidance.high} Cr`} />
+                    <MiniStat label={t('investor.horizon')} value={`${l.bigLand?.horizonYears ?? '—'} ${t('unit.yrs')}`} />
+                    <MiniStat label={t('investor.area')} value={l.areaLabel.replace('≈ ', '')} />
                   </div>
 
                   {l.bigLand && <p className="mt-5 text-[0.88rem] leading-relaxed text-ink-faint">“{l.bigLand.appreciationNote}.”</p>}

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useLang } from '@/i18n/LanguageContext'
 
 /* ============================================================
    MassingArt — axonometric survey drawing of a parcel's massing,
@@ -245,6 +246,7 @@ function Dim({ from, to, label, dx = 0, dy = 0 }: { from: [number, number]; to: 
 }
 
 export function MassingArt({ className = '' }: { className?: string }) {
+  const { t } = useLang()
   const boundary = M([P(0, 0, 0), P(10, 0, 0), P(10, 8, 0), P(0, 8, 0)]) + ' Z'
   const setback = M([P(0.9, 0.9, 0), P(9.1, 0.9, 0), P(9.1, 7.1, 0), P(0.9, 7.1, 0)]) + ' Z'
   const road = M([P(0, 8.6, 0), P(10, 8.6, 0), P(10, 9.6, 0), P(0, 9.6, 0)]) + ' Z'
@@ -259,7 +261,7 @@ export function MassingArt({ className = '' }: { className?: string }) {
       transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
       aria-hidden
     >
-      <svg viewBox="-268 -300 590 690" className="h-auto w-full" role="img" aria-label="Axonometric survey drawing of a verified parcel">
+      <svg viewBox="-268 -300 590 690" className="h-auto w-full" role="img" aria-label={t('a11y.axonometricDrawing')}>
         {/* floor grid */}
         {gridLines.map((d) => (
           <path key={d} d={d} fill="none" stroke="#1A1E1B" strokeOpacity="0.07" strokeWidth="1" />
@@ -312,7 +314,7 @@ export function MassingArt({ className = '' }: { className?: string }) {
             13.2█°N · 77.7█°E
           </text>
           <text x={60} y={-240} fill={GOLD} fontFamily="'IBM Plex Mono', monospace" fontSize="10" letterSpacing="2.4">
-            SEALED · NDA REQUIRED
+            MEMBERS ONLY · VERIFIED ACCESS
           </text>
 
           {/* road label + surveyor's dimensions + north arrow */}

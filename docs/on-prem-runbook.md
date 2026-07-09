@@ -395,7 +395,7 @@ sudo restic -r /srv/restic/terracrest restore latest --target /tmp/tc-restore
 # load into a throwaway database and sanity-check the row counts
 sudo -u postgres createdb terracrest_verify
 sudo -u postgres pg_restore -d terracrest_verify /tmp/tc-restore/terracrest-*.dump
-sudo -u postgres psql -d terracrest_verify -c "SELECT count(*) FROM listings; SELECT count(*) FROM ndas;"
+sudo -u postgres psql -d terracrest_verify -c "SELECT count(*) FROM listings; SELECT count(*) FROM users;"
 sudo -u postgres dropdb terracrest_verify
 sudo rm -rf /tmp/tc-restore
 ```
@@ -410,11 +410,11 @@ Record the drill result and the restore time in the operations diary.
 |--------|---------|
 | Laptop physically stolen | LUKS full-disk encryption; header backed up off-site |
 | Attacker on the office LAN | Replication only over WireGuard; DB not listening on the LAN; Nginx is the sole ingress |
-| Sealed data leaking to a non-entitled member | Enforced **server-side** in `routers/listings.py:can_see_sealed` — the API never serializes sealed fields without a logged NDA. On-prem changes nothing here |
+| Full parcel data leaking to a non-member | Enforced **server-side** — every listings/documents/messages endpoint requires `get_current_user`; there is no route that serializes parcel detail for an unauthenticated caller. On-prem changes nothing here |
 | Document exfiltration | Every vault PDF is watermarked with the viewer's username; every open is written to the `activity_events` audit trail |
 | Ransomware / destructive insider | Air-gapped, encrypted cold vault (`tc-vault`) that is offline except during a supervised monthly sync |
 | Credential theft | Short-lived (15 min) access tokens; bcrypt password hashes; admin-issued accounts only — no self-signup |
-| Repudiation ("I never opened that") | Append-only `activity_events`: login, NDA, document view, Deal Room message, status change, architect delivery |
+| Repudiation ("I never opened that") | Append-only `activity_events`: login, membership access, document view, Deal Room message, status change, architect delivery |
 
 The application code is identical between the cloud pilot and this on-prem target.
 The moat is in the server, not the network — the three-machine layout adds

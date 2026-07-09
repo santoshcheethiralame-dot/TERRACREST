@@ -1,8 +1,10 @@
 import type { ModelCard as ModelCardData } from '@/domain/types'
+import { useLang } from '@/i18n/LanguageContext'
 
 /* The valuation model, laid bare — metrics, corpus provenance, and the learned
    feature importances. This is the transparency piece: nothing is a black box. */
 export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRetrain?: () => void; busy?: boolean }) {
+  const { t } = useLang()
   const top = card.importances.slice(0, 8)
   const max = Math.max(...top.map((i) => i.weight), 1e-6)
   const when = fmt(card.trainedAt)
@@ -11,23 +13,23 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
     <div>
       <div className="flex items-baseline justify-between gap-4">
         <div>
-          <p className="label text-accent">Valuation Model</p>
+          <p className="label text-accent">{t('modelCard.title')}</p>
           <p className="mono mt-1 text-[0.72rem] text-ink-dim">{card.modelType}</p>
         </div>
         {onRetrain && (
           <button onClick={onRetrain} disabled={busy} className="label border border-[color:var(--line-accent)] px-4 py-2 text-accent transition-colors hover:bg-accent hover:text-paper disabled:opacity-50">
-            {busy ? 'Retraining…' : 'Retrain'}
+            {busy ? t('modelCard.retraining') : t('modelCard.retrain')}
           </button>
         )}
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-px overflow-hidden border border-line bg-[color:var(--line)]">
-        <Stat k="R² (holdout)" v={card.metrics.r2.toFixed(2)} />
-        <Stat k="Mean error" v={`${card.metrics.maePct.toFixed(1)}%`} />
-        <Stat k="Corpus" v={String(card.nExamples)} sub={`${card.nReal} real · ${card.nSynthetic} synth`} />
+        <Stat k={t('modelCard.r2Holdout')} v={card.metrics.r2.toFixed(2)} />
+        <Stat k={t('modelCard.meanError')} v={`${card.metrics.maePct.toFixed(1)}%`} />
+        <Stat k={t('modelCard.corpus')} v={String(card.nExamples)} sub={`${card.nReal} ${t('modelCard.realSynth').replace('{n}', String(card.nSynthetic))}`} />
       </div>
 
-      <p className="label mt-6 text-ink-faint">What the model learned drives value</p>
+      <p className="label mt-6 text-ink-faint">{t('modelCard.whatDrivesValue')}</p>
       <div className="mt-3 space-y-2.5">
         {top.map((f) => {
           const up = f.direction === 'raises'
@@ -44,7 +46,9 @@ export function ModelCard({ card, onRetrain, busy }: { card: ModelCardData; onRe
       </div>
 
       <p className="mt-6 text-[0.8rem] leading-relaxed text-ink-faint">{card.provenance}</p>
-      <p className="mono mt-3 text-[0.68rem] text-ink-faint">Target: {card.target} · trained {when}</p>
+      <p className="mono mt-3 text-[0.68rem] text-ink-faint">
+        {t('modelCard.target')}: {card.target} · {t('modelCard.trained')} {when}
+      </p>
     </div>
   )
 }

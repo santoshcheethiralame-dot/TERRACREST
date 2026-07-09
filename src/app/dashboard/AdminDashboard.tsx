@@ -1,51 +1,49 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
-import type { ActivityEvent, ActivityKind, ArchitectReview, Deal, Listing, ListingStatus, ModelCard as ModelCardData, Nda, PriceBook, Role, User, Vertical } from '@/domain/types'
-import { DEAL_STAGE_LABEL, STATUS_LABEL, VERTICAL_LABEL } from '@/domain/types'
+import type { ActivityEvent, ActivityKind, ArchitectReview, Deal, Listing, ListingStatus, ModelCard as ModelCardData, PriceBook, Role, User, Vertical } from '@/domain/types'
+import { DEAL_STAGE_KEY, STATUS_KEY, VERTICAL_KEY } from '@/i18n/translations'
+import { useLang } from '@/i18n/LanguageContext'
 import { repo } from '@/data/repository'
 import { AppShell } from '@/components/AppShell'
 import { ModelCard } from '@/components/ModelCard'
 
-type Tab = 'ndas' | 'listings' | 'new' | 'users' | 'pipeline' | 'prices' | 'architect' | 'model' | 'activity'
-
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'ndas', label: 'NDA Desk' },
-  { key: 'listings', label: 'Listings' },
-  { key: 'new', label: 'New Parcel' },
-  { key: 'users', label: 'Accounts' },
-  { key: 'pipeline', label: 'Pipeline' },
-  { key: 'prices', label: 'Prices' },
-  { key: 'architect', label: 'Architect' },
-  { key: 'model', label: 'Model' },
-  { key: 'activity', label: 'Activity' },
-]
+type Tab = 'listings' | 'new' | 'users' | 'pipeline' | 'prices' | 'architect' | 'model' | 'activity'
 
 const ACTIVITY_SEEN_KEY = 'tc_admin_activity_seen'
 
 const STATUS_FLOW: ListingStatus[] = ['draft', 'documents-uploaded', 'under-review', 'verified', 'live', 'under-offer', 'closed']
 
 export function AdminDashboard() {
-  const [tab, setTab] = useState<Tab>('ndas')
+  const { t } = useLang()
+  const [tab, setTab] = useState<Tab>('listings')
   const [users, setUsers] = useState<User[]>([])
   const [listings, setListings] = useState<Listing[]>([])
-  const [ndas, setNdas] = useState<Nda[]>([])
   const [deals, setDeals] = useState<Deal[]>([])
   const [activity, setActivity] = useState<ActivityEvent[]>([])
   const [reviews, setReviews] = useState<ArchitectReview[]>([])
   const [seenAt, setSeenAt] = useState<string>(() => localStorage.getItem(ACTIVITY_SEEN_KEY) ?? '')
   const [loading, setLoading] = useState(true)
 
+  const TABS: { key: Tab; label: string }[] = [
+    { key: 'listings', label: t('admin.tabListings') },
+    { key: 'new', label: t('admin.tabNewParcel') },
+    { key: 'users', label: t('admin.tabAccounts') },
+    { key: 'pipeline', label: t('admin.tabPipeline') },
+    { key: 'prices', label: t('admin.tabPrices') },
+    { key: 'architect', label: t('admin.tabArchitect') },
+    { key: 'model', label: t('admin.tabModel') },
+    { key: 'activity', label: t('admin.tabActivity') },
+  ]
+
   const reload = async () => {
-    const [u, l, n, d, a, r] = await Promise.all([
+    const [u, l, d, a, r] = await Promise.all([
       repo.adminListUsers(),
       repo.adminListListings(),
-      repo.adminListNdas(),
       repo.adminListDeals(),
       repo.adminActivity(),
       repo.adminArchitectReviews(),
     ])
     setUsers(u)
     setListings(l)
-    setNdas(n)
     setDeals(d)
     setActivity(a)
     setReviews(r)
@@ -68,32 +66,32 @@ export function AdminDashboard() {
   }
 
   const pendingReviews = reviews.filter((r) => r.status === 'requested').length
-  const counts: Record<Tab, number> = { ndas: ndas.length, listings: listings.length, users: users.length, pipeline: deals.length, new: 0, prices: 0, architect: reviews.length, model: 0, activity: activity.length }
+  const counts: Record<Tab, number> = { listings: listings.length, users: users.length, pipeline: deals.length, new: 0, prices: 0, architect: reviews.length, model: 0, activity: activity.length }
 
   return (
     <AppShell>
       <header>
-        <p className="label text-accent">Operations Centre</p>
-        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">The desk.</h1>
-        <p className="mt-4 max-w-2xl text-ink-dim">Create accounts after offline KYC, verify parcels before they go live, and log the witnessed NDAs that unseal them.</p>
+        <p className="label text-accent">{t('admin.eyebrow')}</p>
+        <h1 className="mt-4 font-display text-5xl text-ink md:text-6xl">{t('admin.headline')}</h1>
+        <p className="mt-4 max-w-2xl text-ink-dim">{t('admin.body')}</p>
       </header>
 
       <nav className="mt-10 flex flex-wrap gap-2 border-b border-line">
-        {TABS.map((t) => (
+        {TABS.map((tb) => (
           <button
-            key={t.key}
-            onClick={() => openTab(t.key)}
+            key={tb.key}
+            onClick={() => openTab(tb.key)}
             className={`label -mb-px border-b-2 px-4 py-3 transition-colors ${
-              tab === t.key ? 'border-accent text-accent' : 'border-transparent text-ink-faint hover:text-ink'
+              tab === tb.key ? 'border-accent text-accent' : 'border-transparent text-ink-faint hover:text-ink'
             }`}
           >
-            {t.label}
-            {t.key === 'activity' ? (
+            {tb.label}
+            {tb.key === 'activity' ? (
               unreadActivity > 0 && <NotifyBadge n={unreadActivity} />
-            ) : t.key === 'architect' ? (
+            ) : tb.key === 'architect' ? (
               pendingReviews > 0 && <NotifyBadge n={pendingReviews} />
-            ) : t.key !== 'new' && t.key !== 'prices' && t.key !== 'model' ? (
-              <span className="ml-1 text-ink-faint">{counts[t.key]}</span>
+            ) : tb.key !== 'new' && tb.key !== 'prices' && tb.key !== 'model' ? (
+              <span className="ml-1 text-ink-faint">{counts[tb.key]}</span>
             ) : null}
           </button>
         ))}
@@ -101,9 +99,7 @@ export function AdminDashboard() {
 
       <div className="mt-10">
         {loading ? (
-          <p className="label animate-pulse py-16 text-center text-ink-faint">Loading the desk…</p>
-        ) : tab === 'ndas' ? (
-          <NdaDesk users={users} listings={listings} ndas={ndas} onLogged={reload} />
+          <p className="label animate-pulse py-16 text-center text-ink-faint">{t('admin.loadingDesk')}</p>
         ) : tab === 'listings' ? (
           <ListingsTab listings={listings} onChanged={reload} />
         ) : tab === 'users' ? (
@@ -126,84 +122,9 @@ export function AdminDashboard() {
   )
 }
 
-/* ------------------------------------------------------------- NDA desk */
-function NdaDesk({ users, listings, ndas, onLogged }: { users: User[]; listings: Listing[]; ndas: Nda[]; onLogged: () => void }) {
-  const builders = users.filter((u) => u.role === 'builder')
-  const [builderId, setBuilderId] = useState('')
-  const [listingId, setListingId] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState<string | null>(null)
-
-  const label = (id: string) => listings.find((l) => l.id === id)?.headline ?? id
-  const who = (id: string) => users.find((u) => u.id === id)?.displayName.split('·')[0].trim() ?? id
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!builderId || !listingId) return
-    setBusy(true)
-    setMsg(null)
-    try {
-      await repo.adminLogNda(builderId, listingId)
-      setMsg(`NDA logged — ${who(builderId)} can now unseal ${label(listingId)}.`)
-      onLogged()
-    } catch {
-      setMsg('Could not log the NDA.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-      <form onSubmit={submit} className="border border-line bg-paper-raise/40 p-7">
-        <p className="label text-accent">Log a witnessed NDA</p>
-        <p className="mt-3 text-sm leading-relaxed text-ink-dim">This is the gate. Once logged, the builder’s view of the parcel unseals — exact location, ownership and the document vault.</p>
-        <div className="mt-6 space-y-5">
-          <Field label="Builder">
-            <Select value={builderId} onChange={setBuilderId} placeholder="Select builder…" options={builders.map((b) => ({ value: b.id, label: b.displayName.split('·')[0].trim() }))} />
-          </Field>
-          <Field label="Parcel">
-            <Select value={listingId} onChange={setListingId} placeholder="Select parcel…" options={listings.map((l) => ({ value: l.id, label: `${l.id} — ${l.headline}` }))} />
-          </Field>
-        </div>
-        <button type="submit" disabled={busy || !builderId || !listingId} className="label mt-7 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:cursor-not-allowed disabled:opacity-50">
-          {busy ? 'Logging…' : 'Log executed NDA'}
-        </button>
-        {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
-      </form>
-
-      <div>
-        <div className="flex items-baseline justify-between">
-          <h2 className="font-display text-2xl text-ink">NDA register</h2>
-          <span className="label text-ink-faint">{ndas.length} on file</span>
-        </div>
-        <div className="mt-5 overflow-x-auto border border-line">
-          <table className="w-full min-w-[520px] text-left">
-            <thead>
-              <tr className="border-b border-line bg-paper-raise/40">
-                {['Parcel', 'Builder', 'Signed'].map((h) => (
-                  <th key={h} className="label px-4 py-3 text-ink-faint">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ndas.map((n) => (
-                <tr key={n.id} className="border-b border-line last:border-0">
-                  <td className="mono px-4 py-3 text-sm text-ink">{n.listingId}</td>
-                  <td className="px-4 py-3 text-sm text-ink-dim">{who(n.builderId)}</td>
-                  <td className="mono px-4 py-3 text-sm text-ink-faint">{n.signedOn}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 /* ------------------------------------------------------------- listings */
 function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: () => void }) {
+  const { t } = useLang()
   const change = async (id: string, status: ListingStatus) => {
     await repo.adminSetStatus(id, status)
     onChanged()
@@ -213,7 +134,7 @@ function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: 
       <table className="w-full min-w-[720px] text-left">
         <thead>
           <tr className="border-b border-line bg-paper-raise/40">
-            {['Parcel', 'Vertical', 'Locality', 'Status'].map((h) => (
+            {[t('admin.colParcel'), t('admin.colVertical'), t('admin.colLocality'), t('admin.colStatus')].map((h) => (
               <th key={h} className="label px-5 py-3.5 text-ink-faint">{h}</th>
             ))}
           </tr>
@@ -225,13 +146,13 @@ function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: 
                 <div className="mono text-[0.72rem] text-ink-dim">{l.id}</div>
                 <div className="text-sm text-ink">{l.headline}</div>
               </td>
-              <td className="px-5 py-4 text-sm text-ink-dim">{VERTICAL_LABEL[l.vertical]}</td>
+              <td className="px-5 py-4 text-sm text-ink-dim">{t(VERTICAL_KEY[l.vertical])}</td>
               <td className="px-5 py-4 text-sm text-ink-faint">{l.localityLabel}</td>
               <td className="px-5 py-4">
                 <Select
                   value={l.status}
                   onChange={(v) => change(l.id, v as ListingStatus)}
-                  options={STATUS_FLOW.map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
+                  options={STATUS_FLOW.map((s) => ({ value: s, label: t(STATUS_KEY[s]) }))}
                 />
               </td>
             </tr>
@@ -244,6 +165,7 @@ function ListingsTab({ listings, onChanged }: { listings: Listing[]; onChanged: 
 
 /* ---------------------------------------------------------------- users */
 function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }) {
+  const { t } = useLang()
   const [username, setUsername] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [role, setRole] = useState<Role>('builder')
@@ -254,11 +176,12 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
 
   const resetPw = async (u: User) => {
     const r = await repo.adminResetPassword(u.id)
-    setActionNote(`Temporary password for ${u.username}: ${r.tempPassword}`)
+    setActionNote(t('admin.tempPasswordFor').replace('{username}', u.username).replace('{password}', r.tempPassword))
   }
   const toggleActive = async (u: User) => {
     await repo.adminSetActive(u.id, u.active === false)
-    setActionNote(`${u.username} ${u.active === false ? 'reactivated' : 'deactivated'}.`)
+    const status = u.active === false ? t('admin.reactivated') : t('admin.deactivatedWord')
+    setActionNote(t('admin.memberStatusChanged').replace('{username}', u.username).replace('{status}', status))
     onCreated()
   }
   const toggleKyc = async (u: User) => {
@@ -273,13 +196,13 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
     setMsg(null)
     try {
       await repo.adminCreateUser({ username: username.trim(), displayName: displayName.trim(), role, officeLocation: office.trim() || undefined })
-      setMsg(`Account “${username.trim().toLowerCase()}” created with a temporary password.`)
+      setMsg(t('admin.accountCreated').replace('{username}', username.trim().toLowerCase()))
       setUsername('')
       setDisplayName('')
       setOffice('')
       onCreated()
     } catch {
-      setMsg('Could not create — the username may already exist.')
+      setMsg(t('admin.createFailed'))
     } finally {
       setBusy(false)
     }
@@ -297,7 +220,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
           <table className="w-full min-w-[560px] text-left">
           <thead>
             <tr className="border-b border-line bg-paper-raise/40">
-              {['Member', 'Role', 'KYC', 'Actions'].map((h) => (
+              {[t('admin.colMember'), t('admin.colRole'), t('admin.colKyc'), t('admin.colActions')].map((h) => (
                 <th key={h} className="label px-5 py-3.5 text-ink-faint">{h}</th>
               ))}
             </tr>
@@ -310,13 +233,13 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
                   <div className="mono text-[0.72rem] text-ink-faint">{u.username}</div>
                 </td>
                 <td className="px-5 py-4"><span className="label text-accent">{u.role}</span></td>
-                <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● Verified</span> : <span className="label text-ink-faint">Pending</span>}</td>
+                <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● {t('admin.verified')}</span> : <span className="label text-ink-faint">{t('admin.pending')}</span>}</td>
                 <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
-                    <button onClick={() => resetPw(u)} className="label text-accent transition-colors hover:text-accent-bright">Reset PW</button>
-                    <button onClick={() => toggleKyc(u)} className="label text-ink-faint transition-colors hover:text-ink">KYC</button>
+                    <button onClick={() => resetPw(u)} className="label text-accent transition-colors hover:text-accent-bright">{t('admin.resetPw')}</button>
+                    <button onClick={() => toggleKyc(u)} className="label text-ink-faint transition-colors hover:text-ink">{t('admin.kyc')}</button>
                     <button onClick={() => toggleActive(u)} className="label text-ink-faint transition-colors hover:text-ink">
-                      {u.active === false ? 'Activate' : 'Deactivate'}
+                      {u.active === false ? t('admin.activate') : t('admin.deactivate')}
                     </button>
                   </div>
                 </td>
@@ -327,23 +250,23 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
       </div>
 
       <form onSubmit={submit} className="border border-line bg-paper-raise/40 p-7">
-        <p className="label text-accent">Create account</p>
-        <p className="mt-3 text-sm text-ink-dim">After offline KYC. A temporary password is issued; the member changes it on first login.</p>
+        <p className="label text-accent">{t('admin.createAccount')}</p>
+        <p className="mt-3 text-sm text-ink-dim">{t('admin.createAccountDesc')}</p>
         <div className="mt-6 space-y-5">
-          <Field label="Username"><Input value={username} onChange={setUsername} placeholder="builder_new_009" /></Field>
-          <Field label="Display name"><Input value={displayName} onChange={setDisplayName} placeholder="Name · Firm" /></Field>
-          <Field label="Role">
+          <Field label={t('admin.username')}><Input value={username} onChange={setUsername} placeholder="builder_new_009" /></Field>
+          <Field label={t('admin.displayName')}><Input value={displayName} onChange={setDisplayName} placeholder="Name · Firm" /></Field>
+          <Field label={t('admin.role')}>
             <Select value={role} onChange={(v) => setRole(v as Role)} options={[
-              { value: 'builder', label: 'Builder' },
-              { value: 'landowner', label: 'Land Owner' },
-              { value: 'investor', label: 'Investor' },
-              { value: 'admin', label: 'Admin' },
+              { value: 'builder', label: t('role.builder') },
+              { value: 'landowner', label: t('role.landowner') },
+              { value: 'investor', label: t('role.investor') },
+              { value: 'admin', label: t('role.admin') },
             ]} />
           </Field>
-          <Field label="Office (optional)"><Input value={office} onChange={setOffice} placeholder="Koramangala, Bengaluru" /></Field>
+          <Field label={t('admin.officeOptional')}><Input value={office} onChange={setOffice} placeholder="Koramangala, Bengaluru" /></Field>
         </div>
         <button type="submit" disabled={busy} className="label mt-7 w-full bg-accent py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
-          {busy ? 'Creating…' : 'Create account'}
+          {busy ? t('admin.creating') : t('admin.createAccount')}
         </button>
         {msg && <p className="mt-5 text-[0.85rem] leading-snug text-emerald-bright">{msg}</p>}
       </form>
@@ -354,7 +277,8 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
 
 /* ------------------------------------------------------------- pipeline */
 function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }) {
-  const stages: Deal['stage'][] = ['new-lead', 'nda-signed', 'site-visit', 'term-sheet', 'closed']
+  const { t } = useLang()
+  const stages: Deal['stage'][] = ['new-lead', 'engaged', 'site-visit', 'term-sheet', 'closed']
   const label = (id: string) => listings.find((l) => l.id === id)?.headline ?? id
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -363,7 +287,7 @@ function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }
         return (
           <div key={s} className="border border-line bg-paper-raise/30">
             <div className="flex items-center justify-between border-b border-line px-4 py-3">
-              <span className="label text-ink-dim">{DEAL_STAGE_LABEL[s]}</span>
+              <span className="label text-ink-dim">{t(DEAL_STAGE_KEY[s])}</span>
               <span className="mono text-[0.72rem] text-ink-faint">{col.length}</span>
             </div>
             <div className="space-y-3 p-3">
@@ -373,8 +297,8 @@ function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }
                 col.map((d) => (
                   <div key={d.id} className="border border-line bg-paper p-3">
                     <div className="text-[0.82rem] leading-snug text-ink">{label(d.listingId)}</div>
-                    <div className="mono mt-2 text-[0.72rem] text-accent">₹{(d.estCommission / 1e5).toFixed(1)} L est.</div>
-                    <div className="label mt-1 text-ink-faint">RM {d.rm}</div>
+                    <div className="mono mt-2 text-[0.72rem] text-accent">₹{(d.estCommission / 1e5).toFixed(1)} L {t('admin.pipelineEstCommission')}</div>
+                    <div className="label mt-1 text-ink-faint">{t('admin.rmPrefix')} {d.rm}</div>
                   </div>
                 ))
               )}
@@ -388,6 +312,7 @@ function PipelineTab({ deals, listings }: { deals: Deal[]; listings: Listing[] }
 
 /* ------------------------------------------------------------ new parcel */
 function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => void }) {
+  const { t } = useLang()
   const [f, setF] = useState({
     id: 'JD-BLR-2026-020',
     vertical: 'joint-development',
@@ -453,10 +378,10 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
         avgUnitSqft: Number(f.avgUnitSqft),
         baseSalePsf: Number(f.baseSalePsf),
       })
-      setMsg({ ok: true, text: `Parcel ${f.id.trim()} created (Verified). Publish it to Live from the Listings tab.` })
+      setMsg({ ok: true, text: t('admin.parcelCreated').replace('{id}', f.id.trim()) })
       onCreated()
     } catch {
-      setMsg({ ok: false, text: 'Could not create — check the ID is unique and the numeric fields are filled.' })
+      setMsg({ ok: false, text: t('admin.parcelCreateFailed') })
     } finally {
       setBusy(false)
     }
@@ -464,59 +389,59 @@ function NewParcelTab({ owners, onCreated }: { owners: User[]; onCreated: () => 
 
   return (
     <form onSubmit={submit} className="max-w-4xl">
-      <Section title="Basics">
-        <Field label="Parcel ID"><Input value={f.id} onChange={(v) => set('id', v)} placeholder="JD-BLR-2026-020" /></Field>
-        <Field label="Vertical">
+      <Section title={t('admin.newParcelBasics')}>
+        <Field label={t('admin.parcelId')}><Input value={f.id} onChange={(v) => set('id', v)} placeholder="JD-BLR-2026-020" /></Field>
+        <Field label={t('admin.vertical')}>
           <Select value={f.vertical} onChange={(v) => set('vertical', v)} options={[
-            { value: 'joint-development', label: 'Joint Development' },
-            { value: 'warehouse', label: 'Warehouse' },
-            { value: 'big-land', label: 'Big Land' },
+            { value: 'joint-development', label: t('vertical.jointDevelopment') },
+            { value: 'warehouse', label: t('vertical.warehouse') },
+            { value: 'big-land', label: t('vertical.bigLand') },
           ]} />
         </Field>
-        <Field label="Owner">
+        <Field label={t('admin.owner')}>
           <Select value={f.ownerId} onChange={(v) => set('ownerId', v)} options={owners.map((o) => ({ value: o.id, label: o.displayName.split('·')[0].trim() }))} />
         </Field>
-        <Field label="Headline"><Input value={f.headline} onChange={(v) => set('headline', v)} placeholder="North-corridor JD parcel…" /></Field>
-        <Field label="Locality (masked)"><Input value={f.localityLabel} onChange={(v) => set('localityLabel', v)} placeholder="Sector 4, Devanahalli · Bengaluru N." /></Field>
-        <Field label="Area label"><Input value={f.areaLabel} onChange={(v) => set('areaLabel', v)} placeholder="≈ 2.4 acres" /></Field>
-        <Field label="Land area (sq ft)"><Input value={f.landAreaSqft} onChange={(v) => set('landAreaSqft', v)} placeholder="104444" /></Field>
-        <Field label="Zoning"><Input value={f.zoning} onChange={(v) => set('zoning', v)} /></Field>
-        <Field label="Guidance low (₹ Cr)"><Input value={f.guidanceLow} onChange={(v) => set('guidanceLow', v)} placeholder="85" /></Field>
-        <Field label="Guidance high (₹ Cr)"><Input value={f.guidanceHigh} onChange={(v) => set('guidanceHigh', v)} placeholder="95" /></Field>
+        <Field label={t('admin.headlineField')}><Input value={f.headline} onChange={(v) => set('headline', v)} placeholder="North-corridor JD parcel…" /></Field>
+        <Field label={t('admin.localityMasked')}><Input value={f.localityLabel} onChange={(v) => set('localityLabel', v)} placeholder="Sector 4, Devanahalli · Bengaluru N." /></Field>
+        <Field label={t('admin.areaLabel')}><Input value={f.areaLabel} onChange={(v) => set('areaLabel', v)} placeholder="≈ 2.4 acres" /></Field>
+        <Field label={t('admin.landArea')}><Input value={f.landAreaSqft} onChange={(v) => set('landAreaSqft', v)} placeholder="104444" /></Field>
+        <Field label={t('admin.zoning')}><Input value={f.zoning} onChange={(v) => set('zoning', v)} /></Field>
+        <Field label={t('admin.guidanceLow')}><Input value={f.guidanceLow} onChange={(v) => set('guidanceLow', v)} placeholder="85" /></Field>
+        <Field label={t('admin.guidanceHigh')}><Input value={f.guidanceHigh} onChange={(v) => set('guidanceHigh', v)} placeholder="95" /></Field>
       </Section>
 
       <label className="mt-5 block">
-        <span className="label text-ink-faint">Locality note (admin assessment)</span>
+        <span className="label text-ink-faint">{t('admin.localityNote')}</span>
         <div className="mt-2"><Input value={f.localityNote} onChange={(v) => set('localityNote', v)} placeholder="Personally inspected on…" /></div>
       </label>
 
-      <Section title="Public map — coarse, shown before NDA">
-        <Field label="Area latitude"><Input value={f.areaLat} onChange={(v) => set('areaLat', v)} /></Field>
-        <Field label="Area longitude"><Input value={f.areaLng} onChange={(v) => set('areaLng', v)} /></Field>
-        <Field label="Radius (km)"><Input value={f.areaRadiusKm} onChange={(v) => set('areaRadiusKm', v)} /></Field>
+      <Section title={t('admin.publicMapSection')}>
+        <Field label={t('admin.areaLat')}><Input value={f.areaLat} onChange={(v) => set('areaLat', v)} /></Field>
+        <Field label={t('admin.areaLng')}><Input value={f.areaLng} onChange={(v) => set('areaLng', v)} /></Field>
+        <Field label={t('admin.radiusKm')}><Input value={f.areaRadiusKm} onChange={(v) => set('areaRadiusKm', v)} /></Field>
       </Section>
 
-      <Section title="Sealed — revealed only after NDA">
-        <Field label="Exact address"><Input value={f.address} onChange={(v) => set('address', v)} /></Field>
-        <Field label="Owner of record"><Input value={f.ownerName} onChange={(v) => set('ownerName', v)} /></Field>
-        <Field label="Survey nos (comma-sep)"><Input value={f.surveyNos} onChange={(v) => set('surveyNos', v)} placeholder="141/2B, 141/3" /></Field>
-        <Field label="Contact"><Input value={f.contact} onChange={(v) => set('contact', v)} /></Field>
-        <Field label="Exact latitude"><Input value={f.exactLat} onChange={(v) => set('exactLat', v)} /></Field>
-        <Field label="Exact longitude"><Input value={f.exactLng} onChange={(v) => set('exactLng', v)} /></Field>
+      <Section title={t('admin.fullDetailSection')}>
+        <Field label={t('admin.exactAddress')}><Input value={f.address} onChange={(v) => set('address', v)} /></Field>
+        <Field label={t('admin.ownerOfRecord')}><Input value={f.ownerName} onChange={(v) => set('ownerName', v)} /></Field>
+        <Field label={t('admin.surveyNos')}><Input value={f.surveyNos} onChange={(v) => set('surveyNos', v)} placeholder="141/2B, 141/3" /></Field>
+        <Field label={t('admin.contact')}><Input value={f.contact} onChange={(v) => set('contact', v)} /></Field>
+        <Field label={t('admin.exactLat')}><Input value={f.exactLat} onChange={(v) => set('exactLat', v)} /></Field>
+        <Field label={t('admin.exactLng')}><Input value={f.exactLng} onChange={(v) => set('exactLng', v)} /></Field>
       </Section>
 
-      <Section title="Feasibility — drives the Studio">
-        <Field label="Plot area (sq ft)"><Input value={f.plotAreaSqft} onChange={(v) => set('plotAreaSqft', v)} placeholder="104444" /></Field>
+      <Section title={t('admin.feasibilitySection')}>
+        <Field label={t('admin.plotArea')}><Input value={f.plotAreaSqft} onChange={(v) => set('plotAreaSqft', v)} placeholder="104444" /></Field>
         <Field label="FSI"><Input value={f.fsi} onChange={(v) => set('fsi', v)} /></Field>
-        <Field label="Floors (G+)"><Input value={f.floors} onChange={(v) => set('floors', v)} /></Field>
-        <Field label="Towers"><Input value={f.towers} onChange={(v) => set('towers', v)} /></Field>
-        <Field label="Avg unit (sq ft)"><Input value={f.avgUnitSqft} onChange={(v) => set('avgUnitSqft', v)} /></Field>
-        <Field label="Sale price (₹/sq ft)"><Input value={f.baseSalePsf} onChange={(v) => set('baseSalePsf', v)} /></Field>
+        <Field label={t('admin.floorsField')}><Input value={f.floors} onChange={(v) => set('floors', v)} /></Field>
+        <Field label={t('admin.towersField')}><Input value={f.towers} onChange={(v) => set('towers', v)} /></Field>
+        <Field label={t('admin.avgUnit')}><Input value={f.avgUnitSqft} onChange={(v) => set('avgUnitSqft', v)} /></Field>
+        <Field label={t('admin.salePrice')}><Input value={f.baseSalePsf} onChange={(v) => set('baseSalePsf', v)} /></Field>
       </Section>
 
       <div className="mt-8 flex flex-wrap items-center gap-4">
         <button type="submit" disabled={busy} className="label bg-accent px-8 py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
-          {busy ? 'Creating…' : 'Create parcel'}
+          {busy ? t('admin.creating') : t('admin.createParcel')}
         </button>
         {msg && <span className={`text-[0.85rem] ${msg.ok ? 'text-emerald-bright' : 'text-oxblood-bright'}`}>{msg.text}</span>}
       </div>
@@ -546,17 +471,18 @@ function NotifyBadge({ n }: { n: number }) {
 const cr = (rupees: number) => `₹${(rupees / 1e7).toFixed(1)} Cr`
 
 function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectReview[]; listings: Listing[]; onDelivered: () => void }) {
-  if (!reviews.length) return <p className="label py-16 text-center text-ink-faint">No architect engagements yet.</p>
+  const { t } = useLang()
+  if (!reviews.length) return <p className="label py-16 text-center text-ink-faint">{t('admin.noArchitectEngagements')}</p>
   const parcel = (id: string) => listings.find((l) => l.id === id)?.headline ?? id
   const pending = reviews.filter((r) => r.status === 'requested')
   const done = reviews.filter((r) => r.status === 'delivered')
   return (
     <div className="max-w-3xl space-y-10">
       <div>
-        <p className="label text-accent">Awaiting the desk{pending.length ? ` · ${pending.length}` : ''}</p>
-        <p className="mt-2 text-sm text-ink-faint">Record the empanelled architect's stamped, validated figure. It lands back in the builder's Studio beside the ML estimate.</p>
+        <p className="label text-accent">{t('admin.awaitingDesk')}{pending.length ? ` · ${pending.length}` : ''}</p>
+        <p className="mt-2 text-sm text-ink-faint">{t('admin.recordArchitectDesc')}</p>
         {pending.length === 0 ? (
-          <p className="mt-5 text-sm text-ink-dim">Nothing awaiting delivery.</p>
+          <p className="mt-5 text-sm text-ink-dim">{t('admin.nothingAwaiting')}</p>
         ) : (
           <div className="mt-6 space-y-5">
             {pending.map((r) => (
@@ -567,7 +493,7 @@ function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectRe
       </div>
       {done.length > 0 && (
         <div>
-          <p className="label text-ink-faint">Delivered</p>
+          <p className="label text-ink-faint">{t('admin.delivered')}</p>
           <div className="mt-5 space-y-4">
             {done.map((r) => (
               <DeliveredCard key={r.id} review={r} parcel={parcel(r.listingId)} />
@@ -580,6 +506,7 @@ function ArchitectTab({ reviews, listings, onDelivered }: { reviews: ArchitectRe
 }
 
 function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview; parcel: string; onDelivered: () => void }) {
+  const { t } = useLang()
   const [name, setName] = useState('')
   const [gdvCr, setGdvCr] = useState('')
   const [notes, setNotes] = useState('')
@@ -608,18 +535,18 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
         <span className="mono text-xs text-ink-faint">{review.builderName}</span>
       </div>
       <p className="mono mt-2 text-xs text-ink-faint">
-        Studio estimate: {cr(review.mlSnapshot.baseNet)} · {review.mlSnapshot.units} units · commissioned {fmtWhen(review.requestedAt)}
+        {t('admin.studioEstimate')}: {cr(review.mlSnapshot.baseNet)} · {review.mlSnapshot.units} {t('admin.units')} · {t('admin.commissioned')} {fmtWhen(review.requestedAt)}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Field label="Architect (name · CoA reg)">
+        <Field label={t('admin.architectNameField')}>
           <Input value={name} onChange={setName} />
         </Field>
-        <Field label="Validated GDV (₹ Cr)">
+        <Field label={t('admin.validatedGdv')}>
           <Input value={gdvCr} onChange={setGdvCr} />
         </Field>
       </div>
       <div className="mt-3">
-        <Field label="Architect's note">
+        <Field label={t('admin.architectsNoteField')}>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -629,13 +556,14 @@ function DeliverCard({ review, parcel, onDelivered }: { review: ArchitectReview;
         </Field>
       </div>
       <button disabled={busy} className="label mt-4 bg-accent px-6 py-3 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
-        {busy ? 'Recording…' : 'Deliver validation'}
+        {busy ? t('admin.recording') : t('admin.deliverValidation')}
       </button>
     </form>
   )
 }
 
 function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: string }) {
+  const { t } = useLang()
   const ml = review.mlSnapshot.baseNet
   const arch = review.architectGdv ?? ml
   const v = ml > 0 ? ((arch - ml) / ml) * 100 : 0
@@ -646,8 +574,8 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
         <span className="mono text-xs text-ink-faint">{review.architectName}</span>
       </div>
       <div className="mono mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs">
-        <span className="text-ink-dim">Studio {cr(ml)}</span>
-        <span className="text-accent">Architect {cr(arch)}</span>
+        <span className="text-ink-dim">{t('admin.studioShort')} {cr(ml)}</span>
+        <span className="text-accent">{t('admin.architectShort')} {cr(arch)}</span>
         <span className={v >= 0 ? 'text-emerald-bright' : 'text-oxblood-bright'}>
           {v >= 0 ? '+' : ''}
           {v.toFixed(1)}%
@@ -660,6 +588,7 @@ function DeliveredCard({ review, parcel }: { review: ArchitectReview; parcel: st
 
 /* ----------------------------------------------------------------- model */
 function ModelTab() {
+  const { t } = useLang()
   const [card, setCard] = useState<ModelCardData | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -676,12 +605,10 @@ function ModelTab() {
     }
   }
 
-  if (!card) return <p className="label animate-pulse py-16 text-center text-ink-faint">Loading the model…</p>
+  if (!card) return <p className="label animate-pulse py-16 text-center text-ink-faint">{t('admin.loadingModel')}</p>
   return (
     <div className="max-w-2xl">
-      <p className="text-sm text-ink-faint">
-        The valuation model behind the Studio. Every architect delivery is a labelled example — retrain to fold the latest deliveries into the corpus and watch the numbers move.
-      </p>
+      <p className="text-sm text-ink-faint">{t('admin.modelDesc')}</p>
       <div className="mt-8 border border-line p-6">
         <ModelCard card={card} onRetrain={retrain} busy={busy} />
       </div>
@@ -690,14 +617,14 @@ function ModelTab() {
 }
 
 /* -------------------------------------------------------------- activity */
-const KIND_META: Record<ActivityKind, { label: string; cls: string }> = {
-  login: { label: 'Login', cls: 'text-ink-dim' },
-  nda: { label: 'NDA', cls: 'text-accent' },
-  message: { label: 'Deal Room', cls: 'text-emerald-bright' },
-  listing_created: { label: 'New Parcel', cls: 'text-ink' },
-  status_change: { label: 'Status', cls: 'text-ink-dim' },
-  document: { label: 'Document', cls: 'text-oxblood-bright' },
-  architect: { label: 'Architect', cls: 'text-accent-bright' },
+const KIND_META: Record<ActivityKind, { labelKey: string; cls: string }> = {
+  login: { labelKey: 'activity.login', cls: 'text-ink-dim' },
+  access: { labelKey: 'activity.access', cls: 'text-accent' },
+  message: { labelKey: 'activity.dealRoom', cls: 'text-emerald-bright' },
+  listing_created: { labelKey: 'activity.newParcel', cls: 'text-ink' },
+  status_change: { labelKey: 'activity.status', cls: 'text-ink-dim' },
+  document: { labelKey: 'activity.document', cls: 'text-oxblood-bright' },
+  architect: { labelKey: 'activity.architect', cls: 'text-accent-bright' },
 }
 
 function fmtWhen(iso: string): string {
@@ -707,13 +634,12 @@ function fmtWhen(iso: string): string {
 }
 
 function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: Listing[] }) {
-  if (!events.length) return <p className="label py-16 text-center text-ink-faint">No activity recorded yet.</p>
+  const { t } = useLang()
+  if (!events.length) return <p className="label py-16 text-center text-ink-faint">{t('admin.noActivity')}</p>
   const parcel = (id?: string) => (id ? listings.find((l) => l.id === id)?.id ?? id : null)
   return (
     <div className="max-w-3xl">
-      <p className="text-sm text-ink-faint">
-        Append-only audit trail. Every sign-in, NDA unlock, document view and Deal Room message is recorded here — nothing on this feed is editable.
-      </p>
+      <p className="text-sm text-ink-faint">{t('admin.activityDesc')}</p>
       <ol className="mt-8 border-l border-line">
         {events.map((e) => {
           const meta = KIND_META[e.kind] ?? KIND_META.login
@@ -721,7 +647,7 @@ function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: 
             <li key={e.id} className="relative pb-7 pl-6 last:pb-0">
               <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-accent ring-4 ring-paper" />
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className={`label rounded-full border border-[color:var(--line-strong)] px-2 py-0.5 text-[0.65rem] ${meta.cls}`}>{meta.label}</span>
+                <span className={`label rounded-full border border-[color:var(--line-strong)] px-2 py-0.5 text-[0.65rem] ${meta.cls}`}>{t(meta.labelKey)}</span>
                 <span className="mono text-xs text-ink-faint">{fmtWhen(e.createdAt)}</span>
                 {e.listingId && <span className="mono text-xs text-ink-faint">· {parcel(e.listingId)}</span>}
               </div>
@@ -736,16 +662,22 @@ function ActivityTab({ events, listings }: { events: ActivityEvent[]; listings: 
 
 /* ---------------------------------------------------------------- prices */
 const RATE_CATS: [string, string][] = [
-  ['flooring', 'Flooring'],
-  ['sanitary', 'Sanitaryware'],
-  ['kitchen', 'Kitchen'],
-  ['windows', 'Windows'],
-  ['lift', 'Lifts'],
-  ['facade', 'Façade'],
+  ['flooring', 'rate.flooring'],
+  ['sanitary', 'rate.sanitary'],
+  ['kitchen', 'rate.kitchen'],
+  ['windows', 'rate.windows'],
+  ['lift', 'rate.lift'],
+  ['facade', 'rate.facade'],
 ]
-const RATE_TIERS = ['budget', 'mid', 'premium', 'luxury']
+const RATE_TIERS: [string, string][] = [
+  ['budget', 'tier.budget'],
+  ['mid', 'tier.mid'],
+  ['premium', 'tier.premium'],
+  ['luxury', 'tier.luxury'],
+]
 
 function PricesTab() {
+  const { t } = useLang()
   const [pb, setPb] = useState<PriceBook | null>(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
@@ -754,7 +686,7 @@ function PricesTab() {
     repo.getPriceBook().then(setPb)
   }, [])
 
-  if (!pb) return <p className="label animate-pulse py-10 text-center text-ink-faint">Loading rates…</p>
+  if (!pb) return <p className="label animate-pulse py-10 text-center text-ink-faint">{t('admin.loadingRates')}</p>
 
   const setRate = (key: string, v: string) => setPb({ ...pb, rates: { ...pb.rates, [key]: Number(v) || 0 } })
   const save = async () => {
@@ -762,14 +694,14 @@ function PricesTab() {
     setMsg(null)
     await repo.adminUpdatePriceBook(pb)
     setBusy(false)
-    setMsg('Rates saved — the Feasibility Studio now prices against these.')
+    setMsg(t('admin.ratesSaved'))
   }
 
   return (
     <div className="max-w-4xl">
-      <p className="text-sm text-ink-faint">Monthly Bangalore rates. The Studio reads these live — change one and every builder's GDV recomputes.</p>
+      <p className="text-sm text-ink-faint">{t('admin.pricesDesc')}</p>
       <div className="mt-6 max-w-xs">
-        <Field label="Base build ₹/sq ft (structure + MEP)">
+        <Field label={t('admin.baseBuild')}>
           <Input value={String(pb.baseBuildPsf)} onChange={(v) => setPb({ ...pb, baseBuildPsf: Number(v) || 0 })} />
         </Field>
       </div>
@@ -777,21 +709,21 @@ function PricesTab() {
         <table className="w-full min-w-[560px] text-left">
           <thead>
             <tr className="border-b border-line bg-paper-raise/40">
-              <th className="label px-4 py-3 text-ink-faint">Finish · ₹/sq ft</th>
-              {RATE_TIERS.map((t) => (
-                <th key={t} className="label px-4 py-3 text-ink-faint">{t}</th>
+              <th className="label px-4 py-3 text-ink-faint">{t('admin.finishRate')}</th>
+              {RATE_TIERS.map(([key, labelKey]) => (
+                <th key={key} className="label px-4 py-3 text-ink-faint">{t(labelKey)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {RATE_CATS.map(([key, name]) => (
+            {RATE_CATS.map(([key, labelKey]) => (
               <tr key={key} className="border-b border-line last:border-0">
-                <td className="px-4 py-3 text-sm text-ink">{name}</td>
-                {RATE_TIERS.map((t) => (
-                  <td key={t} className="px-4 py-2">
+                <td className="px-4 py-3 text-sm text-ink">{t(labelKey)}</td>
+                {RATE_TIERS.map(([tierKey]) => (
+                  <td key={tierKey} className="px-4 py-2">
                     <input
-                      value={pb.rates[`${key}:${t}`] ?? ''}
-                      onChange={(e) => setRate(`${key}:${t}`, e.target.value)}
+                      value={pb.rates[`${key}:${tierKey}`] ?? ''}
+                      onChange={(e) => setRate(`${key}:${tierKey}`, e.target.value)}
                       className="mono w-20 border border-line bg-paper px-2 py-1.5 text-sm text-ink outline-none transition-colors focus:border-[color:var(--line-accent)]"
                     />
                   </td>
@@ -803,7 +735,7 @@ function PricesTab() {
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <button onClick={save} disabled={busy} className="label bg-accent px-8 py-3.5 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
-          {busy ? 'Saving…' : 'Save rates'}
+          {busy ? t('admin.saving') : t('admin.saveRates')}
         </button>
         {msg && <span className="text-[0.85rem] text-emerald-bright">{msg}</span>}
       </div>

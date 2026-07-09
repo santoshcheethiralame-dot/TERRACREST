@@ -1,5 +1,5 @@
-import type { User, Listing, Nda, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
-import { users, listings, ndas as seedNdas, engagements, offers, deals, documents, messages, activityEvents, architectReviews } from '@/data/seed'
+import type { User, Listing, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
+import { users, listings, engagements, offers, deals, documents, messages, activityEvents, architectReviews } from '@/data/seed'
 import { api, apiEnabled, ApiError, getBlobUrl } from '@/data/api'
 import { defaultPriceBook } from '@/lib/gdv'
 import { fallbackPredict, fallbackModelCard, fallbackRisk } from '@/lib/mlFallback'
@@ -17,8 +17,7 @@ export interface AuthResult {
   refreshToken: string | null
 }
 
-// In-memory logs — only used in fallback (no-backend) mode.
-const ndaLog: Nda[] = [...seedNdas]
+// In-memory log — only used in fallback (no-backend) mode.
 const reviewLog: ArchitectReview[] = [...architectReviews]
 
 const latency = <T,>(value: T, ms = 160): Promise<T> =>
@@ -62,31 +61,6 @@ export const repo = {
     return latency(listings.find((l) => l.id === id))
   },
 
-  async isUnlocked(listingId: string, builderId: string): Promise<boolean> {
-    if (apiEnabled) return (await api.get<{ unlocked: boolean }>(`/listings/${listingId}/unlocked`)).unlocked
-    return latency(ndaLog.some((n) => n.listingId === listingId && n.builderId === builderId))
-  },
-
-  /**
-   * Logs an executed NDA — the only gate that unseals a parcel. In API mode the
-   * server enforces this and only then serves the sealed fields on the next fetch.
-   */
-  async logNda(listingId: string, builderId: string): Promise<Nda> {
-    if (apiEnabled) return api.post<Nda>(`/listings/${listingId}/nda`)
-    const listing = listings.find((l) => l.id === listingId)
-    const nda: Nda = {
-      id: `NDA-${listingId}-${builderId}`,
-      builderId,
-      landownerId: listing?.sealed?.ownerId ?? 'unknown',
-      listingId,
-      signedOn: new Date().toISOString().slice(0, 10),
-      witnessedBy: 'Adv. Meera Krishnan',
-      scanRef: `/deals/${listingId}/nda/`,
-    }
-    if (!ndaLog.some((n) => n.id === nda.id)) ndaLog.push(nda)
-    return latency(nda, 420)
-  },
-
   async getEngagement(listingId: string): Promise<Engagement | undefined> {
     if (apiEnabled) return (await api.get<Engagement | null>(`/listings/${listingId}/engagement`)) ?? undefined
     return latency(engagements.find((e) => e.listingId === listingId))
@@ -102,19 +76,9 @@ export const repo = {
     return latency(deals.filter((d) => d.builderId === builderId))
   },
 
-  async ndasForBuilder(builderId: string): Promise<Nda[]> {
-    if (apiEnabled) return api.get<Nda[]>('/me/ndas')
-    return latency(ndaLog.filter((n) => n.builderId === builderId))
-  },
-
-  async ndasForListing(listingId: string): Promise<Nda[]> {
-    if (apiEnabled) return api.get<Nda[]>(`/listings/${listingId}/ndas`)
-    return latency(ndaLog.filter((n) => n.listingId === listingId))
-  },
-
   async listingsForOwner(ownerId: string): Promise<Listing[]> {
     if (apiEnabled) return api.get<Listing[]>('/me/properties')
-    return latency(listings.filter((l) => l.sealed?.ownerId === ownerId))
+    return latency(listings.filter((l) => l.sealed.ownerId === ownerId))
   },
 
   // --- admin operations centre ---
@@ -148,27 +112,6 @@ export const repo = {
     const listing = listings.find((l) => l.id === listingId)
     if (listing) listing.status = status
     return latency(listing as Listing, 300)
-  },
-
-  async adminListNdas(): Promise<Nda[]> {
-    if (apiEnabled) return api.get<Nda[]>('/admin/ndas')
-    return latency([...ndaLog])
-  },
-
-  async adminLogNda(builderId: string, listingId: string): Promise<Nda> {
-    if (apiEnabled) return api.post<Nda>('/admin/ndas', { builderId, listingId })
-    const listing = listings.find((l) => l.id === listingId)
-    const nda: Nda = {
-      id: `NDA-${listingId}-${builderId}`,
-      builderId,
-      landownerId: listing?.sealed?.ownerId ?? 'unknown',
-      listingId,
-      signedOn: new Date().toISOString().slice(0, 10),
-      witnessedBy: 'Adv. Meera Krishnan',
-      scanRef: `/deals/${listingId}/nda/`,
-    }
-    if (!ndaLog.some((n) => n.id === nda.id)) ndaLog.push(nda)
-    return latency(nda, 300)
   },
 
   async adminListDeals(): Promise<Deal[]> {

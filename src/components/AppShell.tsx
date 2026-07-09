@@ -2,18 +2,21 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import type { Role } from '@/domain/types'
 import { useAuth } from '@/auth/AuthContext'
-
-const ROLE_LABEL: Record<Role, string> = {
-  builder: 'Builder',
-  landowner: 'Land Owner',
-  investor: 'Investor',
-  admin: 'Desk',
-}
+import { useLang } from '@/i18n/LanguageContext'
+import { LangToggle } from '@/components/LangToggle'
 
 /** Shared chrome for authenticated screens: crest, member identity, sign-out. */
 export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNode }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { t } = useLang()
+
+  const roleLabel: Record<Role, string> = {
+    builder: t('role.builder'),
+    landowner: t('role.landowner'),
+    investor: t('role.investor'),
+    admin: t('role.deskShort'),
+  }
 
   const onLogout = () => {
     logout()
@@ -31,18 +34,19 @@ export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNo
             </Link>
             {nav}
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4">
             {user && (
               <div className="hidden text-right sm:block">
                 <p className="mono text-[0.72rem] text-ink">{user.displayName.split('·')[0].trim()}</p>
-                <p className="label text-ink-faint">{ROLE_LABEL[user.role]}</p>
+                <p className="label text-ink-faint">{roleLabel[user.role]}</p>
               </div>
             )}
+            <LangToggle />
             <button
               onClick={onLogout}
               className="label border border-line px-4 py-2.5 text-ink-faint transition-colors hover:border-[color:var(--line-accent)] hover:text-accent"
             >
-              Sign out
+              {t('appshell.signOut')}
             </button>
           </div>
         </div>

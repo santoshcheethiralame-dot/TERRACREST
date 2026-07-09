@@ -51,7 +51,7 @@ export interface GeoPoint {
   lng: number
 }
 
-/** Coarse, admin-set area shown before an NDA — never the exact plot. */
+/** Coarse, admin-set area — a lower-precision view of the parcel. */
 export interface PublicArea {
   lat: number
   lng: number
@@ -66,7 +66,7 @@ export interface Comparable {
   note: string
 }
 
-/** Everything hidden behind the masking layer until an NDA is logged. */
+/** Full location and ownership detail — visible to any verified member. */
 export interface SealedDetails {
   coords: GeoPoint
   address: string
@@ -127,8 +127,8 @@ export interface Listing {
   verification: { by: string; on: string }
   guidance: { low: number; high: number } // in crore
   publicArea?: PublicArea
-  // --- sealed (unlock-only) — absent from the API response until an NDA is logged ---
-  sealed?: SealedDetails
+  // --- full detail — attached for every authenticated member ---
+  sealed: SealedDetails
   // --- vertical-specific ---
   jd?: JointDevelopmentSpec
   warehouse?: WarehouseSpec
@@ -138,21 +138,11 @@ export interface Listing {
   createdAt: string
 }
 
-export interface Nda {
-  id: string
-  builderId: string
-  landownerId: string
-  listingId: string
-  signedOn: string
-  witnessedBy: string
-  scanRef: string
-}
-
-export type DealStage = 'new-lead' | 'nda-signed' | 'site-visit' | 'term-sheet' | 'closed'
+export type DealStage = 'new-lead' | 'engaged' | 'site-visit' | 'term-sheet' | 'closed'
 
 export const DEAL_STAGE_LABEL: Record<DealStage, string> = {
   'new-lead': 'New Lead',
-  'nda-signed': 'NDA Signed',
+  engaged: 'Engaged',
   'site-visit': 'Site Visit',
   'term-sheet': 'Term Sheet',
   closed: 'Closed',
@@ -304,7 +294,7 @@ export interface ValuationContext {
 
 export type ActivityKind =
   | 'login'
-  | 'nda'
+  | 'access'
   | 'message'
   | 'listing_created'
   | 'status_change'

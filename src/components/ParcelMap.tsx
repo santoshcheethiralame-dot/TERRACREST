@@ -1,13 +1,14 @@
 import { MapContainer, TileLayer, Circle, CircleMarker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { GeoPoint, PublicArea } from '@/domain/types'
+import { useLang } from '@/i18n/LanguageContext'
 
 /**
- * The map's precision is itself part of the moat: sealed, it shows only a coarse
- * area circle (the admin's "rough pin"); unlocked, the exact coordinates — which
- * the server withholds until an NDA — drop a precise pin.
+ * Renders a coarse area circle when only the public area is known, or an
+ * exact pin once the caller has the parcel's precise coordinates.
  */
 export function ParcelMap({ area, exact }: { area?: PublicArea; exact?: GeoPoint }) {
+  const { t } = useLang()
   if (!area && !exact) return null
   const center: [number, number] = exact ? [exact.lat, exact.lng] : [area!.lat, area!.lng]
   const zoom = exact ? 15 : 12
@@ -34,7 +35,7 @@ export function ParcelMap({ area, exact }: { area?: PublicArea; exact?: GeoPoint
         )}
       </MapContainer>
       <div className="pointer-events-none absolute bottom-0 left-0 z-[500] border-r border-t border-line bg-paper/85 px-3 py-1.5 backdrop-blur-sm">
-        <span className="label text-ink-faint">{exact ? 'Exact location' : 'Approximate area · exact on NDA'}</span>
+        <span className="label text-ink-faint">{exact ? t('map.exactLocation') : t('map.approximateArea')}</span>
       </div>
     </div>
   )

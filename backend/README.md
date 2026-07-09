@@ -1,8 +1,10 @@
 # DB Terracrest Advisory — API
 
-FastAPI backend for the invitation-only deal portal. It enforces the masking
-moat **server-side**: sealed parcel details (exact GPS, owner, survey numbers,
-document vault) are never serialized without a logged NDA.
+FastAPI backend for the invitation-only deal portal. Membership is the gate,
+enforced **server-side**: every listing, document, and Deal Room endpoint
+requires a verified, admin-issued account — full parcel detail (exact GPS,
+owner, survey numbers, document vault) is never serialized for an
+unauthenticated request.
 
 ## Stack
 - FastAPI + Uvicorn
@@ -32,13 +34,11 @@ All seeded accounts use the password `demo`:
 |---|---|---|
 | POST | `/auth/login` | `{username, password}` → JWT + user |
 | GET | `/auth/me` | current user (Bearer token) |
-| GET | `/listings` | discovery feed — **sealed stripped unless entitled** |
-| GET | `/listings/{id}` | single parcel — masked/unmasked per NDA |
-| GET | `/listings/{id}/unlocked` | `{unlocked}` for the caller |
-| POST | `/listings/{id}/nda` | log an executed NDA → unseals the parcel |
+| GET | `/listings` | discovery feed — full detail for any verified member |
+| GET | `/listings/{id}` | single parcel, full detail |
 | GET | `/listings/{id}/engagement` | named analytics (owner) |
 | GET | `/listings/{id}/offers` | expressions of interest |
-| GET | `/me/properties` · `/me/ndas` · `/me/deals` | caller-scoped |
+| GET | `/me/properties` · `/me/deals` | caller-scoped |
 
 ## Deploy (make the public link full-stack)
 

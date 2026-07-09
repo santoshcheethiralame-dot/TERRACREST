@@ -1,4 +1,4 @@
-import type { User, Listing, Nda, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview } from '@/domain/types'
+import type { User, Listing, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview } from '@/domain/types'
 
 /* ============================================================
    Seed data — a realistic Bengaluru book of business.
@@ -207,19 +207,6 @@ export const listings: Listing[] = [
   },
 ]
 
-/** One NDA pre-logged: Rajesh has unlocked the Devanahalli JD parcel. */
-export const ndas: Nda[] = [
-  {
-    id: 'NDA-JD-012-rajesh',
-    builderId: 'builder_rajesh_001',
-    landownerId: 'landowner_ramanathan_002',
-    listingId: 'JD-BLR-2026-012',
-    signedOn: '2026-06-24',
-    witnessedBy: 'Adv. Meera Krishnan',
-    scanRef: '/deals/deal_001/nda/',
-  },
-]
-
 export const offers: Offer[] = [
   {
     id: 'OF-1',
@@ -282,7 +269,7 @@ export const deals: Deal[] = [
     id: 'deal_001',
     listingId: 'JD-BLR-2026-012',
     builderId: 'builder_rajesh_001',
-    stage: 'nda-signed',
+    stage: 'engaged',
     estCommission: 17000000,
     rm: 'Kavya R.',
   },
@@ -358,10 +345,10 @@ export const architectReviews: ArchitectReview[] = [
 ]
 
 export const activityEvents: ActivityEvent[] = [
+  { id: 'ev_0', actorName: 'Terracrest Desk', actorId: 'builder_rajesh_001', kind: 'access', summary: 'Rajesh Menon · Rajesh Developers granted membership access', createdAt: '2026-03-11T09:00:00+00:00' },
   { id: 'ev_1', actorName: 'Terracrest Desk', kind: 'listing_created', listingId: 'JD-BLR-2026-012', summary: 'Parcel JD-BLR-2026-012 created — North-corridor JD parcel', createdAt: '2026-06-14T09:12:00+00:00' },
   { id: 'ev_2', actorName: 'Terracrest Desk', kind: 'status_change', listingId: 'JD-BLR-2026-012', summary: 'JD-BLR-2026-012 → live', createdAt: '2026-06-20T15:41:00+00:00' },
   { id: 'ev_3', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'login', summary: 'Rajesh Menon · Rajesh Developers signed in', createdAt: '2026-06-24T08:03:00+00:00' },
-  { id: 'ev_4', actorName: 'Terracrest Desk', actorId: 'builder_rajesh_001', kind: 'nda', listingId: 'JD-BLR-2026-012', summary: 'Desk recorded a witnessed NDA — Rajesh Menon · Rajesh Developers on North-corridor JD parcel', createdAt: '2026-06-24T10:22:00+00:00' },
-  { id: 'ev_5', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'document', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel', createdAt: '2026-06-24T10:31:00+00:00' },
-  { id: 'ev_6', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'message', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room', createdAt: '2026-06-25T11:40:00+00:00' },
+  { id: 'ev_4', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'document', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers opened “Title deed” — North-corridor JD parcel', createdAt: '2026-06-24T10:31:00+00:00' },
+  { id: 'ev_5', actorName: 'Rajesh Menon · Rajesh Developers', actorId: 'builder_rajesh_001', kind: 'message', listingId: 'JD-BLR-2026-012', summary: 'Rajesh Menon · Rajesh Developers posted in the North-corridor JD parcel Deal Room', createdAt: '2026-06-25T11:40:00+00:00' },
 ]

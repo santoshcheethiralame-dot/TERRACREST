@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useLang } from '@/i18n/LanguageContext'
 
 type SealProps = {
   size?: number
@@ -13,6 +14,7 @@ type SealProps = {
  * the "physically verified" stamp on listings.
  */
 export function Seal({ size = 84, text, className = '' }: SealProps) {
+  const { t } = useLang()
   const raw = useId().replace(/[:]/g, '')
   const ringId = `seal-ring-${raw}`
   return (
@@ -22,7 +24,7 @@ export function Seal({ size = 84, text, className = '' }: SealProps) {
       height={size}
       className={className}
       role="img"
-      aria-label={text ? text : 'Verified by Terracrest'}
+      aria-label={text ? text : t('a11y.verifiedByTerracrest')}
     >
       <defs>
         {/* clockwise circle for the legend text */}

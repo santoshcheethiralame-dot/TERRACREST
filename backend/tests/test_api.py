@@ -57,24 +57,24 @@ def test_refresh_garbage_rejected(client):
     assert client.post("/auth/refresh", json={"refreshToken": "not.a.jwt"}).status_code == 401
 
 
-# ----------------------------------------------------- masking (the moat)
+# ------------------------------------------------- full access (the moat)
 def test_listings_requires_auth(client):
     assert client.get("/listings").status_code == 401
 
 
-def test_builder_sees_sealed_only_with_nda(client):
+def test_any_member_sees_full_sealed_detail(client):
     h = headers(client, "builder_rajesh_001")
     listings = {l["id"]: l for l in client.get("/listings", headers=h).json()}
-    assert listings["JD-BLR-2026-012"].get("sealed")  # pre-logged seed NDA
-    assert not listings["WH-BLR-2026-047"].get("sealed")
-    assert not listings["BL-BLR-2026-008"].get("sealed")
+    assert listings["JD-BLR-2026-012"].get("sealed")
+    assert listings["WH-BLR-2026-047"].get("sealed")
+    assert listings["BL-BLR-2026-008"].get("sealed")
 
 
-def test_public_area_always_present_but_sealed_withheld(client):
+def test_public_area_and_sealed_both_present(client):
     h = headers(client, "builder_rajesh_001")
     wh = client.get("/listings/WH-BLR-2026-047", headers=h).json()
     assert wh.get("publicArea")
-    assert not wh.get("sealed")
+    assert wh.get("sealed") and "KIADB" in wh["sealed"]["address"]
 
 
 def test_owner_sees_own_sealed(client):
@@ -83,20 +83,19 @@ def test_owner_sees_own_sealed(client):
     assert jd.get("sealed") and jd["sealed"]["ownerName"] == "Ramanathan Holdings LLP"
 
 
-# ------------------------------------------------------------- nda unlock
-def test_nda_unlocks_parcel(client):
-    h = headers(client, "builder_rajesh_001")
-    assert not client.get("/listings/WH-BLR-2026-047", headers=h).json().get("sealed")
-    assert client.post("/listings/WH-BLR-2026-047/nda", headers=h).status_code == 200
-    after = client.get("/listings/WH-BLR-2026-047", headers=h).json()
-    assert after.get("sealed") and "KIADB" in after["sealed"]["address"]
+def test_a_second_member_sees_the_same_full_detail(client):
+    """Membership itself is the gate — there is no further per-parcel unlock step."""
+    h = headers(client, "builder_priya_003")
+    jd = client.get("/listings/JD-BLR-2026-012", headers=h).json()
+    assert jd.get("sealed") and jd["sealed"]["ownerName"] == "Ramanathan Holdings LLP"
 
 
 # ------------------------------------------------------------- documents
-def test_documents_gated_by_nda(client):
-    h = headers(client, "builder_rajesh_001")
-    assert len(client.get("/listings/JD-BLR-2026-012/documents", headers=h).json()) == 4  # has NDA
-    assert client.get("/listings/WH-BLR-2026-047/documents", headers=h).json() == []  # sealed
+def test_documents_always_listed_for_any_member(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    priya = headers(client, "builder_priya_003")
+    assert len(client.get("/listings/JD-BLR-2026-012/documents", headers=rajesh).json()) == 4
+    assert len(client.get("/listings/WH-BLR-2026-047/documents", headers=priya).json()) == 4
 
 
 def test_document_download_is_watermarked_pdf(client):
@@ -107,10 +106,11 @@ def test_document_download_is_watermarked_pdf(client):
     assert r.content[:5] == b"%PDF-"
 
 
-def test_document_download_blocked_when_sealed(client):
-    h = headers(client, "builder_rajesh_001")
-    r = client.get("/listings/WH-BLR-2026-047/documents/WH-BLR-2026-047-title-deed", headers=h)
-    assert r.status_code == 403
+def test_document_download_works_for_any_member(client):
+    priya = headers(client, "builder_priya_003")
+    r = client.get("/listings/WH-BLR-2026-047/documents/WH-BLR-2026-047-title-deed", headers=priya)
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "application/pdf"
 
 
 # ------------------------------------------------------- admin authorization
@@ -121,15 +121,6 @@ def test_admin_forbidden_for_non_admin(client):
 def test_admin_lists_all_users(client):
     r = client.get("/admin/users", headers=headers(client, "admin_terracrest"))
     assert r.status_code == 200 and len(r.json()) == 7
-
-
-def test_admin_logging_nda_unseals_for_builder(client):
-    admin = headers(client, "admin_terracrest")
-    priya = headers(client, "builder_priya_003")
-    assert not client.get("/listings/JD-BLR-2026-012", headers=priya).json().get("sealed")
-    r = client.post("/admin/ndas", headers=admin, json={"builderId": "builder_priya_003", "listingId": "JD-BLR-2026-012"})
-    assert r.status_code in (200, 201)
-    assert client.get("/listings/JD-BLR-2026-012", headers=priya).json().get("sealed")
 
 
 def test_admin_creates_loginable_account(client):
@@ -159,10 +150,10 @@ def test_admin_creates_listing(client):
     r = client.post("/admin/listings", headers=admin, json=payload)
     assert r.status_code == 201
     assert r.json()["id"] == "JD-BLR-2026-099" and r.json()["status"] == "verified"
-    # appears in discovery, sealed withheld from a builder without NDA, and has a vault
+    # appears in discovery, full detail visible to any member immediately, and has a vault
     builder = headers(client, "builder_rajesh_001")
     assert "JD-BLR-2026-099" in [l["id"] for l in client.get("/listings", headers=builder).json()]
-    assert not client.get("/listings/JD-BLR-2026-099", headers=builder).json().get("sealed")
+    assert client.get("/listings/JD-BLR-2026-099", headers=builder).json().get("sealed")
     assert len(client.get("/listings/JD-BLR-2026-099/documents", headers=admin).json()) == 4
 
 
@@ -179,14 +170,13 @@ def test_admin_create_listing_rejects_duplicate(client):
 
 
 # ------------------------------------------------------------- deal room
-def test_deal_room_gated_and_post(client):
-    rajesh = headers(client, "builder_rajesh_001")  # has NDA on JD-012
-    priya = headers(client, "builder_priya_003")  # no NDA on JD-012
+def test_deal_room_open_to_any_member(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    priya = headers(client, "builder_priya_003")
     assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 3
-    assert client.get("/listings/JD-BLR-2026-012/messages", headers=priya).json() == []
-    assert client.post("/listings/JD-BLR-2026-012/messages", headers=priya, json={"body": "hi"}).status_code == 403
-    r = client.post("/listings/JD-BLR-2026-012/messages", headers=rajesh, json={"body": "Following up on the site walk."})
-    assert r.status_code == 201 and r.json()["authorId"] == "builder_rajesh_001"
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=priya).json()) == 3
+    r = client.post("/listings/JD-BLR-2026-012/messages", headers=priya, json={"body": "Interested in this parcel too."})
+    assert r.status_code == 201 and r.json()["authorId"] == "builder_priya_003"
     assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 4
 
 
@@ -229,7 +219,7 @@ def test_pricebook_read_and_admin_update(client):
 
 # ---------------------------------------------------------- activity feed
 def test_activity_feed_admin_only_and_grows(client):
-    rajesh = headers(client, "builder_rajesh_001")  # has NDA on JD-012
+    rajesh = headers(client, "builder_rajesh_001")
     admin = headers(client, "admin_terracrest")
     # the audit feed is admin-only
     assert client.get("/admin/activity", headers=rajesh).status_code == 403

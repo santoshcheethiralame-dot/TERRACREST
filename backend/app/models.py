@@ -32,10 +32,11 @@ class Listing(Base):
     locality_note = Column(String, nullable=False)
     verification = Column(JSON, nullable=False)  # {by, on}
     guidance = Column(JSON, nullable=False)  # {low, high}
-    public_area = Column(JSON, nullable=True)  # {lat, lng, radiusKm} — coarse, safe to show pre-NDA
+    public_area = Column(JSON, nullable=True)  # {lat, lng, radiusKm} — coarse, safe to show to the public
     # first-class owner (queryable + used for authorization)
     owner_id = Column(String, ForeignKey("users.id"), index=True, nullable=False)
-    # SEALED — never serialized without an NDA. {coords, address, ownerName, surveyNos, contact}
+    # Full location/ownership detail — withheld from the public, visible to any verified member.
+    # {coords, address, ownerName, surveyNos, contact}
     sealed = Column(JSON, nullable=False)
     # vertical-specific
     jd = Column(JSON, nullable=True)
@@ -44,18 +45,6 @@ class Listing(Base):
     comps = Column(JSON, nullable=False)
     feasibility = Column(JSON, nullable=False)
     created_at = Column(String, nullable=False)
-
-
-class Nda(Base):
-    __tablename__ = "ndas"
-
-    id = Column(String, primary_key=True)
-    builder_id = Column(String, ForeignKey("users.id"), index=True, nullable=False)
-    landowner_id = Column(String, nullable=False)
-    listing_id = Column(String, ForeignKey("listings.id"), index=True, nullable=False)
-    signed_on = Column(String, nullable=False)
-    witnessed_by = Column(String, nullable=False)
-    scan_ref = Column(String, nullable=False)
 
 
 class Offer(Base):
@@ -100,8 +89,7 @@ class Deal(Base):
 
 
 class Message(Base):
-    """Deal Room correspondence — visible only to entitled parties (NDA'd builder,
-    owner, admin)."""
+    """Deal Room correspondence between a member and the counterparty."""
 
     __tablename__ = "messages"
 
@@ -154,7 +142,7 @@ class ActivityEvent(Base):
     id = Column(String, primary_key=True)
     actor_id = Column(String, nullable=True)
     actor_name = Column(String, nullable=False)
-    # login | nda | message | listing_created | status_change | document | architect
+    # login | access | message | listing_created | status_change | document | architect
     kind = Column(String, nullable=False)
     listing_id = Column(String, nullable=True)
     summary = Column(String, nullable=False)

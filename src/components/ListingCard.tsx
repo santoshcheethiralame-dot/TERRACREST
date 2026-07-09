@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import type { Listing } from '@/domain/types'
-import { VERTICAL_LABEL, STATUS_LABEL } from '@/domain/types'
+import { useLang } from '@/i18n/LanguageContext'
+import { VERTICAL_KEY, STATUS_KEY } from '@/i18n/translations'
 
-export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked: boolean }) {
+export function ListingCard({ listing }: { listing: Listing }) {
+  const { t } = useLang()
   return (
     <Link
       to={`/listing/${listing.id}`}
@@ -10,21 +12,15 @@ export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked:
     >
       <div className="flex items-center justify-between">
         <span className="mono text-[0.72rem] text-ink-dim">{listing.id}</span>
-        {unlocked ? (
-          <span className="label text-emerald-bright">● Unlocked</span>
-        ) : (
-          <span className="label inline-flex items-center gap-1.5 text-ink-faint">
-            <LockGlyph /> Sealed
-          </span>
-        )}
+        <span className="label text-emerald-bright">● {t('listingCard.fullAccess')}</span>
       </div>
 
       <h3 className="mt-4 font-display text-2xl font-semibold leading-tight tracking-tight2 text-ink">{listing.headline}</h3>
 
       <div className="mt-3 flex items-center gap-2">
-        <span className="label text-accent">{VERTICAL_LABEL[listing.vertical]}</span>
+        <span className="label text-accent">{t(VERTICAL_KEY[listing.vertical])}</span>
         <span className="text-ink-faint">·</span>
-        <span className="label text-ink-faint">{STATUS_LABEL[listing.status]}</span>
+        <span className="label text-ink-faint">{t(STATUS_KEY[listing.status])}</span>
       </div>
 
       <p className="mt-3 text-sm text-ink-dim">{listing.localityLabel}</p>
@@ -34,7 +30,7 @@ export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked:
 
       <div className="mt-5 flex items-end justify-between border-t border-line pt-4">
         <div>
-          <p className="label text-ink-faint">Guidance</p>
+          <p className="label text-ink-faint">{t('listingCard.guidance')}</p>
           <p className="mono mt-1 text-lg text-ink">
             ₹{listing.guidance.low}–{listing.guidance.high} Cr
           </p>
@@ -42,14 +38,5 @@ export function ListingCard({ listing, unlocked }: { listing: Listing; unlocked:
         <span className="text-ink-faint transition-transform duration-300 group-hover:translate-x-1">→</span>
       </div>
     </Link>
-  )
-}
-
-function LockGlyph() {
-  return (
-    <svg width="10" height="12" viewBox="0 0 14 16" fill="none" aria-hidden>
-      <rect x="1.5" y="6.5" width="11" height="8" rx="0.5" stroke="currentColor" />
-      <path d="M4 6.5V4a3 3 0 0 1 6 0v2.5" stroke="currentColor" />
-    </svg>
   )
 }
