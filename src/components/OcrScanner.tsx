@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { API_URL } from '@/data/api'
 
-export function OcrScanner({ docId }: { docId: string }) {
+export function OcrScanner({ docId: _docId }: { docId: string }) {
   const [scanning, setScanning] = useState(false)
   const [result, setResult] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
