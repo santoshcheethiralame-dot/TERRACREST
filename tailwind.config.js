@@ -1,0 +1,58 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        paper: {
+          DEFAULT: 'var(--paper)',
+          raise: 'var(--paper-raise)',
+          card: 'var(--paper-card)',
+        },
+        navy: 'var(--navy)',
+        ink: {
+          DEFAULT: 'var(--ink)',
+          dim: 'var(--ink-dim)',
+          faint: 'var(--ink-faint)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          bright: 'var(--accent-bright)',
+          deep: 'var(--accent-deep)',
+        },
+        gold: {
+          DEFAULT: 'var(--gold)',
+          bright: 'var(--gold-bright)',
+          deep: 'var(--gold-deep)',
+        },
+        emerald: {
+          DEFAULT: 'var(--emerald)',
+          bright: 'var(--emerald-bright)',
+        },
+        oxblood: {
+          DEFAULT: 'var(--oxblood)',
+          bright: 'var(--oxblood-bright)',
+        },
+      },
+      fontFamily: {
+        display: ['Space Grotesk', 'Noto Sans Kannada', 'system-ui', 'sans-serif'],
+        sans: ['Satoshi', 'Noto Sans Kannada', 'system-ui', 'sans-serif'],
+        mono: ['IBM Plex Mono', 'Noto Sans Kannada', 'ui-monospace', 'monospace'],
+      },
+      letterSpacing: {
+        label: '0.24em',
+        wide2: '0.14em',
+        tight2: '-0.04em',
+      },
+      maxWidth: {
+        shell: '1320px',
+      },
+      boxShadow: {
+        deep: '0 30px 80px -30px rgba(26,30,27,0.28)',
+        lift: '0 12px 40px -20px rgba(26,30,27,0.18)',
+        glow: '0 16px 50px -16px rgba(30,77,59,0.35)',
+      },
+    },
+  },
+  plugins: [],
+}

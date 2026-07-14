@@ -1,0 +1,22 @@
+# Render blueprint — one-click free backend for DB Terracrest Advisory.
+# In Render:  New → Blueprint → connect this repo → Apply.
+# The service auto-seeds its database on first boot. Then set VITE_API_URL in
+# Vercel to the deployed API URL and redeploy the frontend.
+#
+# Note: the free web service uses ephemeral SQLite — data resets when the
+# instance sleeps (~15 min idle) and re-seeds to the clean demo on wake. For
+# persistent data, attach a Postgres (e.g. Neon's free tier) and set DATABASE_URL.
+services:
+  - type: web
+    name: terracrest-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: TERRACREST_JWT_SECRET
+        generateValue: true
+      - key: TERRACREST_CORS_ORIGINS
+        value: https://terracrest.vercel.app
