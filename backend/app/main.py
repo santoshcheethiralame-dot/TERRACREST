@@ -5,7 +5,7 @@ from .config import settings
 from .database import SessionLocal
 from .ml import valuation as vmodel
 from .seed import seed_if_empty
-from .routers import admin, architect, auth, dashboard, documents, listings, messages, ocr, pricebook, valuation
+from .routers import admin, architect, auth, dashboard, documents, listings, messages, ocr, pricebook, valuation, verification
 
 # Ensure tables exist and a fresh database is populated (idempotent).
 seed_if_empty()
@@ -46,6 +46,7 @@ app.include_router(pricebook.router)
 app.include_router(architect.router)
 app.include_router(valuation.router)
 app.include_router(ocr.router)
+app.include_router(verification.router)
 
 
 @app.get("/health", tags=["meta"])

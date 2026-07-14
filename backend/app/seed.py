@@ -215,6 +215,14 @@ def _messages():
         models.Message(id="msg_003", listing_id="JD-BLR-2026-012", author_id="landowner_ramanathan_002",
                        body="Certainly. Our RM Kavya will coordinate — proposing Tuesday morning.",
                        created_at="2026-06-26T09:05+00:00"),
+        models.Message(id="msg_004", listing_id="JD-BLR-2026-012", author_id="admin_terracrest",
+                       body="https://meet.google.com/jde-brlr-012",
+                       created_at="2026-06-26T09:20+00:00",
+                       meeting_time="2026-07-01T11:00"),
+        models.Message(id="msg_005", listing_id="JD-BLR-2026-012", author_id="builder_rajesh_001",
+                       body="Opening proposal — a 60:40 split in the developer's favour given the FSI headroom.",
+                       created_at="2026-06-27T16:30+00:00",
+                       deal_share={"builderPct": 60, "landownerPct": 40}),
     ]
 
 
@@ -273,6 +281,41 @@ def _activity():
     ]
 
 
+def _lawyer_verifications():
+    return [
+        models.LawyerVerification(listing_id="JD-BLR-2026-012", lawyer_name="Adv. Meera Krishnan", bar_council_no="KAR/2009/04412",
+                                  verification_date="2026-06-18", verified=True,
+                                  remarks="Title clear and marketable. Single-owner chain traced to the 2004 sale deed; no encumbrance, no pending litigation. Plan sanction and conversion in order."),
+        models.LawyerVerification(listing_id="WH-BLR-2026-047", lawyer_name="Adv. S. Prakash", bar_council_no="KAR/2012/08830",
+                                  verification_date="2026-06-11", verified=True,
+                                  remarks="KIADB allotment and lease-cum-sale deed verified. Occupancy certificate on record; title fit for a long-term industrial lease."),
+        models.LawyerVerification(listing_id="BL-BLR-2026-008", lawyer_name="Adv. Latha Rao", bar_council_no="KAR/2007/02215",
+                                  verification_date="2026-06-05", verified=True,
+                                  remarks="Agricultural title verified; contiguous survey numbers under one family trust. Conversion feasibility confirmed with the tahsildar's office."),
+    ]
+
+
+def _document_summaries():
+    ts = "2026-06-18T10:00+00:00"
+    return [
+        models.DocumentSummary(listing_id="JD-BLR-2026-012", updated_at=ts,
+                               ownership_chain="Held by Ramanathan Holdings LLP since 2004 via registered sale deed №4471/2004. No intermediate transfers on record.",
+                               ec_summary="Encumbrance certificate clean for 2004–2026 — no mortgage, lien, or court attachment.",
+                               tax_history="Property tax paid current through FY 2025-26; BBMP receipts on file for the last three years.",
+                               katha_details="A-Khata in the LLP's name; khata extract reconciled against the survey record."),
+        models.DocumentSummary(listing_id="WH-BLR-2026-047", updated_at="2026-06-11T10:00+00:00",
+                               ownership_chain="KIADB allotment (2016) followed by a registered lease-cum-sale deed. Single institutional holder.",
+                               ec_summary="EC clean since allotment; the standard KIADB charge is noted and satisfied.",
+                               tax_history="Industrial tax and KIADB maintenance dues paid to date.",
+                               katha_details="KIADB allotment record stands in place of a municipal khata for this industrial plot."),
+        models.DocumentSummary(listing_id="BL-BLR-2026-008", updated_at="2026-06-05T10:00+00:00",
+                               ownership_chain="Contiguous survey numbers held by the Narayan Family Trust across three generations; consolidated under the trust in 2019.",
+                               ec_summary="EC clean for the full agricultural holding; no loans against the land.",
+                               tax_history="Land revenue (kandaya) paid current; receipts held by the trust.",
+                               katha_details="Revenue records (RTC / pahani) verified; names tally with the trust deed."),
+    ]
+
+
 def _insert_all(db) -> None:
     db.add_all(_users())
     db.add_all(_listings())
@@ -284,6 +327,8 @@ def _insert_all(db) -> None:
     db.add(_pricebook())
     db.add_all(_architect_reviews())
     db.add_all(_activity())
+    db.add_all(_lawyer_verifications())
+    db.add_all(_document_summaries())
     db.commit()
 
 

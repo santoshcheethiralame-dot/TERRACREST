@@ -19,6 +19,8 @@ def _to_out(m: models.Message, author_name: str) -> schemas.MessageOut:
         author_name=author_name,
         body=m.body,
         created_at=m.created_at,
+        meeting_time=m.meeting_time,
+        deal_share=m.deal_share,
     )
 
 
@@ -46,12 +48,19 @@ def post_message(listing_id: str, body: schemas.PostMessageRequest, user: models
         author_id=user.id,
         body=text,
         created_at=dt.datetime.now(dt.timezone.utc).isoformat(timespec="minutes"),
+        meeting_time=body.meetingTime or None,
+        deal_share=body.dealShare or None,
     )
     db.add(msg)
     db.commit()
     db.refresh(msg)
+    summary = f"{user.display_name} posted in the {listing.headline} Deal Room"
+    if body.meetingTime:
+        summary = f"{user.display_name} scheduled a meeting in the {listing.headline} Deal Room"
+    elif body.dealShare:
+        summary = f"{user.display_name} proposed a revenue split in the {listing.headline} Deal Room"
     activity.log(
-        db, kind="message", summary=f"{user.display_name} posted in the {listing.headline} Deal Room",
+        db, kind="message", summary=summary,
         actor_id=user.id, actor_name=user.display_name, listing_id=listing_id,
     )
     return _to_out(msg, user.display_name)

@@ -89,7 +89,10 @@ class Deal(Base):
 
 
 class Message(Base):
-    """Deal Room correspondence between a member and the counterparty."""
+    """Deal Room correspondence between a member and the counterparty.
+
+    A message can carry a scheduled meeting (a time + a link in the body) or a
+    proposed revenue split — the two negotiation moves the deal room supports."""
 
     __tablename__ = "messages"
 
@@ -98,6 +101,8 @@ class Message(Base):
     author_id = Column(String, ForeignKey("users.id"), nullable=False)
     body = Column(String, nullable=False)
     created_at = Column(String, nullable=False)
+    meeting_time = Column(String, nullable=True)  # ISO local datetime of a scheduled meeting
+    deal_share = Column(JSON, nullable=True)  # {builderPct, landownerPct}
 
 
 class PriceBook(Base):
@@ -147,3 +152,33 @@ class ActivityEvent(Base):
     listing_id = Column(String, nullable=True)
     summary = Column(String, nullable=False)
     created_at = Column(String, nullable=False)  # ISO-8601 UTC
+
+
+class LawyerVerification(Base):
+    """Independent legal due-diligence recorded by the desk against a parcel —
+    the empanelled advocate who cleared the title, and their remarks."""
+
+    __tablename__ = "lawyer_verifications"
+
+    listing_id = Column(String, ForeignKey("listings.id"), primary_key=True)
+    lawyer_name = Column(String, nullable=False)
+    bar_council_no = Column(String, nullable=False)
+    verification_date = Column(String, nullable=False)
+    remarks = Column(String, nullable=False, default="")
+    verified = Column(Boolean, nullable=False, default=True)
+
+
+class DocumentSummary(Base):
+    """The desk's plain-language title-and-document summary for a parcel:
+    ownership chain, encumbrance, tax, and katha, distilled from the record set.
+    Prepared by a person on the desk — not an automated claim."""
+
+    __tablename__ = "document_summaries"
+
+    listing_id = Column(String, ForeignKey("listings.id"), primary_key=True)
+    ownership_chain = Column(String, nullable=False, default="")
+    ec_summary = Column(String, nullable=False, default="")
+    tax_history = Column(String, nullable=False, default="")
+    katha_details = Column(String, nullable=False, default="")
+    prepared_by = Column(String, nullable=False, default="Terracrest Desk")
+    updated_at = Column(String, nullable=False)

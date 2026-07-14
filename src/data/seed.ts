@@ -1,4 +1,4 @@
-import type { User, Listing, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview } from '@/domain/types'
+import type { User, Listing, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview, LawyerVerification, DocumentSummary } from '@/domain/types'
 
 /* ============================================================
    Seed data — a realistic Bengaluru book of business.
@@ -299,6 +299,81 @@ export const messages: Message[] = [
     authorName: 'S. Ramanathan · Ramanathan Holdings LLP',
     body: 'Certainly. Our RM Kavya will coordinate — proposing Tuesday morning.',
     createdAt: '2026-06-26T09:05+00:00',
+  },
+  {
+    id: 'msg_004',
+    listingId: 'JD-BLR-2026-012',
+    authorId: 'admin_terracrest',
+    authorName: 'Terracrest Desk',
+    body: 'https://meet.google.com/jde-brlr-012',
+    createdAt: '2026-06-26T09:20+00:00',
+    meetingTime: '2026-07-01T11:00',
+  },
+  {
+    id: 'msg_005',
+    listingId: 'JD-BLR-2026-012',
+    authorId: 'builder_rajesh_001',
+    authorName: 'Rajesh Menon · Rajesh Developers',
+    body: "Opening proposal — a 60:40 split in the developer's favour given the FSI headroom.",
+    createdAt: '2026-06-27T16:30+00:00',
+    dealShare: { builderPct: 60, landownerPct: 40 },
+  },
+]
+
+export const lawyerVerifications: LawyerVerification[] = [
+  {
+    listingId: 'JD-BLR-2026-012',
+    lawyerName: 'Adv. Meera Krishnan',
+    barCouncilNo: 'KAR/2009/04412',
+    verificationDate: '2026-06-18',
+    verified: true,
+    remarks: 'Title clear and marketable. Single-owner chain traced to the 2004 sale deed; no encumbrance, no pending litigation. Plan sanction and conversion in order.',
+  },
+  {
+    listingId: 'WH-BLR-2026-047',
+    lawyerName: 'Adv. S. Prakash',
+    barCouncilNo: 'KAR/2012/08830',
+    verificationDate: '2026-06-11',
+    verified: true,
+    remarks: 'KIADB allotment and lease-cum-sale deed verified. Occupancy certificate on record; title fit for a long-term industrial lease.',
+  },
+  {
+    listingId: 'BL-BLR-2026-008',
+    lawyerName: 'Adv. Latha Rao',
+    barCouncilNo: 'KAR/2007/02215',
+    verificationDate: '2026-06-05',
+    verified: true,
+    remarks: 'Agricultural title verified; contiguous survey numbers under one family trust. Conversion feasibility confirmed with the tahsildar\'s office.',
+  },
+]
+
+export const documentSummaries: DocumentSummary[] = [
+  {
+    listingId: 'JD-BLR-2026-012',
+    ownershipChain: 'Held by Ramanathan Holdings LLP since 2004 via registered sale deed №4471/2004. No intermediate transfers on record.',
+    ecSummary: 'Encumbrance certificate clean for 2004–2026 — no mortgage, lien, or court attachment.',
+    taxHistory: 'Property tax paid current through FY 2025-26; BBMP receipts on file for the last three years.',
+    kathaDetails: "A-Khata in the LLP's name; khata extract reconciled against the survey record.",
+    preparedBy: 'Terracrest Desk',
+    updatedAt: '2026-06-18T10:00+00:00',
+  },
+  {
+    listingId: 'WH-BLR-2026-047',
+    ownershipChain: 'KIADB allotment (2016) followed by a registered lease-cum-sale deed. Single institutional holder.',
+    ecSummary: 'EC clean since allotment; the standard KIADB charge is noted and satisfied.',
+    taxHistory: 'Industrial tax and KIADB maintenance dues paid to date.',
+    kathaDetails: 'KIADB allotment record stands in place of a municipal khata for this industrial plot.',
+    preparedBy: 'Terracrest Desk',
+    updatedAt: '2026-06-11T10:00+00:00',
+  },
+  {
+    listingId: 'BL-BLR-2026-008',
+    ownershipChain: 'Contiguous survey numbers held by the Narayan Family Trust across three generations; consolidated under the trust in 2019.',
+    ecSummary: 'EC clean for the full agricultural holding; no loans against the land.',
+    taxHistory: 'Land revenue (kandaya) paid current; receipts held by the trust.',
+    kathaDetails: 'Revenue records (RTC / pahani) verified; names tally with the trust deed.',
+    preparedBy: 'Terracrest Desk',
+    updatedAt: '2026-06-05T10:00+00:00',
   },
 ]
 

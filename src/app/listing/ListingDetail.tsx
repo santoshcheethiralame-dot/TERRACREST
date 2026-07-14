@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import type { Document, Listing, Message, RiskScore } from '@/domain/types'
+import type { Document, Listing, Message, DealShare, RiskScore } from '@/domain/types'
 import { repo } from '@/data/repository'
 import { useAuth } from '@/auth/AuthContext'
 import { useLang } from '@/i18n/LanguageContext'
@@ -10,6 +10,7 @@ import { AppShell } from '@/components/AppShell'
 import { Seal } from '@/components/Seal'
 import { ParcelMap } from '@/components/ParcelMap'
 import { OcrScanner } from '@/components/OcrScanner'
+import { VerificationSection } from '@/components/Verification'
 import { rise, stagger } from '@/lib/motion'
 
 const TODAY = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -109,9 +110,9 @@ export function ListingDetail() {
     window.open(url, '_blank', 'noopener')
   }
 
-  const sendMessage = async (body: string) => {
+  const sendMessage = async (body: string, opts?: { meetingTime?: string; dealShare?: DealShare }) => {
     setSending(true)
-    const m = await repo.postMessage(listing.id, body)
+    const m = await repo.postMessage(listing.id, body, opts)
     setSending(false)
     setMsgs((prev) => [...prev, m])
   }
@@ -204,7 +205,9 @@ export function ListingDetail() {
         </motion.div>
       </motion.div>
 
-      <DealRoom currentUserId={user?.id} msgs={msgs} onSend={sendMessage} sending={sending} />
+      <VerificationSection listingId={listing.id} isAdmin={user?.role === 'admin'} />
+
+      <DealRoom currentUserId={user?.id} currentUserRole={user?.role} msgs={msgs} onSend={sendMessage} sending={sending} />
     </AppShell>
   )
 }
@@ -255,24 +258,50 @@ function RiskScorecard({ risk }: { risk: RiskScore | null }) {
 
 function DealRoom({
   currentUserId,
+  currentUserRole,
   msgs,
   onSend,
   sending,
 }: {
   currentUserId?: string
+  currentUserRole?: string
   msgs: Message[]
-  onSend: (body: string) => void
+  onSend: (body: string, opts?: { meetingTime?: string; dealShare?: DealShare }) => void
   sending: boolean
 }) {
   const { t } = useLang()
   const [draft, setDraft] = useState('')
+  const [showMeeting, setShowMeeting] = useState(false)
+  const [meetingTime, setMeetingTime] = useState('')
+  const [showShare, setShowShare] = useState(false)
+  const [sharePct, setSharePct] = useState(60)
+
+  const isAdmin = currentUserRole === 'admin'
+  const isPrincipal = currentUserRole === 'builder' || currentUserRole === 'investor' || currentUserRole === 'landowner'
+
+  const reset = () => {
+    setDraft('')
+    setMeetingTime('')
+    setShowMeeting(false)
+    setShowShare(false)
+  }
+
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    if (draft.trim()) {
-      onSend(draft.trim())
-      setDraft('')
+    const text = draft.trim()
+    if (showShare) {
+      onSend(text || t('dealRoom.shareNote'), { dealShare: { builderPct: sharePct, landownerPct: 100 - sharePct } })
+      reset()
+    } else if (showMeeting) {
+      if (!text || !meetingTime) return
+      onSend(text, { meetingTime })
+      reset()
+    } else if (text) {
+      onSend(text)
+      reset()
     }
   }
+
   return (
     <section className="mt-14 border-t border-line pt-10">
       <div className="flex items-baseline gap-3">
@@ -290,24 +319,171 @@ function DealRoom({
                 <div className="label text-ink-faint">
                   {m.authorName.split('·')[0].trim()} · {new Date(m.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </div>
-                <p className="mt-1.5 text-[0.92rem] leading-relaxed text-ink">{m.body}</p>
+                {m.meetingTime ? (
+                  <MeetingBlock time={m.meetingTime} link={m.body} />
+                ) : (
+                  <p className="mt-1.5 text-[0.92rem] leading-relaxed text-ink">{m.body}</p>
+                )}
+                {m.dealShare && <DealShareCard share={m.dealShare} />}
               </div>
             </div>
           )
         })}
       </div>
-      <form onSubmit={submit} className="mt-6 flex max-w-3xl gap-3">
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder={t('listing.writeMessage')}
-          className="mono flex-1 border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-[color:var(--line-accent)]"
-        />
-        <button type="submit" disabled={sending || !draft.trim()} className="label bg-accent px-6 py-3 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50">
-          {sending ? '…' : t('listing.send')}
-        </button>
+
+      <form onSubmit={submit} className="mt-6 max-w-3xl space-y-3">
+        {(isAdmin || isPrincipal) && (
+          <div className="flex flex-wrap gap-5">
+            {isAdmin && (
+              <button type="button" onClick={() => { setShowMeeting((v) => !v); setShowShare(false) }} className="label text-accent transition-colors hover:text-accent-bright">
+                + {showMeeting ? t('dealRoom.cancelMeeting') : t('dealRoom.scheduleMeeting')}
+              </button>
+            )}
+            {isPrincipal && (
+              <button type="button" onClick={() => { setShowShare((v) => !v); setShowMeeting(false) }} className="label text-accent transition-colors hover:text-accent-bright">
+                + {showShare ? t('dealRoom.cancelShare') : t('dealRoom.proposeShare')}
+              </button>
+            )}
+          </div>
+        )}
+
+        {showMeeting && (
+          <div className="flex flex-wrap items-center gap-3 border border-[color:var(--line-accent)] bg-accent/5 p-3">
+            <span className="label text-accent">{t('dealRoom.meetingTime')}</span>
+            <input
+              type="datetime-local"
+              value={meetingTime}
+              onChange={(e) => setMeetingTime(e.target.value)}
+              className="mono border border-line bg-paper px-2 py-1.5 text-sm text-ink outline-none focus:border-[color:var(--line-accent)]"
+            />
+          </div>
+        )}
+
+        {showShare && (
+          <div className="flex flex-col items-center gap-8 border border-[color:var(--line-accent)] bg-accent/5 p-6 md:flex-row md:justify-center">
+            <SharePie pct={sharePct} onChange={setSharePct} />
+            <div className="flex flex-col gap-4">
+              <ShareInput label={t('role.builder')} color="var(--accent)" value={sharePct} onChange={setSharePct} />
+              <ShareInput label={t('role.landowner')} color="var(--gold)" value={100 - sharePct} onChange={(v) => setSharePct(100 - v)} />
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={showMeeting ? t('dealRoom.pasteMeetingLink') : t('listing.writeMessage')}
+            className="mono flex-1 border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-[color:var(--line-accent)]"
+          />
+          <button
+            type="submit"
+            disabled={sending || (showMeeting ? !draft.trim() || !meetingTime : showShare ? false : !draft.trim())}
+            className="label bg-accent px-6 py-3 text-paper transition-colors hover:bg-accent-bright disabled:opacity-50"
+          >
+            {sending ? '…' : t('listing.send')}
+          </button>
+        </div>
       </form>
     </section>
+  )
+}
+
+function SharePie({ pct, onChange }: { pct: number; onChange: (v: number) => void }) {
+  const { t } = useLang()
+  const drag = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget
+    const set = (ev: MouseEvent | React.MouseEvent) => {
+      const r = el.getBoundingClientRect()
+      const x = ev.clientX - r.left - r.width / 2
+      const y = ev.clientY - r.top - r.height / 2
+      let a = Math.atan2(y, x) * (180 / Math.PI) + 90
+      if (a < 0) a += 360
+      onChange(Math.max(0, Math.min(100, Math.round((a / 360) * 100))))
+    }
+    set(e)
+    const move = (ev: MouseEvent) => set(ev)
+    const up = () => {
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseup', up)
+    }
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', up)
+  }
+  return (
+    <div
+      onMouseDown={drag}
+      className="relative h-44 w-44 shrink-0 cursor-pointer overflow-hidden rounded-full border-4 border-paper-raise"
+      style={{ background: `conic-gradient(var(--accent) ${pct}%, var(--gold) 0)` }}
+    >
+      <div className="pointer-events-none absolute inset-[18px] flex flex-col items-center justify-center rounded-full bg-paper">
+        <span className="font-display text-2xl font-semibold text-ink">{pct}:{100 - pct}</span>
+        <span className="label mt-1 text-ink-faint">{t('dealRoom.dragToTune')}</span>
+      </div>
+    </div>
+  )
+}
+
+function ShareInput({ label, color, value, onChange }: { label: string; color: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div>
+      <span className="label mb-1.5 flex items-center gap-2 text-ink-dim">
+        <span className="inline-block h-2 w-2 rounded-full" style={{ background: color }} /> {label}
+      </span>
+      <div className="flex items-center border border-line bg-paper focus-within:border-[color:var(--line-accent)]">
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={value}
+          onChange={(e) => {
+            const v = parseInt(e.target.value, 10)
+            onChange(Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 0)
+          }}
+          className="w-20 bg-transparent py-2 text-center font-display text-xl text-ink outline-none"
+        />
+        <span className="pr-3 text-ink-dim">%</span>
+      </div>
+    </div>
+  )
+}
+
+function DealShareCard({ share }: { share: DealShare }) {
+  const { t } = useLang()
+  return (
+    <div className="mt-3 flex items-center gap-4 border border-[color:var(--line-accent)] bg-paper-raise/40 p-3">
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full" style={{ background: `conic-gradient(var(--accent) ${share.builderPct}%, var(--gold) 0)` }}>
+        <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-paper">
+          <span className="font-display text-xs font-semibold text-ink">{share.builderPct}:{share.landownerPct}</span>
+        </div>
+      </div>
+      <div>
+        <p className="label text-ink-faint">{t('dealRoom.proposedShare')}</p>
+        <ul className="mt-1.5 space-y-1 text-xs text-ink">
+          <li className="flex items-center gap-2"><span className="inline-block h-2 w-2 rounded-full bg-accent" /> {t('role.builder')} · {share.builderPct}%</li>
+          <li className="flex items-center gap-2"><span className="inline-block h-2 w-2 rounded-full" style={{ background: 'var(--gold)' }} /> {t('role.landowner')} · {share.landownerPct}%</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+function MeetingBlock({ time, link }: { time: string; link: string }) {
+  const { t } = useLang()
+  const when = new Date(time)
+  const label = isNaN(when.getTime()) ? time : when.toLocaleString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+  const isUrl = /^https?:\/\//i.test(link.trim())
+  return (
+    <div className="mt-1.5">
+      <p className="mono text-[0.82rem] text-beam">📅 {t('dealRoom.meetingScheduled')} · {label}</p>
+      {isUrl ? (
+        <a href={link.trim()} target="_blank" rel="noopener noreferrer" className="label mt-1.5 inline-block text-accent transition-colors hover:text-accent-bright">
+          {t('dealRoom.joinMeeting')} →
+        </a>
+      ) : (
+        <p className="mt-1 text-[0.92rem] text-ink">{link}</p>
+      )}
+    </div>
   )
 }
 

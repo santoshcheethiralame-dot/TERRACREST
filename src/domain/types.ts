@@ -188,6 +188,11 @@ export interface Document {
   kind: string
 }
 
+export interface DealShare {
+  builderPct: number
+  landownerPct: number
+}
+
 export interface Message {
   id: string
   listingId: string
@@ -195,6 +200,29 @@ export interface Message {
   authorName: string
   body: string
   createdAt: string
+  meetingTime?: string
+  dealShare?: DealShare
+}
+
+/** Independent legal due diligence recorded by the desk against a parcel. */
+export interface LawyerVerification {
+  listingId: string
+  lawyerName: string
+  barCouncilNo: string
+  verificationDate: string
+  remarks: string
+  verified: boolean
+}
+
+/** The desk's plain-language title-and-document summary for a parcel. */
+export interface DocumentSummary {
+  listingId: string
+  ownershipChain: string
+  ecSummary: string
+  taxHistory: string
+  kathaDetails: string
+  preparedBy: string
+  updatedAt: string
 }
 
 /** Admin-maintained construction rates the Studio reads live. */

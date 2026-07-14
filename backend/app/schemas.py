@@ -98,10 +98,14 @@ class MessageOut(CamelModel):
     author_name: str
     body: str
     created_at: str
+    meeting_time: Optional[str] = None
+    deal_share: Optional[dict] = None
 
 
 class PostMessageRequest(BaseModel):
     body: str
+    meetingTime: Optional[str] = None
+    dealShare: Optional[dict] = None
 
 
 class DealOut(CamelModel):
@@ -189,6 +193,40 @@ class ActivityEventOut(CamelModel):
     listing_id: Optional[str] = None
     summary: str
     created_at: str
+
+
+class LawyerVerificationOut(CamelModel):
+    listing_id: str
+    lawyer_name: str
+    bar_council_no: str
+    verification_date: str
+    remarks: str
+    verified: bool
+
+
+class LawyerVerificationRequest(BaseModel):
+    lawyerName: str
+    barCouncilNo: str
+    verificationDate: str
+    remarks: str = ""
+    verified: bool = True
+
+
+class DocumentSummaryOut(CamelModel):
+    listing_id: str
+    ownership_chain: str
+    ec_summary: str
+    tax_history: str
+    katha_details: str
+    prepared_by: str
+    updated_at: str
+
+
+class DocumentSummaryRequest(BaseModel):
+    ownershipChain: str = ""
+    ecSummary: str = ""
+    taxHistory: str = ""
+    kathaDetails: str = ""
 
 
 class PriceBookOut(CamelModel):

@@ -173,11 +173,27 @@ def test_admin_create_listing_rejects_duplicate(client):
 def test_deal_room_open_to_any_member(client):
     rajesh = headers(client, "builder_rajesh_001")
     priya = headers(client, "builder_priya_003")
-    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 3
-    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=priya).json()) == 3
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 5
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=priya).json()) == 5
     r = client.post("/listings/JD-BLR-2026-012/messages", headers=priya, json={"body": "Interested in this parcel too."})
     assert r.status_code == 201 and r.json()["authorId"] == "builder_priya_003"
-    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 4
+    assert len(client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()) == 6
+
+
+def test_deal_room_meeting_and_share(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    msgs = client.get("/listings/JD-BLR-2026-012/messages", headers=rajesh).json()
+    # the seed carries a scheduled meeting and a proposed split
+    assert any(m.get("meetingTime") for m in msgs)
+    assert any((m.get("dealShare") or {}).get("builderPct") == 60 for m in msgs)
+    # a builder can post a fresh revenue-split proposal that round-trips
+    r = client.post(
+        "/listings/JD-BLR-2026-012/messages",
+        headers=rajesh,
+        json={"body": "Revised offer.", "dealShare": {"builderPct": 55, "landownerPct": 45}},
+    )
+    assert r.status_code == 201
+    assert r.json()["dealShare"] == {"builderPct": 55, "landownerPct": 45}
 
 
 # ------------------------------------------------- admin user management
@@ -262,6 +278,34 @@ def test_architect_review_flow(client):
     assert mine[rid]["status"] == "delivered" and mine[rid]["architectName"] == "Test Architect · CoA 1"
     # a non-admin cannot deliver
     assert client.patch(f"/admin/architect-reviews/{rid}", headers=rajesh, json=payload).status_code == 403
+
+
+# ------------------------------------------------- lawyer + document verification
+def test_lawyer_verification_seeded_and_admin_upsert(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    admin = headers(client, "admin_terracrest")
+    lv = client.get("/listings/JD-BLR-2026-012/lawyer-verification", headers=rajesh).json()
+    assert lv and lv["lawyerName"] == "Adv. Meera Krishnan" and lv["verified"] is True
+    # a non-admin cannot record a verification
+    assert client.put(
+        "/admin/listings/JD-BLR-2026-012/lawyer-verification", headers=rajesh,
+        json={"lawyerName": "X", "barCouncilNo": "Y", "verificationDate": "2026-07-01"},
+    ).status_code == 403
+    # the desk upserts a fresh figure
+    r = client.put(
+        "/admin/listings/JD-BLR-2026-012/lawyer-verification", headers=admin,
+        json={"lawyerName": "Adv. New", "barCouncilNo": "KAR/2020/1", "verificationDate": "2026-07-01", "remarks": "clear", "verified": True},
+    )
+    assert r.status_code == 200 and r.json()["lawyerName"] == "Adv. New"
+    assert client.get("/listings/JD-BLR-2026-012/lawyer-verification", headers=rajesh).json()["lawyerName"] == "Adv. New"
+
+
+def test_document_summary_seeded_and_gated(client):
+    rajesh = headers(client, "builder_rajesh_001")
+    ds = client.get("/listings/JD-BLR-2026-012/document-summary", headers=rajesh).json()
+    assert ds and "Ramanathan Holdings LLP" in ds["ownershipChain"]
+    # member-gated
+    assert client.get("/listings/JD-BLR-2026-012/document-summary").status_code == 401
 
 
 # --------------------------------------------------- valuation intelligence

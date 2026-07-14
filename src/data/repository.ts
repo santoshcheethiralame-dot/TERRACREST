@@ -1,5 +1,5 @@
-import type { User, Listing, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
-import { users, listings, engagements, offers, deals, documents, messages, activityEvents, architectReviews } from '@/data/seed'
+import type { User, Listing, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, DealShare, LawyerVerification, DocumentSummary, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
+import { users, listings, engagements, offers, deals, documents, messages, activityEvents, architectReviews, lawyerVerifications, documentSummaries } from '@/data/seed'
 import { api, apiEnabled, ApiError, getBlobUrl } from '@/data/api'
 import { defaultPriceBook } from '@/lib/gdv'
 import { fallbackPredict, fallbackModelCard, fallbackRisk } from '@/lib/mlFallback'
@@ -206,8 +206,8 @@ export const repo = {
     return latency(messages.filter((m) => m.listingId === listingId))
   },
 
-  async postMessage(listingId: string, body: string): Promise<Message> {
-    if (apiEnabled) return api.post<Message>(`/listings/${listingId}/messages`, { body })
+  async postMessage(listingId: string, body: string, opts?: { meetingTime?: string; dealShare?: DealShare }): Promise<Message> {
+    if (apiEnabled) return api.post<Message>(`/listings/${listingId}/messages`, { body, ...opts })
     const msg: Message = {
       id: `msg_local_${messages.length + 1}`,
       listingId,
@@ -215,9 +215,46 @@ export const repo = {
       authorName: 'You',
       body,
       createdAt: new Date().toISOString().slice(0, 16),
+      meetingTime: opts?.meetingTime,
+      dealShare: opts?.dealShare,
     }
     messages.push(msg)
     return latency(msg, 200)
+  },
+
+  // --- verification (lawyer + document summary) ---
+  async getLawyerVerification(listingId: string): Promise<LawyerVerification | null> {
+    if (apiEnabled) return (await api.get<LawyerVerification | null>(`/listings/${listingId}/lawyer-verification`)) ?? null
+    return latency(lawyerVerifications.find((v) => v.listingId === listingId) ?? null)
+  },
+
+  async getDocumentSummary(listingId: string): Promise<DocumentSummary | null> {
+    if (apiEnabled) return (await api.get<DocumentSummary | null>(`/listings/${listingId}/document-summary`)) ?? null
+    return latency(documentSummaries.find((d) => d.listingId === listingId) ?? null)
+  },
+
+  async adminSaveLawyerVerification(
+    listingId: string,
+    input: { lawyerName: string; barCouncilNo: string; verificationDate: string; remarks: string; verified: boolean },
+  ): Promise<LawyerVerification> {
+    if (apiEnabled) return api.put<LawyerVerification>(`/admin/listings/${listingId}/lawyer-verification`, input)
+    const rec: LawyerVerification = { listingId, ...input }
+    const i = lawyerVerifications.findIndex((v) => v.listingId === listingId)
+    if (i >= 0) lawyerVerifications[i] = rec
+    else lawyerVerifications.push(rec)
+    return latency(rec, 200)
+  },
+
+  async adminSaveDocumentSummary(
+    listingId: string,
+    input: { ownershipChain: string; ecSummary: string; taxHistory: string; kathaDetails: string },
+  ): Promise<DocumentSummary> {
+    if (apiEnabled) return api.put<DocumentSummary>(`/admin/listings/${listingId}/document-summary`, input)
+    const rec: DocumentSummary = { listingId, ...input, preparedBy: 'Terracrest Desk', updatedAt: new Date().toISOString().slice(0, 16) }
+    const i = documentSummaries.findIndex((d) => d.listingId === listingId)
+    if (i >= 0) documentSummaries[i] = rec
+    else documentSummaries.push(rec)
+    return latency(rec, 200)
   },
 
   // --- price book ---
