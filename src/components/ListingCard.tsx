@@ -5,6 +5,13 @@ import { VERTICAL_KEY, STATUS_KEY } from '@/i18n/translations'
 
 export function ListingCard({ listing }: { listing: Listing }) {
   const { t } = useLang()
+  const isWarehouse = listing.vertical === 'warehouse'
+  // Warehouses come to market either for sale or on a lease; a leased shell is
+  // priced per month, everything else on a capital (crore) guidance.
+  const isLease = isWarehouse && /rent|lease/i.test(listing.warehouse?.leaseType ?? '')
+  const price = isLease
+    ? `₹${listing.guidance.low}–${listing.guidance.high} ${t('listingCard.perMonth')}`
+    : `₹${listing.guidance.low}–${listing.guidance.high} Cr`
   return (
     <Link
       to={`/listing/${listing.id}`}
@@ -17,8 +24,14 @@ export function ListingCard({ listing }: { listing: Listing }) {
 
       <h3 className="mt-4 font-display text-2xl font-semibold leading-tight tracking-tight2 text-ink">{listing.headline}</h3>
 
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="label text-accent">{t(VERTICAL_KEY[listing.vertical])}</span>
+        {isWarehouse && listing.warehouse?.leaseType && (
+          <>
+            <span className="text-ink-faint">·</span>
+            <span className="label text-beam">{t(isLease ? 'listingCard.forRent' : 'listingCard.forSale')}</span>
+          </>
+        )}
         <span className="text-ink-faint">·</span>
         <span className="label text-ink-faint">{t(STATUS_KEY[listing.status])}</span>
       </div>
@@ -31,9 +44,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <div className="mt-5 flex items-end justify-between border-t border-line pt-4">
         <div>
           <p className="label text-ink-faint">{t('listingCard.guidance')}</p>
-          <p className="mono mt-1 text-lg text-ink">
-            ₹{listing.guidance.low}–{listing.guidance.high} Cr
-          </p>
+          <p className="mono mt-1 text-lg text-ink">{price}</p>
         </div>
         <span className="text-ink-faint transition-transform duration-300 group-hover:translate-x-1">→</span>
       </div>

@@ -9,7 +9,9 @@ export function ProtectedRoute({ children, roles }: { children: ReactNode; roles
   const location = useLocation()
 
   if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />
-  if (roles && !roles.includes(user.role)) return <Navigate to="/studio" replace />
+  // Wrong role for this page → send them to their own home, never back to the
+  // page they were just refused (that loops when the refused page is /studio).
+  if (roles && !roles.includes(user.role)) return <Navigate to="/app" replace />
 
   return <>{children}</>
 }

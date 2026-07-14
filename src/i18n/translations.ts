@@ -213,6 +213,19 @@ export const translations: Record<string, Entry> = {
   // --- listing card ---
   'listingCard.fullAccess': { en: 'Full access', kn: 'ಪೂರ್ಣ ಪ್ರವೇಶ' },
   'listingCard.guidance': { en: 'Guidance', kn: 'ಮಾರ್ಗದರ್ಶನ' },
+  'listingCard.forSale': { en: 'For sale', kn: 'ಮಾರಾಟಕ್ಕೆ' },
+  'listingCard.forRent': { en: 'For lease', kn: 'ಗುತ್ತಿಗೆಗೆ' },
+  'listingCard.perMonth': { en: 'L / mo', kn: 'ಲ / ತಿಂಗಳು' },
+
+  // --- discovery search / filter ---
+  'search.placeholder': { en: 'Search parcels…', kn: 'ಭೂಖಂಡಗಳನ್ನು ಹುಡುಕಿ…' },
+  'search.allVerticals': { en: 'All verticals', kn: 'ಎಲ್ಲಾ ವರ್ಟಿಕಲ್‌ಗಳು' },
+  'search.newest': { en: 'Newest first', kn: 'ಹೊಸದು ಮೊದಲು' },
+  'search.priceLow': { en: 'Price: low → high', kn: 'ಬೆಲೆ: ಕಡಿಮೆ → ಹೆಚ್ಚು' },
+  'search.priceHigh': { en: 'Price: high → low', kn: 'ಬೆಲೆ: ಹೆಚ್ಚು → ಕಡಿಮೆ' },
+  'search.largestArea': { en: 'Largest area', kn: 'ದೊಡ್ಡ ವಿಸ್ತೀರ್ಣ' },
+  'search.clear': { en: 'Clear', kn: 'ತೆರವು' },
+  'search.noMatch': { en: 'No parcels match your search.', kn: 'ನಿಮ್ಮ ಹುಡುಕಾಟಕ್ಕೆ ಯಾವುದೇ ಭೂಖಂಡ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ.' },
 
   // --- parcel map ---
   'map.exactLocation': { en: 'Exact location', kn: 'ನಿಖರ ಸ್ಥಳ' },
