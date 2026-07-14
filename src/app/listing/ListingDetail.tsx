@@ -9,6 +9,7 @@ import { VERTICAL_KEY, STATUS_KEY } from '@/i18n/translations'
 import { AppShell } from '@/components/AppShell'
 import { Seal } from '@/components/Seal'
 import { ParcelMap } from '@/components/ParcelMap'
+import { OcrScanner } from '@/components/OcrScanner'
 import { rise, stagger } from '@/lib/motion'
 
 const TODAY = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -182,6 +183,7 @@ export function ListingDetail() {
                     <VaultRow key={cat.kind} name={t(cat.key)} doc={docs.find((d) => d.kind === cat.kind)} onOpen={openDoc} />
                   ))}
                 </div>
+                <OcrScanner className="mt-4" />
               </div>
 
               {/* action */}

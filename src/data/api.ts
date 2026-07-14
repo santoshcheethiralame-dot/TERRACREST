@@ -87,6 +87,14 @@ export async function getBlobUrl(path: string): Promise<string> {
   return URL.createObjectURL(await res.blob())
 }
 
+/** POST multipart form-data (e.g. a file upload) with auth + silent refresh.
+ *  No Content-Type is set, so the browser writes the multipart boundary itself. */
+export async function postForm<T>(path: string, form: FormData): Promise<T> {
+  const res = await authedFetch(path, { method: 'POST', body: form })
+  if (!res.ok) throw new ApiError(res.status)
+  return (await res.json()) as T
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown) =>

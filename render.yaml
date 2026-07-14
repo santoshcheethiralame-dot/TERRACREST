@@ -9,11 +9,12 @@
 services:
   - type: web
     name: terracrest-api
-    runtime: python
+    # Docker (not the native python runtime) so the image can apt-install
+    # tesseract-ocr + the Kannada pack that the /api/ocr scanner needs.
+    runtime: docker
     plan: free
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     envVars:
       - key: TERRACREST_JWT_SECRET

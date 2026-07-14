@@ -574,6 +574,19 @@ export const translations: Record<string, Entry> = {
   'a11y.axonometricDrawing': { en: 'Axonometric survey drawing of a verified parcel', kn: 'ಪರಿಶೀಲಿಸಲಾದ ಭೂಖಂಡದ ಆಕ್ಸೊನೊಮೆಟ್ರಿಕ್ ಸರ್ವೆ ರೇಖಾಚಿತ್ರ' },
   'a11y.massingSchematic': { en: 'Live parcel massing schematic', kn: 'ಲೈವ್ ಭೂಖಂಡ ಮಾಸಿಂಗ್ ಸ್ಕೀಮ್ಯಾಟಿಕ್' },
 
+  // --- Kannada document scanner (OCR) ---
+  'ocr.title': { en: 'Kannada Document Scanner', kn: 'ಕನ್ನಡ ದಾಖಲೆ ಸ್ಕ್ಯಾನರ್' },
+  'ocr.hint': { en: 'Upload a scan or photo of a land record — title deed, EC, katha, tax receipt — to pull out its Kannada and English text.', kn: 'ಭೂ ದಾಖಲೆಯ ಸ್ಕ್ಯಾನ್ ಅಥವಾ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ — ಕ್ರಯಪತ್ರ, EC, ಖಾತಾ, ತೆರಿಗೆ ರಸೀದಿ — ಅದರ ಕನ್ನಡ ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಪಠ್ಯವನ್ನು ಹೊರತೆಗೆಯಲು.' },
+  'ocr.upload': { en: 'Upload & scan', kn: 'ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ' },
+  'ocr.scanning': { en: 'Scanning…', kn: 'ಸ್ಕ್ಯಾನ್ ಆಗುತ್ತಿದೆ…' },
+  'ocr.extracted': { en: 'Extracted text', kn: 'ಹೊರತೆಗೆದ ಪಠ್ಯ' },
+  'ocr.confidence': { en: 'confidence', kn: 'ವಿಶ್ವಾಸ' },
+  'ocr.noText': { en: 'No text found in that image. Try a clearer scan.', kn: 'ಆ ಚಿತ್ರದಲ್ಲಿ ಪಠ್ಯ ಸಿಗಲಿಲ್ಲ. ಸ್ಪಷ್ಟವಾದ ಸ್ಕ್ಯಾನ್ ಪ್ರಯತ್ನಿಸಿ.' },
+  'ocr.failed': { en: 'Could not scan that image. Try a clearer photo.', kn: 'ಆ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಸ್ಪಷ್ಟವಾದ ಫೋಟೋ ಪ್ರಯತ್ನಿಸಿ.' },
+  'ocr.tooLarge': { en: 'Image too large — 8 MB maximum.', kn: 'ಚಿತ್ರ ತುಂಬಾ ದೊಡ್ಡದು — ಗರಿಷ್ಠ 8 MB.' },
+  'ocr.unavailable': { en: 'The scanner is offline right now. Please try again shortly.', kn: 'ಸ್ಕ್ಯಾನರ್ ಈಗ ಆಫ್‌ಲೈನ್ ಆಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.' },
+  'ocr.demoOnly': { en: 'The scanner runs on the live server — connect the backend to use it.', kn: 'ಸ್ಕ್ಯಾನರ್ ಲೈವ್ ಸರ್ವರ್‌ನಲ್ಲಿ ಚಲಿಸುತ್ತದೆ — ಬಳಸಲು ಬ್ಯಾಕೆಂಡ್ ಸಂಪರ್ಕಿಸಿ.' },
+
   'admin.tempPasswordFor': { en: 'Temporary password for {username}: {password}', kn: '{username} ಗಾಗಿ ತಾತ್ಕಾಲಿಕ ಪಾಸ್‌ವರ್ಡ್: {password}' },
   'admin.reactivated': { en: 'reactivated', kn: 'ಮರುಸಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ' },
   'admin.deactivatedWord': { en: 'deactivated', kn: 'ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ' },
