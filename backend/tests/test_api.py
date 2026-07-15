@@ -120,7 +120,7 @@ def test_admin_forbidden_for_non_admin(client):
 
 def test_admin_lists_all_users(client):
     r = client.get("/admin/users", headers=headers(client, "admin_terracrest"))
-    assert r.status_code == 200 and len(r.json()) == 7
+    assert r.status_code == 200 and len(r.json()) == 8
 
 
 def test_admin_creates_loginable_account(client):
@@ -306,6 +306,49 @@ def test_document_summary_seeded_and_gated(client):
     assert ds and "Ramanathan Holdings LLP" in ds["ownershipChain"]
     # member-gated
     assert client.get("/listings/JD-BLR-2026-012/document-summary").status_code == 401
+
+
+# ------------------------------------------------------ warehouse reservations
+def test_reservation_full_lifecycle(client):
+    biz = headers(client, "bizowner_iyer_007")
+    r = client.post("/listings/WH-BLR-2026-047/reservations", headers=biz)
+    assert r.status_code == 201
+    res = r.json()
+    assert res["status"] == "held" and res["listingId"] == "WH-BLR-2026-047"
+    rid = res["id"]
+
+    # it shows up in the business owner's own list
+    mine = client.get("/me/reservations", headers=biz).json()
+    assert any(x["id"] == rid and x["status"] == "held" for x in mine)
+
+    # a second hold on the same warehouse is rejected while one is active
+    assert client.post("/listings/WH-BLR-2026-047/reservations", headers=biz).status_code == 409
+
+    # confirm persists server-side — re-fetching proves it, not just the response
+    c = client.patch(f"/reservations/{rid}/confirm", headers=biz)
+    assert c.status_code == 200 and c.json()["status"] == "confirmed" and c.json()["confirmedAt"]
+    assert client.get("/me/reservations", headers=biz).json()[0]["status"] == "confirmed"
+
+    # release persists too, and frees the listing for a new hold
+    rel = client.patch(f"/reservations/{rid}/release", headers=biz)
+    assert rel.status_code == 200 and rel.json()["status"] == "released"
+    assert client.get("/me/reservations", headers=biz).json()[0]["status"] == "released"
+    again = client.post("/listings/WH-BLR-2026-047/reservations", headers=biz)
+    assert again.status_code == 201
+
+
+def test_reservation_role_and_ownership_gating(client):
+    rajesh = headers(client, "builder_rajesh_001")  # not a business account
+    biz = headers(client, "bizowner_iyer_007")
+    priya = headers(client, "builder_priya_003")
+
+    # only a business (or admin) account may hold
+    assert client.post("/listings/WH-BLR-2026-047/reservations", headers=rajesh).status_code == 403
+
+    r = client.post("/listings/WH-BLR-2026-047/reservations", headers=biz).json()
+    # someone else can't confirm or release another member's hold
+    assert client.patch(f"/reservations/{r['id']}/confirm", headers=priya).status_code == 403
+    assert client.patch(f"/reservations/{r['id']}/release", headers=priya).status_code == 403
 
 
 # --------------------------------------------------- valuation intelligence

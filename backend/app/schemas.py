@@ -229,6 +229,17 @@ class DocumentSummaryRequest(BaseModel):
     kathaDetails: str = ""
 
 
+class WarehouseReservationOut(CamelModel):
+    id: str
+    listing_id: str
+    business_owner_id: str
+    status: str
+    held_at: str
+    expires_at: str
+    confirmed_at: Optional[str] = None
+    released_at: Optional[str] = None
+
+
 class PriceBookOut(CamelModel):
     base_build_psf: int
     rates: dict

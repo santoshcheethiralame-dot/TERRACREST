@@ -163,6 +163,7 @@ export const translations: Record<string, Entry> = {
   'role.builder': { en: 'Builder', kn: 'ಬಿಲ್ಡರ್' },
   'role.landowner': { en: 'Land Owner', kn: 'ಭೂ ಮಾಲೀಕ' },
   'role.investor': { en: 'Investor', kn: 'ಹೂಡಿಕೆದಾರ' },
+  'role.businessOwner': { en: 'Business Owner', kn: 'ವ್ಯಾಪಾರ ಮಾಲೀಕ' },
   'role.admin': { en: 'Admin', kn: 'ಅಡ್ಮಿನ್' },
   'role.deskShort': { en: 'Desk', kn: 'ಡೆಸ್ಕ್' },
 
@@ -296,6 +297,28 @@ export const translations: Record<string, Entry> = {
   'verify.saving': { en: 'Saving…', kn: 'ಉಳಿಸಲಾಗುತ್ತಿದೆ…' },
   'verify.saved': { en: 'Saved', kn: 'ಉಳಿಸಲಾಗಿದೆ' },
   'verify.titleClear': { en: 'Title verified — clear for transaction', kn: 'ಶೀರ್ಷಿಕೆ ಪರಿಶೀಲಿಸಲಾಗಿದೆ — ವಹಿವಾಟಿಗೆ ಸಿದ್ಧ' },
+
+  // --- business owner desk: warehouse reservations ---
+  'bizOwner.loading': { en: 'Loading your desk…', kn: 'ನಿಮ್ಮ ಡೆಸ್ಕ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ…' },
+  'bizOwner.eyebrow': { en: 'Business Desk', kn: 'ವ್ಯಾಪಾರ ಡೆಸ್ಕ್' },
+  'bizOwner.activeReservations': { en: 'Active reservations', kn: 'ಸಕ್ರಿಯ ಕಾಯ್ದಿರಿಸುವಿಕೆಗಳು' },
+  'bizOwner.activeReservationsDesc': { en: 'Your exclusive holds on premium warehouse space.', kn: 'ಪ್ರೀಮಿಯಂ ಗೋದಾಮು ಸ್ಥಳದ ಮೇಲಿನ ನಿಮ್ಮ ವಿಶೇಷ ಕಾಯ್ದಿರಿಸುವಿಕೆಗಳು.' },
+  'bizOwner.noReservations': { en: 'No active reservations.', kn: 'ಯಾವುದೇ ಸಕ್ರಿಯ ಕಾಯ್ದಿರಿಸುವಿಕೆ ಇಲ್ಲ.' },
+  'bizOwner.browseWarehouses': { en: 'Available warehouses', kn: 'ಲಭ್ಯವಿರುವ ಗೋದಾಮುಗಳು' },
+  'bizOwner.browseWarehousesDesc': { en: 'Verified logistics infrastructure available for immediate hold.', kn: 'ತಕ್ಷಣದ ಕಾಯ್ದಿರಿಸುವಿಕೆಗೆ ಲಭ್ಯವಿರುವ ಪರಿಶೀಲಿತ ಲಾಜಿಸ್ಟಿಕ್ಸ್ ಮೂಲಸೌಕರ್ಯ.' },
+  'bizOwner.noneAvailable': { en: 'No warehouses available right now.', kn: 'ಈಗ ಯಾವುದೇ ಗೋದಾಮುಗಳು ಲಭ್ಯವಿಲ್ಲ.' },
+  'bizOwner.reserve': { en: 'Reserve', kn: 'ಕಾಯ್ದಿರಿಸಿ' },
+  'bizOwner.reserving': { en: 'Reserving…', kn: 'ಕಾಯ್ದಿರಿಸಲಾಗುತ್ತಿದೆ…' },
+  'bizOwner.reservedToast': { en: '{headline} successfully reserved for 14 days.', kn: '{headline} ಅನ್ನು 14 ದಿನಗಳವರೆಗೆ ಯಶಸ್ವಿಯಾಗಿ ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.' },
+  'bizOwner.reserveFailed': { en: 'That warehouse already has an active hold.', kn: 'ಆ ಗೋದಾಮಿಗೆ ಈಗಾಗಲೇ ಸಕ್ರಿಯ ಕಾಯ್ದಿರಿಸುವಿಕೆ ಇದೆ.' },
+  'bizOwner.statusHeld': { en: 'Held', kn: 'ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ' },
+  'bizOwner.statusConfirmed': { en: 'Confirmed', kn: 'ದೃಢೀಕರಿಸಲಾಗಿದೆ' },
+  'bizOwner.expires': { en: 'Expires', kn: 'ಮುಕ್ತಾಯ' },
+  'bizOwner.confirmHold': { en: 'Confirm hold', kn: 'ಕಾಯ್ದಿರಿಸುವಿಕೆ ದೃಢೀಕರಿಸಿ' },
+  'bizOwner.confirmedToast': { en: 'Reservation confirmed — moving to contract stage.', kn: 'ಕಾಯ್ದಿರಿಸುವಿಕೆ ದೃಢೀಕರಿಸಲಾಗಿದೆ — ಒಪ್ಪಂದ ಹಂತಕ್ಕೆ ಸಾಗುತ್ತಿದೆ.' },
+  'bizOwner.release': { en: 'Release', kn: 'ಬಿಡುಗಡೆ ಮಾಡಿ' },
+  'bizOwner.releasedToast': { en: 'Reservation released — the warehouse is back on the market.', kn: 'ಕಾಯ್ದಿರಿಸುವಿಕೆ ಬಿಡುಗಡೆಯಾಗಿದೆ — ಗೋದಾಮು ಮತ್ತೆ ಮಾರುಕಟ್ಟೆಯಲ್ಲಿದೆ.' },
+  'bizOwner.openDealRoom': { en: 'Open Deal Room', kn: 'ಡೀಲ್ ರೂಮ್ ತೆರೆಯಿರಿ' },
   'listing.vaultView': { en: 'View', kn: 'ವೀಕ್ಷಿಸಿ' },
   'listing.developmentPotential': { en: 'Development potential', kn: 'ಅಭಿವೃದ್ಧಿ ಸಾಮರ್ಥ್ಯ' },
   'listing.comparableSales': { en: 'Comparable sales — admin-maintained', kn: 'ತುಲನಾತ್ಮಕ ಮಾರಾಟಗಳು — ಅಡ್ಮಿನ್ ನಿರ್ವಹಿಸಿದ' },
@@ -587,6 +610,7 @@ export const translations: Record<string, Entry> = {
   'activity.status': { en: 'Status', kn: 'ಸ್ಥಿತಿ' },
   'activity.document': { en: 'Document', kn: 'ದಾಖಲೆ' },
   'activity.architect': { en: 'Architect', kn: 'ವಾಸ್ತುಶಿಲ್ಪಿ' },
+  'activity.reservation': { en: 'Reservation', kn: 'ಕಾಯ್ದಿರಿಸುವಿಕೆ' },
 
   'admin.pricesDesc': { en: "Monthly Bangalore rates. The Studio reads these live — change one and every builder's GDV recomputes.", kn: 'ಮಾಸಿಕ ಬೆಂಗಳೂರು ದರಗಳು. ಸ್ಟುಡಿಯೋ ಇವುಗಳನ್ನು ನೇರವಾಗಿ ಓದುತ್ತದೆ — ಒಂದನ್ನು ಬದಲಾಯಿಸಿ ಮತ್ತು ಪ್ರತಿ ಬಿಲ್ಡರ್‌ನ GDV ಮರುಲೆಕ್ಕಾಚಾರವಾಗುತ್ತದೆ.' },
   'admin.baseBuild': { en: 'Base build ₹/sq ft (structure + MEP)', kn: 'ಮೂಲ ನಿರ್ಮಾಣ ₹/ಚ.ಅಡಿ (ರಚನೆ + MEP)' },
@@ -653,6 +677,14 @@ export const translations: Record<string, Entry> = {
 
 /** Domain-enum → translation-key maps, so a raw backend value (e.g. Listing.status)
  *  can be rendered via t(STATUS_KEY[status]) instead of a hardcoded label. */
+export const ROLE_KEY: Record<string, string> = {
+  builder: 'role.builder',
+  landowner: 'role.landowner',
+  investor: 'role.investor',
+  business_owner: 'role.businessOwner',
+  admin: 'role.admin',
+}
+
 export const VERTICAL_KEY: Record<string, string> = {
   'joint-development': 'vertical.jointDevelopment',
   warehouse: 'vertical.warehouse',

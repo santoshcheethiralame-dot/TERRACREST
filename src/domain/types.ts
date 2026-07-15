@@ -4,7 +4,7 @@
    engine, and (later) a FastAPI/Postgres backend unchanged.
    ============================================================ */
 
-export type Role = 'builder' | 'landowner' | 'investor' | 'admin'
+export type Role = 'builder' | 'landowner' | 'investor' | 'business_owner' | 'admin'
 
 export type Vertical = 'joint-development' | 'warehouse' | 'big-land'
 
@@ -204,6 +204,19 @@ export interface Message {
   dealShare?: DealShare
 }
 
+/** An exclusive hold a business owner places on a warehouse while they
+ *  finalize a lease — one active hold per listing at a time. */
+export interface WarehouseReservation {
+  id: string
+  listingId: string
+  businessOwnerId: string
+  status: 'held' | 'confirmed' | 'released'
+  heldAt: string
+  expiresAt: string
+  confirmedAt?: string
+  releasedAt?: string
+}
+
 /** Independent legal due diligence recorded by the desk against a parcel. */
 export interface LawyerVerification {
   listingId: string
@@ -328,6 +341,7 @@ export type ActivityKind =
   | 'status_change'
   | 'document'
   | 'architect'
+  | 'reservation'
 
 /** One row of the append-only operations-centre audit trail. */
 export interface ActivityEvent {

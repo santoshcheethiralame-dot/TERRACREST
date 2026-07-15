@@ -1,5 +1,5 @@
-import type { User, Listing, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, DealShare, LawyerVerification, DocumentSummary, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
-import { users, listings, engagements, offers, deals, documents, messages, activityEvents, architectReviews, lawyerVerifications, documentSummaries } from '@/data/seed'
+import type { User, Listing, Engagement, Offer, Deal, Role, Document, NewListingInput, Message, DealShare, LawyerVerification, DocumentSummary, WarehouseReservation, PriceBook, ActivityEvent, ArchitectReview, MlSnapshot, ValuationContext, ValuationPrediction, ModelCard, RiskScore } from '@/domain/types'
+import { users, listings, engagements, offers, deals, documents, messages, activityEvents, architectReviews, lawyerVerifications, documentSummaries, warehouseReservations } from '@/data/seed'
 import { api, apiEnabled, ApiError, getBlobUrl } from '@/data/api'
 import { defaultPriceBook } from '@/lib/gdv'
 import { fallbackPredict, fallbackModelCard, fallbackRisk } from '@/lib/mlFallback'
@@ -255,6 +255,52 @@ export const repo = {
     if (i >= 0) documentSummaries[i] = rec
     else documentSummaries.push(rec)
     return latency(rec, 200)
+  },
+
+  // --- warehouse reservations (business owner) ---
+  async getMyReservations(): Promise<WarehouseReservation[]> {
+    if (apiEnabled) return api.get<WarehouseReservation[]>('/me/reservations')
+    return latency([...warehouseReservations].sort((a, b) => b.heldAt.localeCompare(a.heldAt)))
+  },
+
+  async holdReservation(listingId: string): Promise<WarehouseReservation> {
+    if (apiEnabled) return api.post<WarehouseReservation>(`/listings/${listingId}/reservations`)
+    const ACTIVE: WarehouseReservation['status'][] = ['held', 'confirmed']
+    if (warehouseReservations.some((r) => r.listingId === listingId && ACTIVE.includes(r.status))) {
+      throw new ApiError(409, 'This warehouse already has an active hold')
+    }
+    const now = new Date()
+    const expires = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+    const res: WarehouseReservation = {
+      id: `res_local_${warehouseReservations.length + 1}`,
+      listingId,
+      businessOwnerId: 'you',
+      status: 'held',
+      heldAt: now.toISOString().slice(0, 16),
+      expiresAt: expires.toISOString().slice(0, 16),
+    }
+    warehouseReservations.push(res)
+    return latency(res, 250)
+  },
+
+  async confirmReservation(id: string): Promise<WarehouseReservation> {
+    if (apiEnabled) return api.patch<WarehouseReservation>(`/reservations/${id}/confirm`)
+    const r = warehouseReservations.find((x) => x.id === id)
+    if (r) {
+      r.status = 'confirmed'
+      r.confirmedAt = new Date().toISOString().slice(0, 16)
+    }
+    return latency(r as WarehouseReservation, 200)
+  },
+
+  async releaseReservation(id: string): Promise<WarehouseReservation> {
+    if (apiEnabled) return api.patch<WarehouseReservation>(`/reservations/${id}/release`)
+    const r = warehouseReservations.find((x) => x.id === id)
+    if (r) {
+      r.status = 'released'
+      r.releasedAt = new Date().toISOString().slice(0, 16)
+    }
+    return latency(r as WarehouseReservation, 200)
   },
 
   // --- price book ---

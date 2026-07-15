@@ -15,6 +15,7 @@ export function AppShell({ children, nav }: { children: ReactNode; nav?: ReactNo
     builder: t('role.builder'),
     landowner: t('role.landowner'),
     investor: t('role.investor'),
+    business_owner: t('role.businessOwner'),
     admin: t('role.deskShort'),
   }
 

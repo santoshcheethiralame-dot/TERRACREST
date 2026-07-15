@@ -17,6 +17,7 @@ def _users():
         ("landowner_gupta_004", "A. Gupta · Gupta Warehousing", "landowner", None, "2026-03-28"),
         ("landowner_narayan_006", "Narayan Family Trust", "landowner", None, "2026-05-06"),
         ("investor_khanna_005", "A. Khanna · Khanna Family Office", "investor", "Indiranagar, Bengaluru", "2026-01-30"),
+        ("bizowner_iyer_007", "Vikram Iyer · FastTrack Fulfillment", "business_owner", "Electronic City, Bengaluru", "2026-05-20"),
         ("admin_terracrest", "Terracrest Desk", "admin", None, "2025-12-01"),
     ]
     return [
@@ -339,7 +340,7 @@ def seed() -> None:
     db = SessionLocal()
     try:
         _insert_all(db)
-        print("Seeded: 7 users, 3 listings, 4 offers, 2 engagements, 1 deal.")
+        print("Seeded: 8 users, 3 listings, 4 offers, 2 engagements, 1 deal.")
         print(f"All demo logins use password: {DEMO_PASSWORD!r}")
     finally:
         db.close()

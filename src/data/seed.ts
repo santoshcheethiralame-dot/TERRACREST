@@ -1,4 +1,4 @@
-import type { User, Listing, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview, LawyerVerification, DocumentSummary } from '@/domain/types'
+import type { User, Listing, Offer, Engagement, Deal, Document, Message, ActivityEvent, ArchitectReview, LawyerVerification, DocumentSummary, WarehouseReservation } from '@/domain/types'
 
 /* ============================================================
    Seed data — a realistic Bengaluru book of business.
@@ -57,6 +57,15 @@ export const users: User[] = [
     officeLocation: 'Indiranagar, Bengaluru',
     kycVerified: true,
     memberSince: '2026-01-30',
+  },
+  {
+    id: 'bizowner_iyer_007',
+    username: 'bizowner_iyer_007',
+    displayName: 'Vikram Iyer · FastTrack Fulfillment',
+    role: 'business_owner',
+    officeLocation: 'Electronic City, Bengaluru',
+    kycVerified: true,
+    memberSince: '2026-05-20',
   },
   {
     id: 'admin_terracrest',
@@ -319,6 +328,10 @@ export const messages: Message[] = [
     dealShare: { builderPct: 60, landownerPct: 40 },
   },
 ]
+
+// Clean slate — a business owner reserves live during the demo rather than
+// finding the one seeded warehouse already held.
+export const warehouseReservations: WarehouseReservation[] = []
 
 export const lawyerVerifications: LawyerVerification[] = [
   {

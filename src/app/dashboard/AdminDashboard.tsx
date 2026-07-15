@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import type { ActivityEvent, ActivityKind, ArchitectReview, Deal, Listing, ListingStatus, ModelCard as ModelCardData, PriceBook, Role, User, Vertical } from '@/domain/types'
-import { DEAL_STAGE_KEY, STATUS_KEY, VERTICAL_KEY } from '@/i18n/translations'
+import { DEAL_STAGE_KEY, ROLE_KEY, STATUS_KEY, VERTICAL_KEY } from '@/i18n/translations'
 import { useLang } from '@/i18n/LanguageContext'
 import { repo } from '@/data/repository'
 import { AppShell } from '@/components/AppShell'
@@ -232,7 +232,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
                   <div className="text-sm text-ink">{u.displayName}</div>
                   <div className="mono text-[0.72rem] text-ink-faint">{u.username}</div>
                 </td>
-                <td className="px-5 py-4"><span className="label text-accent">{u.role}</span></td>
+                <td className="px-5 py-4"><span className="label text-accent">{t(ROLE_KEY[u.role])}</span></td>
                 <td className="px-5 py-4">{u.kycVerified ? <span className="label text-emerald-bright">● {t('admin.verified')}</span> : <span className="label text-ink-faint">{t('admin.pending')}</span>}</td>
                 <td className="px-5 py-4">
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
@@ -260,6 +260,7 @@ function UsersTab({ users, onCreated }: { users: User[]; onCreated: () => void }
               { value: 'builder', label: t('role.builder') },
               { value: 'landowner', label: t('role.landowner') },
               { value: 'investor', label: t('role.investor') },
+              { value: 'business_owner', label: t('role.businessOwner') },
               { value: 'admin', label: t('role.admin') },
             ]} />
           </Field>
@@ -625,6 +626,7 @@ const KIND_META: Record<ActivityKind, { labelKey: string; cls: string }> = {
   status_change: { labelKey: 'activity.status', cls: 'text-ink-dim' },
   document: { labelKey: 'activity.document', cls: 'text-oxblood-bright' },
   architect: { labelKey: 'activity.architect', cls: 'text-accent-bright' },
+  reservation: { labelKey: 'activity.reservation', cls: 'text-beam' },
 }
 
 function fmtWhen(iso: string): string {

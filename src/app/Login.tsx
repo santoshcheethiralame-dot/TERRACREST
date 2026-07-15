@@ -11,6 +11,7 @@ const DEMO = [
   { u: 'builder_rajesh_001', labelKey: 'role.builder' },
   { u: 'landowner_ramanathan_002', labelKey: 'role.landowner' },
   { u: 'investor_khanna_005', labelKey: 'role.investor' },
+  { u: 'bizowner_iyer_007', labelKey: 'role.businessOwner' },
 ]
 
 export function Login() {
@@ -102,7 +103,7 @@ export function Login() {
 
           <motion.div variants={rise} className="mt-10 border-t border-line pt-8">
             <p className="label mb-3 text-ink-faint">{t('login.demoAccess')}</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {DEMO.map((d) => (
                 <button
                   key={d.u}

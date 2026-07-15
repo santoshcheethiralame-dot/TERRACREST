@@ -9,7 +9,7 @@ class User(Base):
     id = Column(String, primary_key=True)
     username = Column(String, unique=True, index=True, nullable=False)
     display_name = Column(String, nullable=False)
-    role = Column(String, nullable=False)  # builder | landowner | investor | admin
+    role = Column(String, nullable=False)  # builder | landowner | investor | business_owner | admin
     office_location = Column(String, nullable=True)
     kyc_verified = Column(Boolean, nullable=False, default=True)
     active = Column(Boolean, nullable=False, default=True)
@@ -147,7 +147,7 @@ class ActivityEvent(Base):
     id = Column(String, primary_key=True)
     actor_id = Column(String, nullable=True)
     actor_name = Column(String, nullable=False)
-    # login | access | message | listing_created | status_change | document | architect
+    # login | access | message | listing_created | status_change | document | architect | reservation
     kind = Column(String, nullable=False)
     listing_id = Column(String, nullable=True)
     summary = Column(String, nullable=False)
@@ -166,6 +166,22 @@ class LawyerVerification(Base):
     verification_date = Column(String, nullable=False)
     remarks = Column(String, nullable=False, default="")
     verified = Column(Boolean, nullable=False, default=True)
+
+
+class WarehouseReservation(Base):
+    """An exclusive hold a business owner places on a warehouse while they
+    finalize a lease — one active hold per listing at a time."""
+
+    __tablename__ = "warehouse_reservations"
+
+    id = Column(String, primary_key=True)
+    listing_id = Column(String, ForeignKey("listings.id"), index=True, nullable=False)
+    business_owner_id = Column(String, ForeignKey("users.id"), index=True, nullable=False)
+    status = Column(String, nullable=False)  # held | confirmed | released
+    held_at = Column(String, nullable=False)
+    expires_at = Column(String, nullable=False)
+    confirmed_at = Column(String, nullable=True)
+    released_at = Column(String, nullable=True)
 
 
 class DocumentSummary(Base):
